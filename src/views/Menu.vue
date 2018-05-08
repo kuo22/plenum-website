@@ -14,6 +14,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import VisualMenu from '@/components/VisualMenu';
 import ProjectTextMenu from '@/components/ProjectTextMenu';
 import Project from '../interfaces/Project';
+import {Projects} from '../enums/Projects';
 
 @Component({
   components: {
@@ -38,7 +39,7 @@ export default class Menu extends Vue {
             let flag = false;
             const filterTopics = this.filterTopics;
             for (const topic of filterTopics) {
-                for (const category of project.categories) {
+                for (const category of project.filterCategories) {
                     if (category === topic) {
                         flag = true;
                     }
@@ -49,45 +50,8 @@ export default class Menu extends Vue {
     }
 
     get projects(): Project[] {
-        return [
-            new Project(
-                'whitevoidfill',
-                'void',
-                2016,
-                ['art'],
-            ),
-            new Project(
-                'cache',
-                'cache',
-                2016,
-                ['art'],
-                [
-                    'Alex Boechenstein',
-                    'Max Cleary',
-                ],
-            ),
-            new Project(
-                'aeolus',
-                'aeolus',
-                2013,
-                ['architecture'],
-                [
-                    'Monica Beatriz',
-                ],
-            ),
-            new Project(
-                'le fresnoy 2.0',
-                'fresnoy',
-                2014,
-                ['architecture'],
-            ),
-            new Project(
-                'home for sale(s)',
-                'home',
-                2015,
-                ['art', 'architecture'],
-            ),
-        ];
+        const projects = new Projects();
+        return projects.allProjects;
     }
 }
 </script>

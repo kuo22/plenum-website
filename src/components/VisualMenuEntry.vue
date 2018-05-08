@@ -22,12 +22,12 @@ export default class VisualMenuEntry extends Vue {
         super();
 
         this.active = false;
-        this.imgSrc = '../assets/' + this.project.nickname + '_index_rect_640.jpg';
+        this.imgSrc = '../assets/' + this.project.pathName + '_index_rect_640.jpg';
         this.imgSrc = '../assets/logo.svg';
     }
 
     public getImgSrc(): string {
-        return require('../assets/' + this.project.nickname + '_index_rect_640.jpg');
+        return require('../assets/' + this.project.pathName + '_index_rect_640.jpg');
     }
 }
 </script>

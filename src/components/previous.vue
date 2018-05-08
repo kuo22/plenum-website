@@ -259,7 +259,7 @@
 						
 		<script>
 		
-			// Changes color of UNDER CONSTRUCTION title by random on click
+			// Changes color of UNDER CONSTRUCTION institution by random on click
 			// 
 			function randomizeColor() {
 			      var font_colour = Math.floor(Math.random() * 16777215).toString(16);
