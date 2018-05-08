@@ -1,18 +1,45 @@
 <template>
   <div class="home">
-    <img src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <FilterMenu id="filter-menu" v-bind:filters="filters"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import FilterMenu from '@/components/FilterMenu.vue'; // @ is an alias to /src
+import Filter from '../interfaces/Filter';
 
 @Component({
   components: {
-    HelloWorld,
+    FilterMenu,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+    private filters: Filter[];
+
+    constructor() {
+        super();
+
+        this.filters = this.createFilters();
+    }
+
+    private createFilters(): Filter[] {
+        return [
+            new Filter('art'),
+            new Filter('architecture'),
+            new Filter('geography'),
+            new Filter('freelance'),
+        ];
+    }
+}
 </script>
+
+<style>
+    #filter-menu {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -110px;
+        margin-left: -150px;
+    }
+</style>
