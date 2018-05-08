@@ -1,8 +1,6 @@
 <template>
   <div class="menu">
-      {{ $route.params.filtersList }}
-      <br>
-      <br>
+      {{ filtersList }}
 
     <ProjectTextMenu v-bind:projects="filteredProjects"/>
     <VisualMenu v-bind:projects="filteredProjects"/>
@@ -13,8 +11,8 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import VisualMenu from '@/components/VisualMenu';
 import ProjectTextMenu from '@/components/ProjectTextMenu';
-import Project from '../interfaces/Project';
-import {Projects} from '../enums/Projects';
+import Project from '@/interfaces/Project';
+import {Projects} from '@/enums/Projects';
 
 @Component({
   components: {
@@ -22,23 +20,28 @@ import {Projects} from '../enums/Projects';
       ProjectTextMenu,
   },
 })
+
 export default class Menu extends Vue {
+    @Prop() public filtersList!: string; // Parameters of URL
+
+    private filters: string[] = this.filtersList.split('&'); // Seperated whitelist filters
+    private whitelistedProjects: Project[] =
+        this.whitelistFilterProjects(this.projects(), this.filters); // Whitelisted Projects
 
     constructor() {
         super();
-
     }
 
-    get filterTopics(): string[] {
-        return this.$route.path.substr(6, this.$route.path.length).split('&');
-    }
-
-    get filteredProjects(): Project[] {
-        return this.projects.filter((project) => {
+    // Filters out unwanted projects that don't belong to the provided project filter categories
+    // by keeping the projects with categories that match the provided filters
+    // parameter(s) needed:
+    //      filters = list of whitelist filters
+    private whitelistFilterProjects(projects: Project[], filters: string[]): Project[] {
+        return projects.filter((project) => {
             project = project as Project;
             let flag = false;
-            const filterTopics = this.filterTopics;
-            for (const topic of filterTopics) {
+
+            for (const topic of filters) {
                 for (const category of project.filterCategories) {
                     if (category === topic) {
                         flag = true;
@@ -49,9 +52,14 @@ export default class Menu extends Vue {
         });
     }
 
-    get projects(): Project[] {
-        const projects = new Projects();
-        return projects.allProjects;
+    // Returns every project available
+    private projects(): Project[] {
+        return new Projects().allProjects;
+    }
+
+    // Return the whitelist filtered projects
+    get filteredProjects(): Project[] {
+        return this.whitelistedProjects;
     }
 }
 </script>
