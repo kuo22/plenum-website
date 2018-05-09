@@ -1,13 +1,14 @@
 <template>
   <div class="home">
-    <FilterMenu id="filter-menu" v-bind:filters="filters"/>
+    <FilterMenu id="filter-menu" :filters="filters"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import FilterMenu from '@/components/FilterMenu.vue'; // @ is an alias to /src
-import Filter from '../interfaces/Filter';
+import FilterMenu from '@/components/FilterMenu.vue';
+import FilterOption from '../interfaces/FilterOption';
+import {ProjectCategory} from '../enums/ProjectCategory';
 
 @Component({
   components: {
@@ -15,7 +16,7 @@ import Filter from '../interfaces/Filter';
   },
 })
 export default class Home extends Vue {
-    private filters: Filter[];
+    private filters: FilterOption[];
 
     constructor() {
         super();
@@ -23,12 +24,14 @@ export default class Home extends Vue {
         this.filters = this.createFilters();
     }
 
-    private createFilters(): Filter[] {
+    // Returns the whitelist filter options based on project categories
+    private createFilters(): FilterOption[] {
         return [
-            new Filter('art'),
-            new Filter('architecture'),
-            new Filter('geography'),
-            new Filter('freelance'),
+            new FilterOption(ProjectCategory.ART),
+            new FilterOption(ProjectCategory.ARCH),
+            new FilterOption(ProjectCategory.GEOG),
+            new FilterOption(ProjectCategory.DEV),
+            new FilterOption(ProjectCategory.FREELANCE),
         ];
     }
 }

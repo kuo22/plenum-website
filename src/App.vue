@@ -1,43 +1,33 @@
 <template>
   <div id="app">
     <a id="logo"><router-link to="/"><img src="./assets/logo.svg"></router-link></a>
-    <router-link id="info" to="/about"><img src="./assets/info.svg"></router-link>
+    <a v-on:click="aboutMeVisible = !aboutMeVisible" id="info" ><img src="./assets/info.svg"></a>
     <transition name="fade" mode="in-out">
         <router-view class="view"></router-view>
     </transition>
-    <!--ProjectTextMenu v-bind:projects="projects"/-->
-    <!--VisualMenu v-bind:projects="projects"/-->
+    <AboutMe id="about-me" v-if="aboutMeVisible"></AboutMe>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import AboutMe from './components/AboutMe';
 
-import FilterMenu from './components/FilterMenu.vue';
-import ProjectTextMenu from './components/ProjectTextMenu.vue';
-import VisualMenu from './components/VisualMenu.vue';
-
-import Project from './interfaces/Project';
 
 @Component({
     components: {
-        ProjectTextMenu,
-        VisualMenu,
-        FilterMenu,
+        AboutMe,
     },
 })
 
 export default class App extends Vue {
-
-
+    private aboutMeVisible: boolean = false;
 
     constructor() {
         super();
 
-
+        this.aboutMeVisible = false;
     }
-
-
 }
 </script>
 
@@ -63,6 +53,18 @@ export default class App extends Vue {
     top: 15px;
     right: 15px;
     width: 20px;
+  }
+
+  #about-me {
+    position: absolute;
+    left: 300px;
+    top: 300px;
+    z-index: 3;
+    font-size: 30px;
+  }
+
+  #info:hover {
+    cursor: pointer;
   }
 
   .fade-enter-active, .fade-leave-active {

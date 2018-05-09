@@ -17,11 +17,6 @@ export default new Router({
             component: Home,
         },
         {
-            path: '/about',
-            name: 'about',
-            component: About,
-        },
-        {
             path: '/menu/:filtersList',
             name: 'menu',
             component: Menu,

@@ -1,4 +1,4 @@
-export default class Filter {
+export default class FilterOption {
     public title: string;
     public checked: boolean;
     public path: string;

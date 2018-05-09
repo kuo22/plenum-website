@@ -2,8 +2,10 @@
   <div class="menu">
       {{ filtersList }}
 
-    <ProjectTextMenu v-bind:projects="filteredProjects"/>
-    <VisualMenu v-bind:projects="filteredProjects"/>
+      <ProjectTextMenu v-bind:projects="filteredProjects"/>
+      <VisualMenu v-bind:projects="filteredProjects"/>
+
+      <img id="filter" src="../assets/filter.svg">
   </div>
 </template>
 
@@ -24,7 +26,7 @@ import {Projects} from '@/enums/Projects';
 export default class Menu extends Vue {
     @Prop() public filtersList!: string; // Parameters of URL
 
-    private filters: string[] = this.filtersList.split('&'); // Seperated whitelist filters
+    private filters: string[] = this.filtersList.split('&'); // Separated whitelist filters
     private whitelistedProjects: Project[] =
         this.whitelistFilterProjects(this.projects(), this.filters); // Whitelisted Projects
 
@@ -71,5 +73,16 @@ export default class Menu extends Vue {
         left: 50%;
         margin-top: -110px;
         margin-left: -150px;
+    }
+
+    #filter {
+        position: absolute;
+        left: 15px;
+        bottom: 15px;
+        width: 35px;
+    }
+
+    #filter:hover {
+        cursor: pointer;
     }
 </style>

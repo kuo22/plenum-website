@@ -1,6 +1,7 @@
 import Project from '@/interfaces/Project';
 import CourseContext from '@/enums/CourseContext';
 import Context from '@/interfaces/Context';
+import {ProjectCategory} from '@/enums/ProjectCategory';
 
 export class Projects {
     private readonly _WHITEVOIDFILL: Project;
@@ -18,7 +19,7 @@ export class Projects {
             'void',
             2016,
             12,
-            ['art'],
+            [ProjectCategory.ART],
             courseContexts.UW_DXARTS_200,
         );
 
@@ -27,7 +28,7 @@ export class Projects {
             'cache',
             2016,
             4,
-            ['art'],
+            [ProjectCategory.ART],
             new Context('', [''], '', ''),
             [
                 'Alex Boechenstein',
@@ -41,7 +42,7 @@ export class Projects {
             'aeolus',
             2013,
             5,
-            ['architecture'],
+            [ProjectCategory.ARCH],
             new Context('', [''], '', ''),
             [
                 'Monica Beatriz',
@@ -53,7 +54,7 @@ export class Projects {
             'fresnoy',
             2014,
             11,
-            ['architecture'],
+            [ProjectCategory.ARCH],
         );
 
         this._HOMEFORSALES = new Project(
@@ -61,7 +62,7 @@ export class Projects {
             'home',
             2015,
             5,
-            ['art', 'architecture'],
+            [ProjectCategory.ART, ProjectCategory.ARCH],
         );
     }
 

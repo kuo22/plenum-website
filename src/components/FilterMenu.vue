@@ -3,13 +3,17 @@
         <ul id="menu" style="list-style-type:none">
             <li v-for="filter in filters">
                 <label class="container">
-                    <a><router-link v-bind:to="'/menu/' + filter.path">{{ filter.path }}</router-link></a>
+                    <a>
+                        <router-link v-bind:to="'/menu/' + filter.path">{{ filter.path }}</router-link>
+                    </a>
                     <input type="checkbox" v-model="filter.checked">
                     <span class="checkmark"></span>
                 </label>
             </li>
             <li>
-                <a style="margin: 0 0 0 33px"><router-link v-bind:to="'/menu/' + getFilterURL()">check 'em out</router-link></a>
+                <a style="margin: 0 0 0 33px">
+                    <router-link v-bind:to="'/menu/' + filtersAsParams">check 'em out</router-link>
+                </a>
             </li>
         </ul>
     </div>
@@ -17,22 +21,32 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import Filter from '../interfaces/Filter';
+import FilterOption from '@/interfaces/FilterOption';
 
 @Component({
-    components: {},
+    components: {}, // TODO: turn filter options into components to insert them into pop-up filter menu in visual menu
 })
-export default class FilterMenu extends Vue {
-    @Prop() private filters!: Filter[];
 
+export default class FilterMenu extends Vue {
+    @Prop() private filters!: FilterOption[]; // List of filter options
+
+    // Creates Vue instance
     constructor() {
         super();
     }
 
-    private getFilterURL(): string {
+    // Returns the parameterized whitelist filters
+    get filtersAsParams(): string {
+        return this.createFiltersAsParams(this.filters);
+    }
+
+    // Consolidates the user-selected whitelist filters into a URL-acceptable parameter
+    // parameter(s) needed:
+    //      filters = list of filter options
+    private createFiltersAsParams(filters: FilterOption[]): string {
         let selectedFilterTitles = '';
 
-        this.filters.forEach((filter: Filter) => {
+        filters.forEach((filter: FilterOption) => {
             if (filter.checked) {
                 selectedFilterTitles += filter.title + '&';
             }
