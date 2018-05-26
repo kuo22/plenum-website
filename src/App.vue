@@ -1,37 +1,41 @@
 <template>
   <div id="app">
-    <a id="logo"><router-link to="/"><img src="./assets/logo.svg"></router-link></a>
-    <a v-on:click="aboutMeVisible = !aboutMeVisible" id="info" ><img src="./assets/info.svg"></a>
+    <Home></Home>
     <transition name="fade" mode="in-out">
         <router-view class="view"></router-view>
     </transition>
-    <AboutMe id="about-me" v-if="aboutMeVisible"></AboutMe>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import AboutMe from './components/AboutMe';
+import Home from '@/views/Home';
 
 
 @Component({
     components: {
-        AboutMe,
+
     },
 })
 
 export default class App extends Vue {
-    private aboutMeVisible: boolean = false;
 
     constructor() {
         super();
-
-        this.aboutMeVisible = false;
     }
 }
 </script>
 
-<style>
+<style lang="scss">
+    $menuFont: 'Open Sans', sans-serif;
+    $readFont: 'Crimson Text', serif;
+
+    * {
+        margin: 0;
+        padding: 0;
+        color: black;
+        list-style-type: none;
+    }
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -39,13 +43,8 @@ export default class App extends Vue {
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
-  }
-
-  #logo img {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 135px;
+      width: 100%;
+      height: 100%;
   }
 
   #info img {
