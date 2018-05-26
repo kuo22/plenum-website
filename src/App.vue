@@ -1,20 +1,24 @@
 <template>
-  <div id="app">
-    <Home></Home>
-    <transition name="fade" mode="in-out">
+    <div id="app">
+        <Menu id="menu-section"></Menu>
+        <Home id="content-section"></Home>
+        <transition name="fade" mode="in-out">
         <router-view class="view"></router-view>
-    </transition>
-  </div>
+        </transition>
+    </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Home from '@/views/Home';
+import Menu from '@/views/Menu';
+// TODO: move Menus out of view folder, it's a component!
 
 
 @Component({
     components: {
-
+        Menu,
+        Home,
     },
 })
 
@@ -36,6 +40,8 @@ export default class App extends Vue {
         color: black;
         list-style-type: none;
     }
+
+
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -47,23 +53,12 @@ export default class App extends Vue {
       height: 100%;
   }
 
-  #info img {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 20px;
+  #menu-section {
+      z-index: 3;
   }
 
-  #about-me {
-    position: absolute;
-    left: 300px;
-    top: 300px;
-    z-index: 3;
-    font-size: 30px;
-  }
+  #content-section {
 
-  #info:hover {
-    cursor: pointer;
   }
 
   .fade-enter-active, .fade-leave-active {

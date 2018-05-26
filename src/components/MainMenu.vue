@@ -1,32 +1,30 @@
 <template>
     <div id="main-menu">
         <ul id="menu">
-            <li v-for="item in menuItems" v-bind:style="{background: backgroundColors[item]}">
-                    {{ item }}
-            </li>
+            <a v-for="item in menuItems" v-on:click="item.active = !item.active">
+                <li :style="{background: item.color}">
+                    {{ item.name }}
+                </li>
+            </a>
         </ul>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {MenuItem} from '@/classes/MenuItem';
 
-@Component({
+    @Component({
     components: {
 
     },
 })
 export default class MainMenu extends Vue {
-    private menuItems: string[];
-    private backgroundColors: {};
+    @Prop() private menuItems!: MenuItem[];
+    private activeMenu: MenuItem;
 
     constructor() {
         super();
-        this.menuItems = ['About', 'Publications', 'Contribute', 'Volunteer'];
-        this.backgroundColors = {About: 'rgb(255, 255, 200)',
-                                Publications: 'rgb(255, 200, 255)',
-                                Contribute: 'rgb(200, 255, 255)',
-                                Volunteer: 'rgb(220, 220, 220)'};
     }
 }
 </script>
@@ -46,5 +44,8 @@ export default class MainMenu extends Vue {
         text-align: right;
     }
 
+    a:hover {
+        cursor: pointer;
+    }
 
 </style>
