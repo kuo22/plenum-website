@@ -53,6 +53,14 @@ export default class App extends Vue {
       height: 100%;
   }
 
+  h1 {
+      font-size: 1.75em;
+  }
+
+  h2 {
+      font-size: 1.4em;
+  }
+
   #menu-section {
       z-index: 3;
   }

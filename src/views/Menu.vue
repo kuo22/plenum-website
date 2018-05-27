@@ -61,8 +61,11 @@ export default class Menu extends Vue {
                     'Showcase': ['GIS', 'Art', 'Book Reviews'],
                 },
             ),
-            // new MenuItem('Contribute', 'rgb(200, 255, 255)'),
-            // new MenuItem('Volunteer', 'rgb(220, 220, 220)'),
+            new MenuItem(
+                'Contribute',
+                'rgb(200, 255, 255)',
+            ),
+            new MenuItem('Volunteer', 'rgb(220, 220, 220)'),
         ];
     }
 

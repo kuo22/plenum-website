@@ -1,8 +1,9 @@
 <template>
     <div class="lefter submenu" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
-        <ul v-for="header in menu.subMenu">
-            {{ header }}
-            <li v-for="subheader in header">
+        <ul id="submenu-container" v-for="(subheaders, header) in menu.subMenu">
+            <h1 v-if="menu.subMenu">{{ header }}</h1>
+
+            <li v-for="subheader in subheaders">
                 <a>
                     <h2>{{ subheader }}</h2>
                 </a>
@@ -34,6 +35,7 @@
 </script>
 
 <style lang="scss" scoped>
+    $viewAll: true;
     $lefterWidth: 240px;
 
     .submenu {
@@ -44,12 +46,39 @@
         cursor: pointer;
     }
 
-    #about {
-        left: $lefterWidth;
+
+    @if $viewAll {
+        #about {
+            left: $lefterWidth;
+        }
+
+        #publications {
+            left: 480px;
+        }
+
+        #contribute {
+            left: 720px;
+        }
+
+        #volunteer {
+            left: 960px;
+        }
     }
 
-    #publications {
-        left: 480px;
+
+    #submenu-container {
+        padding: 15px 15px;
+    }
+
+    h1 {
+        text-align: left;
+        padding-bottom: 15px;
+    }
+
+    h2 {
+        text-align: right;
+        margin-bottom: 6px;
+        padding: 2px;
     }
 
 </style>

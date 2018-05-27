@@ -3,7 +3,7 @@
         <ul id="menu">
             <a v-for="item in menuItems" v-on:click="item.active = !item.active">
                 <li :style="{background: item.color}">
-                    {{ item.name }}
+                    <h1>{{ item.name }}</h1>
                 </li>
             </a>
         </ul>
@@ -31,7 +31,6 @@ export default class MainMenu extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $menuFont: 'Open Sans', sans-serif;
 
     #main-menu {
         padding: 15px;
@@ -40,8 +39,6 @@ export default class MainMenu extends Vue {
     li {
         padding: 2px 7px;
         margin: 15px 0px;
-        font-family: $menuFont;
-        font-size: 20px;
         text-align: right;
     }
 
