@@ -1,11 +1,11 @@
 <template>
-    <div class="lefter submenu" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
+    <div :class="{ active: menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
         <ul id="submenu-container" v-for="(subheaders, header) in menu.subMenu">
             <h1 v-if="menu.subMenu">
                 {{ header }}
             </h1>
             <li v-for="subheader in subheaders">
-                <a>
+                <a v-on:click="activateMenu(menu)">
                     <h2>
                         {{ subheader }}
                     </h2>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-    import { Component, Prop, Vue } from 'vue-property-decorator';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {MenuItem} from '@/classes/MenuItem';
 
     @Component({
@@ -33,6 +33,11 @@
             super();
         }
 
+        // Emits an open event to the parent
+        @Emit('activateMenu') public activateMenu(item: MenuItem): void {
+            /* tslint fix - 'no-empty blocks' */
+        }
+
     }
 </script>
 
@@ -40,8 +45,9 @@
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
 
-    .submenu {
-        left: $lefterWidth;
+    .active {
+        left: 20px;
+        z-index: 1;
     }
 
     .submenu a:hover {

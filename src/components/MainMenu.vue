@@ -40,10 +40,19 @@ export default class MainMenu extends Vue {
     public changeBackground(item: MenuItem): {} {
         let bg = {};
 
-        if (item.hoverState || item.open) {
+        if (item.hoverState || item.open || item.active) {
             bg = { background: 'transparent' };
         } else {
             bg = { background: item.color };
+        }
+
+        // If another menu item is open, while this item is active -> show background
+        if (item.active) {
+            for (const otherItem: MenuItem of this.menuItems) {
+                if (otherItem.name !== item.name && otherItem.open) {
+                    bg = {background: item.color};
+                }
+            }
         }
 
         return bg;

@@ -9,7 +9,8 @@
                 </router-link>
             </div>
 
-            <main-menu v-bind:menuItems="menuItems" v-on:open="toggleOpenMenu"></main-menu>
+            <main-menu v-bind:menuItems="menuItems"
+                       v-on:open="toggleOpenMenu"></main-menu>
 
             <div class="grid-frame" id="about-brief">
                 <p>
@@ -22,7 +23,10 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="submenu" v-show="item.open" ref="item.name" v-bind:menu="item"></sub-menu>
+            <sub-menu class="lefter submenu" :class="{ active: item.active }"
+                      v-show="item.open || item.active"
+                      v-bind:menu="item"
+                      v-on:activateMenu="toggleActiveMenu"></sub-menu>
         </transition>
     </div>
 </template>
@@ -41,7 +45,7 @@ import {MenuItem} from '../classes/MenuItem';
     },
 })
 
-//
+// The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
     private menuItems: MenuItem[]; // Main Menu Options
@@ -49,13 +53,59 @@ export default class NavBar extends Vue {
     constructor() {
         super();
 
-        this.menuItems = [
+        this.menuItems = this.getMenuItems();
+    }
+
+    // Sets the open menu and if the menu to open is already open, it closes
+    public toggleOpenMenu(item: MenuItem): void {
+        const alreadyOpen: boolean = item.open;
+
+        if (item.open) {
+            item.open = false;
+        } else {
+            for (const menuItem of this.menuItems) {
+                menuItem.open = false;
+            }
+
+            if (item.subMenu) {
+                item.open = true;
+            } else {
+                this.toggleActiveMenu(item);
+            }
+
+        }
+    }
+
+    private toggleActiveMenu(item: MenuItem): void {
+        // Reset all submenus
+        for (const menuItem of this.menuItems) {
+            menuItem.active = false;
+        }
+
+        item.active = !item.active;
+
+        if (item.active) {
+            item.open = false;
+        }
+    }
+
+    // Returns a list of the main menu items
+    // TODO: Replace contents with fetch command to wordpress API
+    private getMenuItems(): MenuItem[] {
+        /*
+        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
+        // Review how current Plenum website accesses this information
+        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
+
+
+         */
+
+        return [
             new MenuItem(
                 'About',
                 'rgb(255, 255, 200)',
                 {
                     About: ['About Plenum', 'About the Authors', 'About the Editors'],
-                        // TODO: IF ONLY ONE HEADER, do NOT show header, just subheaders
                 },
             ),
             new MenuItem(
@@ -74,17 +124,6 @@ export default class NavBar extends Vue {
         ];
     }
 
-    // Sets the open menu and if the menu to open is already open, it closes
-    public toggleOpenMenu(item: MenuItem): void {
-        const alreadyOpen: boolean = item.open;
-        for (const menuItem of this.menuItems) {
-            menuItem.open = false;
-        }
-        if (!alreadyOpen) {
-            item.open = true;
-        }
-    }
-
 }
 </script>
 
@@ -99,6 +138,10 @@ export default class NavBar extends Vue {
         height: 100%;
         outline: $border;
         width: $lefterWidth;
+    }
+
+    .submenu {
+        left: $lefterWidth;
     }
 </style>
 
@@ -170,22 +213,22 @@ export default class NavBar extends Vue {
     }
 
     .submenu-slide-leave {
-        z-index: 1;
+        z-index: 2;
     }
 
 
 
     .submenu-slide-leave-active {
         transition: all .8s ease;
-        z-index: 1;
+        z-index: 2;
     }
 
     .submenu-slide-leave-to {
-        z-index: 1;
+        z-index: 2;
+        transform: translateX(-$lefterWidth);
     }
 
-
-    .submenu-slide-enter, .submenu-slide-leave-to
+    .submenu-slide-enter //, .submenu-slide-leave-to
         /* .slide-fade-leave-active below version 2.1.8 */ {
         transform: translateX(-$lefterWidth);
         //opacity: 0;
