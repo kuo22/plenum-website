@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <Menu id="menu-section"></Menu>
-        <Home id="content-section"></Home>
+        <Menu id="menu-grid-section"></Menu>
+        <Home id="content-grid-section"></Home>
         <transition name="fade" mode="in-out">
         <router-view class="view"></router-view>
         </transition>
@@ -31,7 +31,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-    $menuFont: 'Open Sans', sans-serif;
+    $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
 
     * {
@@ -43,7 +43,7 @@ export default class App extends Vue {
 
 
   #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-family: $menuFont;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;

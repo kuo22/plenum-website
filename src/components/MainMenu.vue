@@ -12,13 +12,14 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {MenuItem} from '@/classes/MenuItem';
+import {MenuItem} from '@/classes/MenuItem';
 
-    @Component({
+@Component({
     components: {
 
     },
 })
+
 export default class MainMenu extends Vue {
     @Prop() private menuItems!: MenuItem[];
     private activeMenu: MenuItem;
