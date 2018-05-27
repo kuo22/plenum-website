@@ -127,7 +127,7 @@ export default class Menu extends Vue {
 
 
     #main {
-        z-index: 4;
+        z-index: 5;
         background: white;
     }
 
@@ -173,21 +173,27 @@ export default class Menu extends Vue {
     }
 
     .submenu-slide-enter {
-        z-index: 3;
+        z-index: 4;
     }
 
     .submenu-slide-enter-active {
-        transition: all .3s ease;
-        z-index: 3;
+        transition: all .5s ease;
+        z-index: 4;
+    }
+
+    .submenu-slide-enter-to {
+        z-index: 4;
     }
 
     .submenu-slide-leave {
-        z-index: 2;
+        z-index: 1;
     }
 
+
+
     .submenu-slide-leave-active {
-        transition: all .5s ease;
-        z-index: 2;
+        transition: all .8s ease;
+        z-index: 1;
     }
 
     .submenu-slide-leave-to {
