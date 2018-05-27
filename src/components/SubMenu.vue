@@ -45,6 +45,7 @@
 
     .submenu a:hover {
         cursor: pointer;
+        text-decoration: underline;
     }
 
 
