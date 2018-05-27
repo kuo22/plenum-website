@@ -9,7 +9,7 @@
                 </router-link>
             </div>
 
-            <MainMenu v-bind:menuItems="menuItems" v-on:open="open"></MainMenu>
+            <main-menu v-bind:menuItems="menuItems" v-on:open="toggleOpenMenu"></main-menu>
 
             <div class="grid-frame" id="about-brief">
                 <p>
@@ -22,7 +22,7 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <SubMenu class="submenu" v-show="item.active" ref="item.name" v-bind:menu="item"></SubMenu>
+            <sub-menu class="submenu" v-show="item.open" ref="item.name" v-bind:menu="item"></sub-menu>
         </transition>
     </div>
 </template>
@@ -40,10 +40,10 @@ import {MenuItem} from '../classes/MenuItem';
         SubMenu,
     },
 })
-export default class Menu extends Vue {
-    @Prop() private itemName: string;
 
-    // private openedItem: MenuItem;
+//
+export default class NavBar extends Vue {
+    @Prop() private itemName: string;
     private menuItems: MenuItem[]; // Main Menu Options
 
     constructor() {
@@ -72,32 +72,16 @@ export default class Menu extends Vue {
             ),
             new MenuItem('Volunteer', 'rgb(220, 220, 220)'),
         ];
-        // this.openedItem = new MenuItem('place', 'holder');
     }
 
-    // Sets the opened submenu to the provided submenu via a main menu click event
-    public open(item: MenuItem): void {
+    // Sets the open menu and if the menu to open is already open, it closes
+    public toggleOpenMenu(item: MenuItem): void {
+        const alreadyOpen: boolean = item.open;
         for (const menuItem of this.menuItems) {
-            menuItem.active = false;
+            menuItem.open = false;
         }
-        item.active = true;
-
-        /*
-        if (this.openedItem.name !== item.name) {
-            for (let i = 0; i < this.menuItems.length; i++) {
-                const menuItem = this.menuItems[i];
-                if (menuItem.name === item.name) {
-                    this.openedItem = this.menuItems[i];
-                    return;
-                }
-            }
-        }
-        */
-    }
-
-    @Watch('openedItem') public onNewOpenedItem(value: MenuItem, oldValue: MenuItem): void {
-        if (oldValue.name !== 'place') {
-            // Move DOM element via 'ref'?
+        if (!alreadyOpen) {
+            item.open = true;
         }
     }
 

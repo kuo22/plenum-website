@@ -6,7 +6,9 @@
             </h1>
             <li v-for="subheader in subheaders">
                 <a>
-                    <h2>{{ subheader }}</h2>
+                    <h2>
+                        {{ subheader }}
+                    </h2>
                 </a>
             </li>
         </ul>
@@ -17,26 +19,25 @@
     import { Component, Prop, Vue } from 'vue-property-decorator';
     import {MenuItem} from '@/classes/MenuItem';
 
-
     @Component({
         components: {
 
         },
     })
+
+    // Submenu associated with a unique main menu entry
     export default class SubMenu extends Vue {
-        @Prop() private menu!: MenuItem;
+        @Prop() private menu!: MenuItem; // Parent menu item
 
         constructor() {
             super();
-
-
         }
 
     }
 </script>
 
 <style lang="scss" scoped>
-    $viewAll: false;
+    $viewAllSubMenus: false;
     $lefterWidth: 240px;
 
     .submenu {
@@ -47,26 +48,6 @@
         cursor: pointer;
         text-decoration: underline;
     }
-
-
-    @if $viewAll {
-        #about {
-            left: $lefterWidth;
-        }
-
-        #publications {
-            left: 480px;
-        }
-
-        #contribute {
-            left: 720px;
-        }
-
-        #volunteer {
-            left: 960px;
-        }
-    }
-
 
     #submenu-container {
         padding: 15px 15px;
@@ -83,4 +64,25 @@
         padding: 2px;
     }
 
+    @if $viewAllSubMenus {
+        #about, #publications, #contribute, #volunteer {
+            display: block !important;
+        }
+
+        #about {
+            left: $lefterWidth;
+        }
+
+        #publications {
+            left: 480px;
+        }
+
+        #contribute {
+            left: 720px;
+        }
+
+        #volunteer {
+            left: 960px;
+        }
+    }
 </style>

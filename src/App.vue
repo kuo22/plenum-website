@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <Menu id="menu-grid-section"></Menu>
-        <Home id="content-grid-section"></Home>
+        <nav-bar id="menu-grid-section"></nav-bar>
+        <home id="content-grid-section"></home>
         <transition name="fade" mode="in-out">
         <router-view class="view"></router-view>
         </transition>
@@ -11,13 +11,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Home from '@/views/Home';
-import Menu from '@/views/Menu';
+import NavBar from '@/views/NavBar';
 // TODO: move Menus out of view folder, it's a component!
 
 
 @Component({
     components: {
-        Menu,
+        NavBar,
         Home,
     },
 })

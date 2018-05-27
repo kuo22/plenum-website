@@ -1,6 +1,6 @@
 # To-do
 
-### Menu
+### Navigation Bar
 
 ##### Functioning
 * [x] Slide out click
