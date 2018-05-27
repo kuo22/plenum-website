@@ -1,6 +1,7 @@
 <template>
     <div class="lefter submenu" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
         <ul v-for="header in menu.subMenu">
+            {{ header }}
             <li v-for="subheader in header">
                 <a>
                     <h2>{{ subheader }}</h2>
@@ -42,8 +43,13 @@
     .submenu a:hover {
         cursor: pointer;
     }
+
     #about {
         left: $lefterWidth;
+    }
+
+    #publications {
+        left: 480px;
     }
 
 </style>
