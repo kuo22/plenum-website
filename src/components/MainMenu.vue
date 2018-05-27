@@ -1,9 +1,9 @@
 <template>
     <div id="main-menu">
         <ul id="menu">
-            <a v-for="item in menuItems" v-on:click="item.active = !item.active">
+            <a v-for="item in menuItems">
                 <li :style="{background: item.color}">
-                    <h1>{{ item.name }}</h1>
+                    <h1 v-on:click="open(item)">{{ item.name }}</h1>
                 </li>
             </a>
         </ul>
@@ -11,21 +11,26 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MenuItem} from '@/classes/MenuItem';
 
 @Component({
-    components: {
+        components: {
 
-    },
-})
+        },
+    })
 
 export default class MainMenu extends Vue {
     @Prop() private menuItems!: MenuItem[];
+    private openedItem: MenuItem;
     private activeMenu: MenuItem;
 
     constructor() {
         super();
+    }
+
+    @Emit('open') public open(item: MenuItem): void {
+        // item.active = true;
     }
 }
 </script>

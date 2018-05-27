@@ -1,8 +1,9 @@
 <template>
     <div class="lefter submenu" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
         <ul id="submenu-container" v-for="(subheaders, header) in menu.subMenu">
-            <h1 v-if="menu.subMenu">{{ header }}</h1>
-
+            <h1 v-if="menu.subMenu">
+                {{ header }}
+            </h1>
             <li v-for="subheader in subheaders">
                 <a>
                     <h2>{{ subheader }}</h2>
@@ -35,11 +36,11 @@
 </script>
 
 <style lang="scss" scoped>
-    $viewAll: true;
+    $viewAll: false;
     $lefterWidth: 240px;
 
     .submenu {
-        z-index: 1;
+        left: $lefterWidth;
     }
 
     .submenu a:hover {

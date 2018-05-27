@@ -9,7 +9,7 @@
                 </router-link>
             </div>
 
-            <MainMenu v-bind:menuItems="menuItems"></MainMenu>
+            <MainMenu v-bind:menuItems="menuItems" v-on:open="open"></MainMenu>
 
             <div class="grid-frame" id="about-brief">
                 <p>
@@ -21,12 +21,14 @@
 
         </div>
 
-        <SubMenu v-for="item in menuItems" v-bind:menu="item"></SubMenu>
+        <transition name="submenu-slide" v-for="item in menuItems">
+            <SubMenu class="submenu" v-show="item.active" ref="item.name" v-bind:menu="item"></SubMenu>
+        </transition>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
@@ -39,6 +41,9 @@ import {MenuItem} from '../classes/MenuItem';
     },
 })
 export default class Menu extends Vue {
+    @Prop() private itemName: string;
+
+    // private openedItem: MenuItem;
     private menuItems: MenuItem[]; // Main Menu Options
 
     constructor() {
@@ -67,6 +72,33 @@ export default class Menu extends Vue {
             ),
             new MenuItem('Volunteer', 'rgb(220, 220, 220)'),
         ];
+        // this.openedItem = new MenuItem('place', 'holder');
+    }
+
+    // Sets the opened submenu to the provided submenu via a main menu click event
+    public open(item: MenuItem): void {
+        for (const menuItem of this.menuItems) {
+            menuItem.active = false;
+        }
+        item.active = true;
+
+        /*
+        if (this.openedItem.name !== item.name) {
+            for (let i = 0; i < this.menuItems.length; i++) {
+                const menuItem = this.menuItems[i];
+                if (menuItem.name === item.name) {
+                    this.openedItem = this.menuItems[i];
+                    return;
+                }
+            }
+        }
+        */
+    }
+
+    @Watch('openedItem') public onNewOpenedItem(value: MenuItem, oldValue: MenuItem): void {
+        if (oldValue.name !== 'place') {
+            // Move DOM element via 'ref'?
+        }
     }
 
 }
@@ -92,8 +124,10 @@ export default class Menu extends Vue {
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
 
+
+
     #main {
-        z-index: 2;
+        z-index: 4;
         background: white;
     }
 
@@ -133,5 +167,39 @@ export default class Menu extends Vue {
         left: 0;
         border-top: $border;
     }
+
+    .submenu {
+        z-index: 3;
+    }
+
+    .submenu-slide-enter {
+        z-index: 3;
+    }
+
+    .submenu-slide-enter-active {
+        transition: all .3s ease;
+        z-index: 3;
+    }
+
+    .submenu-slide-leave {
+        z-index: 2;
+    }
+
+    .submenu-slide-leave-active {
+        transition: all .5s ease;
+        z-index: 2;
+    }
+
+    .submenu-slide-leave-to {
+        z-index: 1;
+    }
+
+
+    .submenu-slide-enter, .submenu-slide-leave-to
+        /* .slide-fade-leave-active below version 2.1.8 */ {
+        transform: translateX(-$lefterWidth);
+        //opacity: 0;
+    }
+
 </style>
 
