@@ -1,6 +1,6 @@
 <template>
     <div id="home">
-
+        Hello
     </div>
 </template>
 
@@ -24,7 +24,7 @@
 
 <style>
     #home {
-        background: black;
+        background: tan;
 
     }
 </style>

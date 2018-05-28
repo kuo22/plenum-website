@@ -1,9 +1,8 @@
 <template>
     <div id="app">
         <nav-bar id="menu-grid-section"></nav-bar>
-        <home id="content-grid-section"></home>
         <transition name="fade" mode="in-out">
-        <router-view class="view"></router-view>
+            <router-view class="view content-section"></router-view>
         </transition>
     </div>
 </template>
@@ -33,6 +32,7 @@ export default class App extends Vue {
 <style lang="scss">
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
+    $lefterWidth: 240px;
 
     * {
         margin: 0;
@@ -48,9 +48,8 @@ export default class App extends Vue {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin-top: 60px;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
   }
 
   h1 {
@@ -60,13 +59,19 @@ export default class App extends Vue {
   h2 {
       font-size: 1.4em;
   }
-
-  #menu-section {
-      z-index: 3;
+  
+  #menu-grid-section {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: $lefterWidth;
   }
 
-  #content-section {
-
+  .content-section {
+      width: calc(100vw - #{$lefterWidth});
+      height: 100vh;
+      float: right;
   }
 
   .fade-enter-active, .fade-leave-active {
