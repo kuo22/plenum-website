@@ -1,5 +1,5 @@
 <template>
-    <div id="home">
+    <div id="table-of-contents">
         Hello
     </div>
 </template>
@@ -13,7 +13,7 @@
         },
     })
 
-    export default class Home extends Vue {
+    export default class TableOfContents extends Vue {
 
         constructor() {
             super();
@@ -23,7 +23,5 @@
 </script>
 
 <style>
-    #home {
-        background: tan;
-    }
+
 </style>
