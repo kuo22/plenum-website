@@ -1,19 +1,66 @@
 <template>
-    <div id="text-article">
-        Text Article {{this.$route.params.article_id}} of Edition {{this.$route.params.id}}
-        <br>
-        <h1>
-            {{this.article.title}}:
-        </h1>
-        <h2>
-            {{this.article.subtitle}}
-        </h2>
-        <p>
-            <strong>Abstract:</strong> {{this.article.abstract}}
-        </p>
-        <br>
-        <br>
-        <p v-html="this.article.body"></p>
+    <div id="text-article-view">
+        <span id="active-submenu-spacer"></span>
+        <div id="text-article">
+            <div class="article-info">
+                <div class="titles">
+                    <h1 class="title">
+                        {{this.article.title}}
+                    </h1>
+                    <h2 class="subtitle">
+                        {{this.article.subtitle}}
+                    </h2>
+                </div>
+                <h3 class="author">
+                    <i>{{this.article.author}}</i>
+                </h3>
+            </div>
+
+            <div id="article-page">
+                <div id="article">
+                    <div id="abstract">
+                        <h4 id="abstract-title">ABSTRACT</h4>
+                        <!--span class="tab"></span-->
+                        <p>
+                            &emsp;&emsp;&emsp;
+                            {{this.article.abstract}}
+                        </p>
+                        <hr>
+                    </div>
+
+                    <div id="in-page-article-info" class="article-info">
+                        <div class="titles">
+                            <h1 class="title">
+                                {{this.article.title}}
+                            </h1>
+                            <h2 class="subtitle">
+                                {{this.article.subtitle}}
+                            </h2>
+                        </div>
+                        <h3 class="author">
+                            <i>{{this.article.author}}</i>
+                        </h3>
+                    </div>
+
+                    <div id="article-body">
+                        <p v-html="this.article.body"></p>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <div id="copyright"
+                     v-if="this.article.copyright">
+                    <p>
+                        Copyright &#169; {{this.article.author}}.
+                        <br>
+                        All rights reserved.
+                    </p>
+                </div>
+                <a id="download"
+                   v-bind:href="this.article.downloadURL"
+                   target="_blank">Download Article</a>
+            </footer>
+        </div>
     </div>
 </template>
 
@@ -29,10 +76,11 @@ import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
 })
 
 export default class Article extends Vue {
+    @Prop() private article: ArticlePeerReviewed;
+    @Prop() private mainTitleOffScreen: boolean;
     private $route: Route;
     private year: string;
     private articleId: number;
-    @Prop() private article: ArticlePeerReviewed;
 
     constructor() {
         super();
@@ -66,20 +114,149 @@ export default class Article extends Vue {
 
     private parseData(data) {
         this.article = new ArticlePeerReviewed(
-            data.field_title[this.articleId].value,
-            data.field_author[this.articleId].value,
-            data.field_abstract[this.articleId].value,
-            data.body[this.articleId].processed,
-            'University of Washington',
-            'Department of Geography',
-            data.field_subtitle[this.articleId].value,
+            data.field_title[0].value, // Title
+            data.field_author[0].value, // Author
+            data.field_abstract[0].value, // Abstract
+            data.body[this.articleId].processed, // Text body
+            data.field_download_[0].url, // Download URL
+            data.field_copyright[0].value,
+            'University of Washington', // University
+            'Department of Geography', // School
+            data.field_subtitle[0].value, // Subtitle
         );
     }
 }
 </script>
 
-<style>
+<style lang="scss">
+    $pageWidth: calc(50vw);
+    $margin: calc(#{$pageWidth} / 8.5);
+    $lefterWidth: 240px;
+    $borderWidth: 3px;
+    $activeMenuWidth: 20px;
+
+    #text-article-view {
+        font-family: 'PT Serif', serif;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: normal;
+    }
+
+    h1 {
+        font-weight: normal;
+    }
+
+    h2 {
+        font-weight: normal;
+    }
+
+    h3 {
+        font-weight: normal;
+    }
+
+    h4 {
+        font-size: 19px;
+    }
+
+    h5 {
+        font-weight: normal;
+    }
+
+    p {
+        text-align: justify;
+        font-size: 17px;
+        line-height: 130%;
+    }
+
+    hr {
+        margin: $margin;
+    }
+
+    .tab {
+        display:inline-block;
+        width: 20px;
+    }
+
+    #active-submenu-spacer {
+        width: calc(#{$activeMenuWidth} + #{$borderWidth});
+        height: 100vh;
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
     #text-article {
-        padding: 0 0 0 20px;
+        position: absolute;
+        left: calc(#{$activeMenuWidth} + #{$borderWidth});
+        top: 0;
+        width: calc(100% - #{$activeMenuWidth} - #{$borderWidth});
+    }
+
+    .article-info {
+        text-align: left;
+        margin: 30px 0px 30px 20px;
+    }
+
+    #in-page-article-info {
+        margin: 0 0 calc(#{$margin} / 1.5) 0;
+    }
+
+    .subtitle {
+        margin-left: 30px;
+    }
+
+    .author {
+        margin-top: 15px;
+    }
+
+    #article-page {
+        width: $pageWidth;
+        margin: 0 auto $margin auto;
+        background: #fafafa;
+        box-shadow: 3px 3px 8px 1px #d5d5d5;
+    }
+
+    #article {
+        padding: $margin;
+        text-align: left;
+    }
+
+    #abstract-title {
+        margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+    }
+
+    footer {
+        position: fixed;
+        //left: $lefterWidth;
+        bottom: 0;
+        z-index: 2;
+        width: calc(100% - calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth}));
+    }
+
+    footer #copyright {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        margin: 0 0 3px calc(#{$borderWidth} + 3px);
+    }
+
+    #copyright p {
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .article-info:not(#in-page-article-info), footer #copyright {
+        left: calc(#{$lefterWidth}+ #{$activeMenuWidth} + #{$borderWidth});
+    }
+
+    footer #download {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        margin: 0 15px 10px 0;
+        text-decoration: underline;
+        color: #0079ff;
     }
 </style>

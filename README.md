@@ -10,6 +10,7 @@
 * [x] Show menu item background while active, if other menu is open
 * [ ] Make 'open' state override 'active' state in menu items. --> Try to open menu once it is active, it will fail.
 * [ ] Transition between 'open' and 'active' states, currently jumps to 'active' position
+* [ ] Close 'open' menu if click outside of menu, or if not hover over menu for a split-sec
 
 ##### Aesthetics
 * [ ] Perceptually uniform color space

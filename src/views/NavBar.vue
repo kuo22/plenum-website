@@ -151,8 +151,6 @@ export default class NavBar extends Vue {
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
 
-
-
     #main {
         z-index: 5;
         background: white;
@@ -186,6 +184,8 @@ export default class NavBar extends Vue {
         font-family: $menuFont;
         font-size: 15.41px;
         text-align: left;
+        line-height: 20px;
+        font-weight: bold;
     }
 
     #about-brief {

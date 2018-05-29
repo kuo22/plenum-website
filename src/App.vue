@@ -33,6 +33,8 @@ export default class App extends Vue {
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
     $lefterWidth: 240px;
+    $activeSubmenuWidth: 20px;
+    $borderWidth: 3px;
 
     * {
         margin: 0;
@@ -48,7 +50,7 @@ export default class App extends Vue {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
   }
 
@@ -66,16 +68,19 @@ export default class App extends Vue {
       left: 0;
       height: 100vh;
       width: $lefterWidth;
+      z-index: 4;
   }
 
   .content-section {
-      width: calc(100vw - #{$lefterWidth});
+      width: calc(100% - #{$lefterWidth});
       height: 100vh;
-      float: right;
+      position: absolute;
+      right: 0;
+      bottom: 0;
   }
 
   .fade-enter-active, .fade-leave-active {
-      transition: opacity .25s;
+      transition: opacity .1s;
   }
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
       opacity: 0;
