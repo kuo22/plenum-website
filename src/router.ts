@@ -3,7 +3,7 @@ import Router from 'vue-router';
 import RouterMode from 'vue-router';
 import Home from '@/views/Home';
 import TableOfContents from '@/views/TableOfContents';
-import Article from '@/views/Article';
+import TextArticle from '@/views/TextArticle';
 // TODO: These aren't views... move them to the components folder
 
 Vue.use(Router);
@@ -23,8 +23,8 @@ export default new Router({
         },
         {
             path: '/pubs/:id/:article_id',
-            name: 'article',
-            component: Article,
+            name: 'text-article',
+            component: TextArticle,
         },
     ],
 

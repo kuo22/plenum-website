@@ -24,6 +24,6 @@
 
 <style>
     #home {
-        background: tan;
+
     }
 </style>
