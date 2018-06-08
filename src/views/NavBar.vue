@@ -186,6 +186,7 @@ export default class NavBar extends Vue {
         text-align: left;
         line-height: 20px;
         font-weight: bold;
+        text-indent: unset;
     }
 
     #about-brief {

@@ -22,7 +22,6 @@
                         <h4 id="abstract-title">ABSTRACT</h4>
                         <!--span class="tab"></span-->
                         <p>
-                            &emsp;&emsp;&emsp;
                             {{this.article.abstract}}
                         </p>
                         <hr>
@@ -134,6 +133,7 @@ export default class Article extends Vue {
     $lefterWidth: 240px;
     $borderWidth: 3px;
     $activeMenuWidth: 20px;
+    $fontSize: 17px;
 
     #text-article-view {
         font-family: 'PT Serif', serif;
@@ -160,17 +160,37 @@ export default class Article extends Vue {
     }
 
     h5 {
-        font-weight: normal;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: $fontSize;
+        text-indent: 0;
+        margin: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
     }
 
     p {
         text-align: justify;
         font-size: 17px;
-        line-height: 130%;
+        line-height: 150%;
+        margin-bottom: 6px;
+        text-indent: 50px;
     }
 
     hr {
         margin: $margin;
+    }
+
+    blockquote {
+        margin: calc(#{$margin} / 2.5) calc(#{$margin} / 1.5);
+        font-weight: lighter;
+    }
+
+    blockquote p {
+        text-indent: 0;
+    }
+
+    blockquote strong {
+        font-weight: normal;
+        font-size: calc(#{$fontSize} - 2px);
     }
 
     .tab {
@@ -245,6 +265,8 @@ export default class Article extends Vue {
     #copyright p {
         font-size: 12px;
         text-align: left;
+        text-indent: 0;
+        margin: 0;
     }
 
     .article-info:not(#in-page-article-info), footer #copyright {
