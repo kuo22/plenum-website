@@ -8,6 +8,7 @@ export class ArticlePeerReviewed {
     public school?: string;
     public abstract: string;
     public body: string;
+    public refs: string;
     public downloadURL: string;
     public copyright: boolean;
     // public sectionTitles: string[];
@@ -17,6 +18,7 @@ export class ArticlePeerReviewed {
                 author: string,
                 abstract: string,
                 body: string,
+                refs: string,
                 downloadURL: string,
                 copyright: boolean,
                 university?: string,
@@ -27,6 +29,7 @@ export class ArticlePeerReviewed {
         this.author = author;
         this.abstract = abstract;
         this.body = body;
+        this.refs = refs;
         this.downloadURL = downloadURL;
         this.copyright = copyright;
         this.university = university;

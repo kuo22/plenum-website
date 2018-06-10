@@ -24,8 +24,9 @@
                         <p>
                             {{this.article.abstract}}
                         </p>
-                        <hr>
                     </div>
+
+                    <hr>
 
                     <div id="in-page-article-info" class="article-info">
                         <div class="titles">
@@ -44,9 +45,19 @@
                     <div id="article-body">
                         <p v-html="this.article.body"></p>
                     </div>
+
+                    <hr>
+
+                    <div id="bibliography">
+                        <h4>BIBLIOGRAPHY</h4>
+
+                        <p v-html="this.article.refs"></p>
+                    </div>
                 </div>
             </div>
+
             <footer>
+
                 <div id="copyright"
                      v-if="this.article.copyright">
                     <p>
@@ -55,9 +66,11 @@
                         All rights reserved.
                     </p>
                 </div>
+
                 <a id="download"
                    v-bind:href="this.article.downloadURL"
                    target="_blank">Download Article</a>
+
             </footer>
         </div>
     </div>
@@ -87,6 +100,7 @@ export default class Article extends Vue {
 
     }
 
+    // When view is mounted, retrieve article
     public mounted() {
         // https://github.com/nuxt-community/typescript-template/issues/23
         this.year = this.$route.params.id;
@@ -117,6 +131,7 @@ export default class Article extends Vue {
             data.field_author[0].value, // Author
             data.field_abstract[0].value, // Abstract
             data.body[this.articleId].processed, // Text body
+            data.field_references[0].value,
             data.field_download_[0].url, // Download URL
             data.field_copyright[0].value,
             'University of Washington', // University
@@ -157,6 +172,7 @@ export default class Article extends Vue {
 
     h4 {
         font-size: 19px;
+        margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
     }
 
     h5 {
@@ -255,7 +271,18 @@ export default class Article extends Vue {
     }
 
     #abstract-title {
-        margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+        // margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+    }
+
+    #bibliography {
+        margin: $margin 0 0 0;
+    }
+
+    #bibliography p p {
+        padding: 0 0 0 50px;
+        text-indent: -50px;
+        font-size: calc(#{$fontSize} - 3px);
+        text-align: left;
     }
 
     footer {
