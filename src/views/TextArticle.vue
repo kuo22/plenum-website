@@ -162,9 +162,20 @@ export default class Article extends Vue {
     h5 {
         font-weight: bold;
         text-transform: uppercase;
-        font-size: $fontSize;
+        font-size: calc(#{$fontSize} + 5px);
         text-indent: 0;
         margin: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
+        text-align: center;
+
+    }
+
+    h6 {
+        width: calc(#{$pageWidth} / 2);
+        font-size: 25px;
+        margin: 25px auto;
+        text-indent: 0;
+        line-height: 125%;
+        outline: 4px #000;
     }
 
     p {
