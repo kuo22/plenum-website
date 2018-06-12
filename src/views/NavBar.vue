@@ -2,11 +2,12 @@
     <div>
         <div id="main" class="lefter">
 
-            <div id="logo" class="grid-frame">
-                <router-link to="/">
+            <div id= "logo" class="grid-frame">
+                <logo-animated></logo-animated>
+                <!--router-link to="/">
                     <span class="logo-helper"></span>
                     <img src="@/assets/plenum-logo-raster.png">
-                </router-link>
+                </router-link-->
             </div>
 
             <main-menu v-bind:menuItems="menuItems"
@@ -36,6 +37,7 @@ import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
+import LogoAnimated from '@/components/LogoAnimated';
 import hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
 
@@ -44,6 +46,7 @@ import {error} from 'util';
     components: {
         MainMenu,
         SubMenu,
+        LogoAnimated,
     },
 })
 
