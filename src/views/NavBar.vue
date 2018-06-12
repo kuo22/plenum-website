@@ -37,6 +37,7 @@ import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
 import hsluv from '../../node_modules/hsluv/hsluv.js';
+import {error} from 'util';
 
 
 @Component({
@@ -94,17 +95,8 @@ export default class NavBar extends Vue {
     // TODO: Replace contents with fetch command to wordpress API
     private getMenuItems(): MenuItem[] {
 
-        const uniformColors: number[number[]] = [[]];
-        const start: number = 55; // 0 - 90
-        const L: number = 95;
-        const C: number = 50;
-        const hMax: number = 360;
-        const numberOfMenus: number = 4;
-        let index = 0;
-        for (let i = start; i < 360; i += hMax / numberOfMenus) {
-            uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
-            index++;
-        }
+        const uniformColors: number[number[]] = [[]] = this.getUniformColors(20);
+
         /*
         let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
         // Review how current Plenum website accesses this information
@@ -150,6 +142,26 @@ export default class NavBar extends Vue {
         ];
     }
 
+    // Returns a collection of perceptually uniform colors in RGB form
+    private getUniformColors(start: number): number[number[]] {
+        const uniformColors: number[number[]] = [];
+
+        if (start > 90) {
+            error('Number can\'t be 90 or greater. Number provided: ' + start);
+        } else {
+            const L: number = 95;
+            const C: number = 50;
+            const hMax: number = 360;
+            const numberOfMenus: number = 4;
+            let index = 0;
+            for (let i = start; i < 360; i += hMax / numberOfMenus) {
+                uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
+                index++;
+            }
+        }
+
+        return uniformColors;
+    }
 }
 </script>
 
