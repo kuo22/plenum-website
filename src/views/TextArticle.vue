@@ -315,6 +315,7 @@ export default class Article extends Vue {
         position: absolute;
         right: 0;
         bottom: 0;
+        padding: 3px 5px;
         margin: 0 15px 10px 0;
         text-decoration: underline;
         color: #0079ff;

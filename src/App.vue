@@ -30,6 +30,12 @@ export default class App extends Vue {
     }
 
     public created(): void {
+        // populate app from API
+
+        // getIssues
+        // initialize store with issues
+
+
         this.getIssues();
         for (let i = 0; i <= this.issues.length; i++) {
             const issue: Issue = this.issues[i];
@@ -132,6 +138,10 @@ export default class App extends Vue {
       position: absolute;
       right: 0;
       bottom: 0;
+  }
+
+  a:focus, li:focus {
+      outline: black solid 3px;
   }
 
   .fade-enter-active, .fade-leave-active {
