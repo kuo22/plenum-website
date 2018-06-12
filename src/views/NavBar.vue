@@ -95,7 +95,7 @@ export default class NavBar extends Vue {
     // TODO: Replace contents with fetch command to wordpress API
     private getMenuItems(): MenuItem[] {
 
-        const uniformColors: number[number[]] = [[]] = this.getUniformColors(20);
+        const uniformColorsAsRGBString: string[] = this.getUniformColors(20);
 
         /*
         let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
@@ -108,20 +108,14 @@ export default class NavBar extends Vue {
         return [
             new MenuItem(
                 'About',
-                'rgb(' +
-                uniformColors[0][0] * 255 + ', ' +
-                uniformColors[0][1] * 255 + ', ' +
-                uniformColors[0][2] * 255 + ')',
+                uniformColorsAsRGBString[0],
                 {
                     About: ['About Plenum', 'About the Authors', 'About the Editors'],
                 },
             ),
             new MenuItem(
                 'Publications',
-                'rgb(' +
-                uniformColors[1][0] * 255 + ', ' +
-                uniformColors[1][1] * 255 + ', ' +
-                uniformColors[1][2] * 255 + ')',
+                uniformColorsAsRGBString[1],
                 {
                     'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
                     'Showcase': ['GIS', 'Art', 'Book Reviews'],
@@ -129,21 +123,17 @@ export default class NavBar extends Vue {
             ),
             new MenuItem(
                 'Contribute',
-                'rgb(' +
-                uniformColors[2][0] * 255 + ', ' +
-                uniformColors[2][1] * 255 + ', ' +
-                uniformColors[2][2] * 255 + ')',
+                uniformColorsAsRGBString[2],
             ),
-            new MenuItem('Volunteer',
-                'rgb(' +
-                uniformColors[3][0] * 255 + ', ' +
-                uniformColors[3][1] * 255 + ', ' +
-                uniformColors[3][2] * 255 + ')'),
+            new MenuItem(
+                'Volunteer',
+                uniformColorsAsRGBString[3],
+            ),
         ];
     }
 
     // Returns a collection of perceptually uniform colors in RGB form
-    private getUniformColors(start: number): number[number[]] {
+    private getUniformColors(start: number): string[] {
         const uniformColors: number[number[]] = [];
 
         if (start > 90) {
@@ -160,7 +150,29 @@ export default class NavBar extends Vue {
             }
         }
 
-        return uniformColors;
+        const uniformColorsAsString: string[] = [
+            'rgb(' +
+            uniformColors[0][0] * 255 + ', ' +
+            uniformColors[0][1] * 255 + ', ' +
+            uniformColors[0][2] * 255 + ')',
+
+            'rgb(' +
+            uniformColors[1][0] * 255 + ', ' +
+            uniformColors[1][1] * 255 + ', ' +
+            uniformColors[1][2] * 255 + ')',
+
+            'rgb(' +
+            uniformColors[2][0] * 255 + ', ' +
+            uniformColors[2][1] * 255 + ', ' +
+            uniformColors[2][2] * 255 + ')',
+
+            'rgb(' +
+            uniformColors[3][0] * 255 + ', ' +
+            uniformColors[3][1] * 255 + ', ' +
+            uniformColors[3][2] * 255 + ')',
+        ];
+
+        return uniformColorsAsString;
     }
 }
 </script>
