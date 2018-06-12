@@ -36,6 +36,7 @@ import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
+import hsluv from '../../node_modules/hsluv/hsluv.js';
 
 
 @Component({
@@ -92,6 +93,18 @@ export default class NavBar extends Vue {
     // Returns a list of the main menu items
     // TODO: Replace contents with fetch command to wordpress API
     private getMenuItems(): MenuItem[] {
+
+        const uniformColors: number[number[]] = [[]];
+        const start: number = 55; // 0 - 90
+        const L: number = 95;
+        const C: number = 50;
+        const hMax: number = 360;
+        const numberOfMenus: number = 4;
+        let index = 0;
+        for (let i = start; i < 360; i += hMax / numberOfMenus) {
+            uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
+            index++;
+        }
         /*
         let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
         // Review how current Plenum website accesses this information
@@ -103,14 +116,20 @@ export default class NavBar extends Vue {
         return [
             new MenuItem(
                 'About',
-                'rgb(255, 255, 200)',
+                'rgb(' +
+                uniformColors[0][0] * 255 + ', ' +
+                uniformColors[0][1] * 255 + ', ' +
+                uniformColors[0][2] * 255 + ')',
                 {
                     About: ['About Plenum', 'About the Authors', 'About the Editors'],
                 },
             ),
             new MenuItem(
                 'Publications',
-                'rgb(255, 200, 255)',
+                'rgb(' +
+                uniformColors[1][0] * 255 + ', ' +
+                uniformColors[1][1] * 255 + ', ' +
+                uniformColors[1][2] * 255 + ')',
                 {
                     'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
                     'Showcase': ['GIS', 'Art', 'Book Reviews'],
@@ -118,9 +137,16 @@ export default class NavBar extends Vue {
             ),
             new MenuItem(
                 'Contribute',
-                'rgb(200, 255, 255)',
+                'rgb(' +
+                uniformColors[2][0] * 255 + ', ' +
+                uniformColors[2][1] * 255 + ', ' +
+                uniformColors[2][2] * 255 + ')',
             ),
-            new MenuItem('Volunteer', 'rgb(220, 220, 220)'),
+            new MenuItem('Volunteer',
+                'rgb(' +
+                uniformColors[3][0] * 255 + ', ' +
+                uniformColors[3][1] * 255 + ', ' +
+                uniformColors[3][2] * 255 + ')'),
         ];
     }
 
