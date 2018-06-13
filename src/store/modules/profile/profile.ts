@@ -12,7 +12,7 @@ export const state: ProfileState = {
 
 const namespaced: boolean = true;
 
-export const index: Module<ProfileState, RootState> = {
+export const profile: Module<ProfileState, RootState> = {
     namespaced,
     state,
     getters,

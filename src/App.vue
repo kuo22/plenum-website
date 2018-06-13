@@ -9,8 +9,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import {State, Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
+import { MenuTreeState, Menu } from './types';
+
+const namespace: string = 'menuTree';
+
 // TODO: move Menus out of view folder, it's a component!
 
 
@@ -22,10 +27,18 @@ import NavBar from '@/views/NavBar';
 })
 
 export default class App extends Vue {
+    @State('menuTree') public menuTree: MenuTreeState;
+    @Action('fetchData', { namespace }) public fetchData: any;
+    @Getter('issuesExist', { namespace }) public fullName: string;
+
 
     constructor() {
         super();
     }
+
+    // public created() {
+    //
+    // }
 }
 </script>
 

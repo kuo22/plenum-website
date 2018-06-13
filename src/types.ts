@@ -13,6 +13,23 @@ export interface User {
     phone?: string;
 }
 
+// Interface for an element of the main navigation
+export interface Menu {
+    title: string; // link.title
+    description?: string; // link.description
+    weight: number; // link.weight
+    parentMenu: string; // link.menu_name
+    url?: string; // link.url
+    has_children: boolean; // has_children
+    subtree?: Menu[]; // subtree
+}
+
+// States
+
+export interface MenuTreeState {
+    main: Menu[];
+}
+
 export interface MenuState {
     active: boolean;
     open: boolean;
