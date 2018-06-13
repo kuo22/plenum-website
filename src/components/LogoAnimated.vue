@@ -1,13 +1,14 @@
 <template>
-    <div id="logo-animation-container">
+    <a v-on:click="play = !play">
+        <div id="logo-animation-container">
 
-    </div>
+        </div>
+    </a>
 </template>
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import p5 from 'p5';
-import p5svg from '../../node_modules/p5.js-svg/dist/p5.svg.js';
 
 @Component({
     components: {
@@ -18,6 +19,8 @@ import p5svg from '../../node_modules/p5.js-svg/dist/p5.svg.js';
 // Submenu associated with a unique main menu entry
 export default class LogoAnimated extends Vue {
     private p5: p5;
+    @Prop() private play: boolean = true;
+    private frame: number = 0;
 
     constructor() {
         super();
@@ -38,40 +41,50 @@ export default class LogoAnimated extends Vue {
 
             p.draw = () => {
                 p.background(255);
-                p.fill(255);
-                p.stroke(0);
-                // p.rect(x / 2, y / 2, 50, 50);
-                // console.log(p.frameRate());
+                p.noFill();
 
-                p.push();
-                p.translate(p.width * 0.2, p.height * 0.5);
-                p.rotate(p.frameCount / 200.0);
-                polygon(0, 0, 30, 3);
-                p.pop();
+                const frameCount = this.frame;
+
+                const rotateSquare = false;
+
+                for (let i = 0; i < 4; i++) {
+                    p.push();
+                    p.translate(p.width / 2, p.height / 2);
+
+                    if (i === 0 && rotateSquare !== true) {
+                        p.rotate(0);
+                    } else if (i % 2 === 0) {
+                        p.rotate(-frameCount / (i * 50.0 + 100.0));
+                    } else {
+                        p.rotate(frameCount / (i * 50.0 + 100.0));
+                    }
+
+                    polygon(0, 0, 100 - i * 5.0, i + 4);  // Square
+                    p.pop();
+                }
+
+                if (this.play) {
+                    this.frame++;
+                }
 
                 function polygon(x, y, radius, npoints) {
                     const angle = p.TWO_PI / npoints;
                     p.beginShape();
-                    p.vertex(42, 48);
-                    p.vertex(22, 186);
-                    p.vertex(174, 12);
-                    p.vertex(260, 192);
-                    p.vertex(42, 48);
-                    /*
+                    p.strokeWeight(20.0 / (npoints * (0.5 * npoints)));
+                    p.stroke((npoints / 4.0) * 40.0 - 40.0);
+
                     for (let a = 0; a < p.TWO_PI; a += angle) {
-                        let sx = x + p.cos(a) * radius;
-                        let sy = y + p.sin(a) * radius;
+                        const sx = x + p.cos(a) * radius;
+                        const sy = y + p.sin(a) * radius;
                         p.vertex(sx, sy);
                     }
-                    */
+
                     p.endShape(p.CLOSE);
                 }
-
             };
         };
 
         this.p5 = new p5(sketch, 'logo-animation-container');
-        // console.log(this.p5);
     }
 
     // Emits an open event to the parent
