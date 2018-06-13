@@ -28,6 +28,7 @@ export interface Menu {
 
 export interface MenuTreeState {
     main: Menu[];
+    error: boolean;
 }
 
 export interface MenuState {

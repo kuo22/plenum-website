@@ -1,13 +1,12 @@
 import { MutationTree } from 'vuex';
-import { MenuHierarchyState, User } from './types';
+import { MenuTreeState, User } from './types';
+import {Menu} from '@/types';
 
-export const mutations: MutationTree<MenuHierarchyState> = {
-    menusLoaded(state, payload: User) {
-        state.error = false;
-        state.user = payload;
+export const mutations: MutationTree<MenuTreeState> = {
+    menusLoaded(state, payload: Menu[]) {
+        state.main = payload;
     },
     menusError(state) {
         state.error = true;
-        state.user = undefined;
     },
 };

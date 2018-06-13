@@ -36,9 +36,9 @@ export default class App extends Vue {
         super();
     }
 
-    // public created() {
-    //
-    // }
+    public created() {
+        this.fetchData();
+    }
 }
 </script>
 
