@@ -41,7 +41,11 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
 
         }).then((response) => {
             // console.log('processing response...');
-            const payload: Menu[] = parseMenuData(response.data);
+            const payload: Menu[] = parseMenuData(response.data).sort(
+                (menu1, menu2) => {
+                    return menu1.weight - menu2.weight;
+                },
+            );
             // createMenu(response && response.data);
             // const payload: Menu[];
             commit('menusLoaded', payload);

@@ -29,7 +29,7 @@ const namespace: string = 'menuTree';
 export default class App extends Vue {
     @State('menuTree') public menuTree: MenuTreeState;
     @Action('fetchData', { namespace }) public fetchData: any;
-    @Getter('issuesExist', { namespace }) public fullName: string;
+    // @Getter('menuTree', { namespace }) public menuTree: Menu[];
 
 
     constructor() {
