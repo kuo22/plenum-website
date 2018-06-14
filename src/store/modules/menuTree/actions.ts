@@ -2,12 +2,11 @@ import { ActionTree } from 'vuex';
 import fetcher from '@/fetcher';
 import {Menu, MenuTreeState, User} from '@/types';
 import { RootState } from '@/types';
+import {error} from 'util';
 
-private function parseMenuData(menuTree): Menu[] {
-    let menus: Menu[];
+function parseMenuData(menuTree: any): Menu[] {
+    const menus: Menu[] = [];
     if (menuTree.length > 0) {
-        menus = [];
-
         for (const menuNode of menuTree) {
             const newMenu: Menu = {
                 title: menuNode.link.title,

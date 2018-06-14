@@ -36,6 +36,10 @@ import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
+import {Action, State} from 'vuex-class';
+import {MenuTreeState} from '../types';
+
+const namespace: string = 'menuTree';
 
 
 @Component({
@@ -48,6 +52,8 @@ import {MenuItem} from '../classes/MenuItem';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
+    @State('menuTree') private menuTree: MenuTreeState;
+    @Action('fetchData', { namespace }) private fetchData: any;
     private menuItems: MenuItem[]; // Main Menu Options
 
     constructor() {
