@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div v-on:mouseover="playLogo = true" v-on:mouseout="playLogo = false">
         <div id="main" class="lefter">
 
             <div id= "logo" class="grid-frame">
-                <logo-animated></logo-animated>
+                <logo-animated :playLogo="playLogo"></logo-animated>
                 <!--router-link to="/">
                     <span class="logo-helper"></span>
                     <img src="@/assets/plenum-logo-raster.png">
@@ -53,6 +53,7 @@ import {error} from 'util';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
+    private playLogo: boolean = false;
     private menuItems: MenuItem[]; // Main Menu Options
 
     constructor() {
