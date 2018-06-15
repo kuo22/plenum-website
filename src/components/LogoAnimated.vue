@@ -30,7 +30,7 @@ export default class LogoAnimated extends Vue {
     public created() {
 
 
-        this.p5 = new p5(this.logoSketch(2.0, 5.0), 'logo-animation-container');
+        this.p5 = new p5(this.logoSketch(1.0, 2.0), 'logo-animation-container');
     }
 
     public logoSketch(animationSpeed: number, transitionSpeed: number): any {

@@ -38,7 +38,7 @@ import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
 import LogoAnimated from '@/components/LogoAnimated';
-import hsluv from '../../node_modules/hsluv/hsluv.js';
+import * as hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
 
 
