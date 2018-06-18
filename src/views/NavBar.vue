@@ -55,7 +55,7 @@ export default class NavBar extends Vue {
     constructor() {
         super();
 
-        this.menuItems = this.getMenuItems();
+        this.menuItems = this.createMenuItems();
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
@@ -93,9 +93,9 @@ export default class NavBar extends Vue {
 
     // Returns a list of the main menu items
     // TODO: Replace contents with fetch command to wordpress API
-    private getMenuItems(): MenuItem[] {
+    private createMenuItems(): MenuItem[] {
 
-        const uniformColorsAsRGBString: string[] = this.getUniformColors(20);
+        const menuColors: string[] = this.getUniformColors(20);
 
         /*
         let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
@@ -108,14 +108,14 @@ export default class NavBar extends Vue {
         return [
             new MenuItem(
                 'About',
-                uniformColorsAsRGBString[0],
+                menuColors[0],
                 {
                     About: ['About Plenum', 'About the Authors', 'About the Editors'],
                 },
             ),
             new MenuItem(
                 'Publications',
-                uniformColorsAsRGBString[1],
+                menuColors[1],
                 {
                     'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
                     'Showcase': ['GIS', 'Art', 'Book Reviews'],
@@ -123,20 +123,26 @@ export default class NavBar extends Vue {
             ),
             new MenuItem(
                 'Contribute',
-                uniformColorsAsRGBString[2],
+                menuColors[2],
             ),
             new MenuItem(
                 'Volunteer',
-                uniformColorsAsRGBString[3],
+                menuColors[3],
             ),
         ];
     }
 
     // Returns a collection of perceptually uniform colors in RGB form
+    // Colors are selected at equal intervals along the LCH uniform color space
+    // with the starting point along the gradient determined by the provided parameter
+    // parameter(s) needed:
+    //      start = starting point of color selection along a cylical color wheel
+    //                  must be 0 - 90
     private getUniformColors(start: number): string[] {
         const uniformColors: number[number[]] = [];
+        const uniformColorsAsString: string[] = [];
 
-        if (start > 90) {
+        if (start > 90 || start < 0) {
             error('Number can\'t be 90 or greater. Number provided: ' + start);
         } else {
             const L: number = 95;
@@ -150,27 +156,23 @@ export default class NavBar extends Vue {
             }
         }
 
-        const uniformColorsAsString: string[] = [
-            'rgb(' +
-            uniformColors[0][0] * 255 + ', ' +
-            uniformColors[0][1] * 255 + ', ' +
-            uniformColors[0][2] * 255 + ')',
+        return this.colorToString(uniformColors);
+    }
 
-            'rgb(' +
-            uniformColors[1][0] * 255 + ', ' +
-            uniformColors[1][1] * 255 + ', ' +
-            uniformColors[1][2] * 255 + ')',
+    // Returns an rgb style string of a provided color
+    // Provided color must be in the form of a matrix
+    // parameter(s) needed:
+    //      colors = set of colors in the form of a matrix
+    private colorToString(colors: number[number[]]): string[] {
+        const uniformColorsAsString: string[] = [];
 
-            'rgb(' +
-            uniformColors[2][0] * 255 + ', ' +
-            uniformColors[2][1] * 255 + ', ' +
-            uniformColors[2][2] * 255 + ')',
-
-            'rgb(' +
-            uniformColors[3][0] * 255 + ', ' +
-            uniformColors[3][1] * 255 + ', ' +
-            uniformColors[3][2] * 255 + ')',
-        ];
+        for (const color of colors) {
+            const colorString: string = 'rgb(' +
+                color[0] * 255 + ', ' +
+                color[1] * 255 + ', ' +
+                color[2] * 255 + ')';
+            uniformColorsAsString.push(colorString);
+        }
 
         return uniformColorsAsString;
     }
