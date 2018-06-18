@@ -3,6 +3,7 @@ import fetcher from '@/fetcher';
 import {Menu, MenuTreeState, User} from '@/types';
 import { RootState } from '@/types';
 import {error} from 'util';
+import {MenuItem} from '@/classes/MenuItem';
 
 function parseMenuData(menuTree: any): Menu[] {
     const menus: Menu[] = [];
@@ -24,33 +25,40 @@ function parseMenuData(menuTree: any): Menu[] {
     return menus;
 }
 
-
 export const actions: ActionTree<MenuTreeState, RootState> = {
-    fetchData({ commit }): any {
-        fetcher({
-            url: 'entity/menu/main/tree',
-            params: {
-                _format: 'json',
-            },
-            timeout: 1000,
-            onDownloadProgress: () => {
-                // run logo loop()
-            },
-            // socketPath: ,
-
-        }).then((response) => {
-            // console.log('processing response...');
-            const payload: Menu[] = parseMenuData(response.data).sort(
-                (menu1, menu2) => {
-                    return menu1.weight - menu2.weight;
-                },
-            );
-            // createMenu(response && response.data);
-            // const payload: Menu[];
-            commit('menusLoaded', payload);
-        }, (error) => {
-            // console.log(error);
-            commit('menusError');
+    fetchData({ commit }): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            fetchMenuTree()
+                .then((menuTree: Menu[]) => {
+                    commit('menusLoaded', menuTree);
+                    resolve(menuTree);
+                })
+                .catch((error) => {
+                    commit('menusError');
+                    reject(error);
+                });
         });
+
+        async function fetchMenuTree(): Promise<any> {
+            return await fetcher({
+                url: 'entity/menu/main/tree',
+                params: {
+                    _format: 'json',
+                },
+                timeout: 1000,
+                // socketPath: ,
+
+            }).then((response) => {
+                const menuTree: Menu[] = parseMenuData(response.data).sort(
+                    (menu1, menu2) => {
+                        return menu1.weight - menu2.weight;
+                    },
+                );
+                return menuTree;
+                // process Menu[] to MenuItem[]
+                // createMenu(response && response.data);
+                // const payload: Menu[];
+            });
+        }
     },
 };

@@ -6,7 +6,7 @@ import {Menu, MenuTreeState} from '@/types';
 import { RootState } from '@/types';
 
 export const state: MenuTreeState = {
-    main: undefined,
+    main: [],
     error: false,
 };
 

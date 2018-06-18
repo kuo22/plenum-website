@@ -1,3 +1,5 @@
+// TODO: seperate types into smaller files
+
 export interface RootState {
     version: string;
 }

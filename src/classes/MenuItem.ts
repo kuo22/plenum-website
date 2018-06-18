@@ -7,6 +7,7 @@ export class MenuItem {
     public active: boolean;     // Menu's active state--if content from the menu/submenu is rendered/active
     public hoverState: boolean; // If the menu item is being hovered by cursor
     public subMenu?: { [header: string]: string[]}; // The submenu content associated with the main menu entry
+    // public submenus: { [header: string]: string[]};
 
     constructor(name: string, color: string, subMenu?: { [header: string]: string[]}) {
         this.name = name;

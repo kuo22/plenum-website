@@ -38,8 +38,8 @@ import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
 import * as hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
-import {Action, State} from 'vuex-class';
-import {MenuTreeState} from '../types';
+import {Action, Getter, State} from 'vuex-class';
+import {Menu, MenuTreeState} from '../types';
 
 const namespace: string = 'menuTree';
 
@@ -54,14 +54,12 @@ const namespace: string = 'menuTree';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
+    @Prop() private menuItems: MenuItem[]; // Main Menu Options
     @State('menuTree') private menuTree: MenuTreeState;
-    @Action('fetchData', { namespace }) private fetchData: any;
-    private menuItems: MenuItem[]; // Main Menu Options
+    @Getter('mainMenu', { namespace }) private mainMenu: any;
 
     constructor() {
         super();
-
-        this.menuItems = this.createMenuItems();
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
@@ -97,90 +95,16 @@ export default class NavBar extends Vue {
         }
     }
 
-    // Returns a list of the main menu items
-    // TODO: Replace contents with fetch command to wordpress API
-    private createMenuItems(): MenuItem[] {
-
-        const menuColors: string[] = this.getUniformColors(20);
-
-        /*
-        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
-        // Review how current Plenum website accesses this information
-        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
-
-
-         */
-
-        return [
-            new MenuItem(
-                'About',
-                menuColors[0],
-                {
-                    About: ['About Plenum', 'About the Authors', 'About the Editors'],
-                },
-            ),
-            new MenuItem(
-                'Publications',
-                menuColors[1],
-                {
-                    'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
-                    'Showcase': ['GIS', 'Art', 'Book Reviews'],
-                },
-            ),
-            new MenuItem(
-                'Contribute',
-                menuColors[2],
-            ),
-            new MenuItem(
-                'Volunteer',
-                menuColors[3],
-            ),
-        ];
-    }
-
-    // Returns a collection of perceptually uniform colors in RGB form
-    // Colors are selected at equal intervals along the LCH uniform color space
-    // with the starting point along the gradient determined by the provided parameter
-    // parameter(s) needed:
-    //      start = starting point of color selection along a cylical color wheel
-    //                  must be 0 - 90
-    private getUniformColors(start: number): string[] {
-        const uniformColors: number[number[]] = [];
-        const uniformColorsAsString: string[] = [];
-
-        if (start > 90 || start < 0) {
-            error('Number can\'t be 90 or greater. Number provided: ' + start);
-        } else {
-            const L: number = 95;
-            const C: number = 50;
-            const hMax: number = 360;
-            const numberOfMenus: number = 4;
-            let index = 0;
-            for (let i = start; i < 360; i += hMax / numberOfMenus) {
-                uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
-                index++;
+    private dataToMenuItems(data?: Menu[]): {[header: string]: string} {
+        for (const menu: Menu in data) {
+            if (!menu.has_children) {
+                // return nothing/ empty array
+            } else {
+                // TODO
             }
         }
 
-        return this.colorToString(uniformColors);
-    }
-
-    // Returns an rgb style string of a provided color
-    // Provided color must be in the form of a matrix
-    // parameter(s) needed:
-    //      colors = set of colors in the form of a matrix
-    private colorToString(colors: number[number[]]): string[] {
-        const uniformColorsAsString: string[] = [];
-
-        for (const color of colors) {
-            const colorString: string = 'rgb(' +
-                color[0] * 255 + ', ' +
-                color[1] * 255 + ', ' +
-                color[2] * 255 + ')';
-            uniformColorsAsString.push(colorString);
-        }
-
-        return uniformColorsAsString;
+        return {};
     }
 }
 </script>
