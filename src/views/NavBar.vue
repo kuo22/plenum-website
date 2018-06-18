@@ -38,6 +38,10 @@ import SubMenu from '@/components/SubMenu';
 import {MenuItem} from '../classes/MenuItem';
 import * as hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
+import {Action, State} from 'vuex-class';
+import {MenuTreeState} from '../types';
+
+const namespace: string = 'menuTree';
 
 
 @Component({
@@ -50,6 +54,8 @@ import {error} from 'util';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
+    @State('menuTree') private menuTree: MenuTreeState;
+    @Action('fetchData', { namespace }) private fetchData: any;
     private menuItems: MenuItem[]; // Main Menu Options
 
     constructor() {

@@ -8,9 +8,14 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
+import {State, Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
+import { MenuTreeState, Menu } from './types';
+
+const namespace: string = 'menuTree';
+
 import { Article, Issue, Author} from './types';
 // TODO: move Menus out of view folder, it's a component!
 
@@ -23,10 +28,18 @@ import { Article, Issue, Author} from './types';
 })
 
 export default class App extends Vue {
+    @State('menuTree') public menuTree: MenuTreeState;
+    @Action('fetchData', { namespace }) public fetchData: any;
+    // @Getter('menuTree', { namespace }) public menuTree: Menu[];
+
     private issues: Issue[] = [];
 
     constructor() {
         super();
+    }
+
+    public created() {
+        this.fetchData();
     }
 
     public created(): void {
@@ -138,10 +151,6 @@ export default class App extends Vue {
       position: absolute;
       right: 0;
       bottom: 0;
-  }
-
-  a:focus, li:focus {
-      outline: black solid 3px;
   }
 
   .fade-enter-active, .fade-leave-active {
