@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
-import { RootState } from '@/types';
+import { RootState } from '@/types/storeTypes';
 import { menuTree } from '@/store/modules/menuTree/menuTree';
 
 Vue.use(Vuex);

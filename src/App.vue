@@ -12,15 +12,16 @@ import { Component, Vue } from 'vue-property-decorator';
 import {State, Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
-import { MenuTreeState, Menu } from './types';
+import { DrupalMenu } from './types/types';
 
 const namespace: string = 'menuTree';
 
-import { Article, Issue, Author} from './types';
-import {MenuItem} from './classes/MenuItem';
+import { Article, Issue, Author } from './types/types';
+import {MainMenuItem} from './classes/MainMenuItem';
 import {error} from 'util';
 
 import * as hsluv from '../node_modules/hsluv/hsluv.js';
+import {MenuTreeState} from './types/storeTypes';
 // TODO: move Menus out of view folder, it's a component!
 
 
@@ -32,21 +33,22 @@ import * as hsluv from '../node_modules/hsluv/hsluv.js';
 })
 
 export default class App extends Vue {
-    @State('menuTree') public menuTree: MenuTreeState;
-    @Action('fetchData', { namespace }) public fetchData: any;
-    @Getter('mainMenu', { namespace }) public mainMenu: Menu[];
+    @Action('fetchMenuData', { namespace }) public fetchData: any; // Action that calls Drupal API
+    @Getter('drupalMenuTree', { namespace }) public drupalMenuTree: DrupalMenu[]; //
 
     private issues: Issue[] = [];
-    private menuItems: MenuItem[] = [];
+    private menuItems: MainMenuItem[] = [];
 
     constructor() {
         super();
     }
 
+    // When the app is created, tell the store to fetch menu data
     public async created(): void {
         await this.fetchData()
-            .then((menuTree: Menu[]) => {
-                this.menuItems = this.createMenuItems();
+            .then(() => {
+                this.menuItems = this.createMenuItems(this.drupalMenuTree);
+                // TODO Convert drupal menu data into menu items legible by components
             })
         // TODO: figure out why this catch is being triggered
             .catch();
@@ -63,21 +65,56 @@ export default class App extends Vue {
 
     // Returns a list of the main menu items
     // TODO: Replace contents with fetch command to wordpress API
-    private createMenuItems(): MenuItem[] {
-        const menuItems: MenuItem[] = [];
+    private createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
+        const menuItems: MainMenuItem[] = [];
         const menuColors: string[] = this.getUniformColors(20);
 
-        for (let i = 0; i < this.mainMenu.length; i++) {
+        function getSubTreeItems(subTree: DrupalMenu[], parentTitle: string): { [header: string]: string[] } {
+            const submenus: { [header: string]: string[] } = {};
+            const menuLinks: string[] = [];
+
+            for (const node of subTree) {
+                // If submenu contains sections
+                if (node.has_children && node.depth === 2) {
+                    for (const nodeSubtree of node.subtree) {
+                        menuLinks.push(nodeSubtree.title);
+                    }
+                    submenus[node.title] = menuLinks;
+                } else if (!node.has_children) {
+                    menuLinks.push(node.title);
+                    submenus[parentTitle] = menuLinks;
+                }
+            }
+
+            return submenus;
+
+            // for (let menuTree: Menu in this.mainMenu[i].subtree) {
+            //     if (!menuTree.has_children) {
+            //
+            //     }
+            // }
+        }
+
+        for (let i = 0; i < drupalMenuTree.length; i++) {
+            let submenus: { [header: string]: string[] };
+            if (drupalMenuTree[i].has_children) {
+                submenus = getSubTreeItems(drupalMenuTree[i].subtree, drupalMenuTree[i].title);
+            } else {
+                submenus = {};
+            }
+
             menuItems.push(
-                new MenuItem(
-                    this.mainMenu[i].title,
+                new MainMenuItem(
+                    drupalMenuTree[i].title,
                     menuColors[i],
+                    submenus,
+                    //
                     // recurse to create menuItems, if
                     // object array with keys from first submenu
                     // and array of values obtained from children of submenu
-                    {
-                        test: ['test1', 'test2'],
-                    },
+                    // {
+                    //     test: ['test1', 'test2'],
+                    // },
                 ),
             );
         }
@@ -135,7 +172,7 @@ export default class App extends Vue {
             const L: number = 95;
             const C: number = 50;
             const hMax: number = 360;
-            const numberOfMenus: number = this.mainMenu.length;
+            const numberOfMenus: number = this.drupalMenuTree.length;
 
             let index = 0;
             for (let i = start; i < 360; i += hMax / numberOfMenus) {
@@ -192,6 +229,8 @@ export default class App extends Vue {
             // create issue in vue
             // add issue to issue array in store?
             const issue: Issue = {
+                articles: [],
+                nodeNumber: null,
                 uuid: issueData.attributes.uuid,
                 title: issueData.attributes.title,
                 articleIds: this.getArticleIds(issueData.relationships.field_articles.data),

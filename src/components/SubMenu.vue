@@ -17,7 +17,7 @@
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {MenuItem} from '@/classes/MenuItem';
+    import {MainMenuItem} from '@/classes/MainMenuItem';
 
     @Component({
         components: {
@@ -27,14 +27,14 @@
 
     // Submenu associated with a unique main menu entry
     export default class SubMenu extends Vue {
-        @Prop() private menu!: MenuItem; // Parent menu item
+        @Prop() private menu!: MainMenuItem; // Parent menu item
 
         constructor() {
             super();
         }
 
         // Emits an open event to the parent
-        @Emit('activateMenu') public activateMenu(item: MenuItem): void {
+        @Emit('activateMenu') public activateMenu(item: MainMenuItem): void {
             /* tslint fix - 'no-empty blocks' */
         }
 
