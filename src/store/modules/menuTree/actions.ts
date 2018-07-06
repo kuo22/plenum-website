@@ -1,19 +1,19 @@
 import { ActionTree } from 'vuex';
 import fetcher from '@/fetcher';
-import {Menu, MenuTreeState, User} from '@/types';
-import { RootState } from '@/types';
+import {DrupalMenu} from '@/types/types';
+import {MenuTreeState, RootState} from '@/types/storeTypes';
 import {error} from 'util';
-import {MenuItem} from '@/classes/MenuItem';
+import {MainMenuItem} from '@/classes/MainMenuItem';
 
-function parseMenuData(menuTree: any): Menu[] {
-    const menus: Menu[] = [];
+function parseMenuData(menuTree: any): DrupalMenu[] {
+    const menus: DrupalMenu[] = [];
     if (menuTree.length > 0) {
         for (const menuNode of menuTree) {
-            const newMenu: Menu = {
+            const newMenu: DrupalMenu = {
                 title: menuNode.link.title,
                 description: menuNode.link.description,
                 weight: menuNode.link.weight,
-                parentMenu: menuNode.link.menu_name,
+                depth: menuNode.depth,
                 url: menuNode.link.url,
                 has_children: menuNode.has_children,
                 subtree: parseMenuData(menuNode.subtree),
@@ -26,12 +26,12 @@ function parseMenuData(menuTree: any): Menu[] {
 }
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
-    fetchData({ commit }): Promise<any> {
+    fetchMenuData({ commit }): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             fetchMenuTree()
-                .then((menuTree: Menu[]) => {
+                .then((menuTree: DrupalMenu[]) => {
                     commit('menusLoaded', menuTree);
-                    resolve(menuTree);
+                    resolve();
                 })
                 .catch((error) => {
                     commit('menusError');
@@ -49,7 +49,7 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
                 // socketPath: ,
 
             }).then((response) => {
-                const menuTree: Menu[] = parseMenuData(response.data).sort(
+                const menuTree: DrupalMenu[] = parseMenuData(response.data).sort(
                     (menu1, menu2) => {
                         return menu1.weight - menu2.weight;
                     },

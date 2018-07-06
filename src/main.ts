@@ -4,7 +4,7 @@ import router from './router';
 import store from '@/store/index';
 import {StoreOptions} from 'vuex';
 import Vuex from 'vuex';
-import {RootState} from '@/types';
+import {RootState} from '@/types/storeTypes';
 import {index} from '@/store/modules/profile/profile';
 
 Vue.config.productionTip = false;

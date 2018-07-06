@@ -35,11 +35,12 @@
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
-import {MenuItem} from '../classes/MenuItem';
+import {MainMenuItem} from '../classes/MainMenuItem';
 import * as hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
 import {Action, Getter, State} from 'vuex-class';
-import {Menu, MenuTreeState} from '../types';
+import {DrupalMenu} from '../types/types';
+import {MenuTreeState} from '../types/storeTypes';
 
 const namespace: string = 'menuTree';
 
@@ -54,7 +55,7 @@ const namespace: string = 'menuTree';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
-    @Prop() private menuItems: MenuItem[]; // Main Menu Options
+    @Prop() private menuItems: MainMenuItem[]; // Main Menu Options
     @State('menuTree') private menuTree: MenuTreeState;
     @Getter('mainMenu', { namespace }) private mainMenu: any;
 
@@ -63,7 +64,7 @@ export default class NavBar extends Vue {
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
-    public toggleOpenMenu(item: MenuItem): void {
+    public toggleOpenMenu(item: MainMenuItem): void {
         const alreadyOpen: boolean = item.open;
 
         if (item.open) {
@@ -82,7 +83,7 @@ export default class NavBar extends Vue {
         }
     }
 
-    private toggleActiveMenu(item: MenuItem): void {
+    private toggleActiveMenu(item: MainMenuItem): void {
         // Reset all submenus
         for (const menuItem of this.menuItems) {
             menuItem.active = false;
@@ -95,8 +96,8 @@ export default class NavBar extends Vue {
         }
     }
 
-    private dataToMenuItems(data?: Menu[]): {[header: string]: string} {
-        for (const menu: Menu in data) {
+    private dataToMenuItems(data?: DrupalMenu[]): {[header: string]: string} {
+        for (const menu: DrupalMenu in data) {
             if (!menu.has_children) {
                 // return nothing/ empty array
             } else {

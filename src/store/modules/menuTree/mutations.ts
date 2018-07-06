@@ -1,9 +1,10 @@
 import { MutationTree } from 'vuex';
-import { MenuTreeState, User } from '@/types';
-import {Menu} from '@/types';
+import { User } from '@/types/types';
+import {DrupalMenu} from '@/types/types';
+import {MenuTreeState} from '@/types/storeTypes';
 
 export const mutations: MutationTree<MenuTreeState> = {
-    menusLoaded(state, payload: Menu[]) {
+    menusLoaded(state, payload: DrupalMenu[]) {
         state.main = payload;
         state.error = false;
     },

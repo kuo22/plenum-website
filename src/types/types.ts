@@ -1,0 +1,54 @@
+// Profile types
+// TODO implement current "interfaces" (class objects) as true interfaces like this
+
+// Interface for an element of the main navigation
+export interface DrupalMenu {
+    title: string; // link.title
+    description?: string; // link.description
+    weight: number; // link.weight
+    depth: number; // depth
+    url?: string; // link.url
+    has_children: boolean; // has_children
+    subtree?: DrupalMenu[]; // subtree
+}
+
+// A Drupal content node
+export interface DrupalNode {
+    nodeNumber: number;
+    uuid: string;
+    urlPath?: string;
+}
+
+// A content author
+export interface Author {
+    firstName: string;
+    lastName: string;
+    university?: string;
+    school?: string;
+}
+
+// A peer-reviewed research article
+export interface Article extends DrupalNode {
+    author: Author;
+    title: string;
+    subtitle?: string;
+    abstract: string;
+    body: string;
+    refs: string;
+    copyright: boolean;
+    downloadURL: string;
+}
+
+// A Plenum Issue, a collection of articles
+export interface Issue extends DrupalNode {
+    title: string;
+    articles: Article[];
+    articleIds: string[];
+}
+
+/*
+export interface MenuLink {
+
+}
+*/
+
