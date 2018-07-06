@@ -63,51 +63,36 @@ export default class App extends Vue {
         // }
     }
 
-    // Returns a list of the main menu items
+    // Returns a list of main menu objects derived from Drupal-provided data
+    // parameter(s) needed:
+    //      drupalMenuTree = tree of menu objects from drupal data
     // TODO: Replace contents with fetch command to wordpress API
+    /*
+        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
+        // Review how current Plenum website accesses this information
+        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
+
+
+         */
     private createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
         const menuItems: MainMenuItem[] = [];
         const menuColors: string[] = this.getUniformColors(20);
 
-        function getSubTreeItems(subTree: DrupalMenu[], parentTitle: string): { [header: string]: string[] } {
-            const submenus: { [header: string]: string[] } = {};
-            const menuLinks: string[] = [];
-
-            for (const node of subTree) {
-                // If submenu contains sections
-                if (node.has_children && node.depth === 2) {
-                    for (const nodeSubtree of node.subtree) {
-                        menuLinks.push(nodeSubtree.title);
-                    }
-                    submenus[node.title] = menuLinks;
-                } else if (!node.has_children) {
-                    menuLinks.push(node.title);
-                    submenus[parentTitle] = menuLinks;
-                }
-            }
-
-            return submenus;
-
-            // for (let menuTree: Menu in this.mainMenu[i].subtree) {
-            //     if (!menuTree.has_children) {
-            //
-            //     }
-            // }
-        }
-
         for (let i = 0; i < drupalMenuTree.length; i++) {
-            let submenus: { [header: string]: string[] };
-            if (drupalMenuTree[i].has_children) {
-                submenus = getSubTreeItems(drupalMenuTree[i].subtree, drupalMenuTree[i].title);
+            const drupalMenu = drupalMenuTree[i];
+            let menuSections: { [sectionHeader: string]: string[] };
+
+            if (drupalMenu.has_children) {
+                menuSections = menuSectionsFromDrupal(drupalMenu.subtree, drupalMenu.title);
             } else {
-                submenus = {};
+                menuSections = {};
             }
 
             menuItems.push(
                 new MainMenuItem(
-                    drupalMenuTree[i].title,
+                    drupalMenu.title,
                     menuColors[i],
-                    submenus,
+                    menuSections,
                     //
                     // recurse to create menuItems, if
                     // object array with keys from first submenu
@@ -121,39 +106,32 @@ export default class App extends Vue {
 
         return menuItems;
 
-        /*
-        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
-        // Review how current Plenum website accesses this information
-        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
+        // Returns a list of menu sections derived from the provided drupal-like menu
+        // parameter(s) needed:
+        //      subTree     =
+        //      parentTitle =
+        function menuSectionsFromDrupal(drupalSections: DrupalMenu[],
+                                        parentTitle: string): { [header: string]: string[] } {
+            const menuSections: { [header: string]: string[] } = {};
+            const sectionList: string[] = [];
 
+            for (const drupalSection: DrupalMenu of drupalSections) {
+                // If section has links
+                if (drupalSection.has_children && drupalSection.depth === 2) {
+                    // Then add title of section to list of rendered menu sections
+                    for (const sectionLink: DrupalMenu of drupalSection.subtree) {
+                        sectionList.push(sectionLink.title);
+                    }
+                    menuSections[drupalSection.title] = sectionList;
+                } else if (!drupalSection.has_children) { // Else if submenu links
 
-         */
+                    sectionList.push(drupalSection.title);
+                    menuSections[parentTitle] = sectionList;
+                }
+            }
 
-        // return [
-        //     new MenuItem(
-        //         'About',
-        //         menuColors[0],
-        //         {
-        //             About: ['About Plenum', 'About the Authors', 'About the Editors'],
-        //         },
-        //     ),
-        //     new MenuItem(
-        //         'Publications',
-        //         menuColors[1],
-        //         {
-        //             'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
-        //             'Showcase': ['GIS', 'Art', 'Book Reviews'],
-        //         },
-        //     ),
-        //     new MenuItem(
-        //         'Contribute',
-        //         menuColors[2],
-        //     ),
-        //     new MenuItem(
-        //         'Volunteer',
-        //         menuColors[3],
-        //     ),
-        // ];
+            return menuSections;
+        }
     }
 
     // Returns a collection of perceptually uniform colors in RGB form
