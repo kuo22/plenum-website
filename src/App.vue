@@ -48,7 +48,6 @@ export default class App extends Vue {
         await this.fetchData()
             .then(() => {
                 this.menuItems = this.createMenuItems(this.drupalMenuTree);
-                // TODO Convert drupal menu data into menu items legible by components
             })
         // TODO: figure out why this catch is being triggered
             .catch();
@@ -81,10 +80,18 @@ export default class App extends Vue {
         for (let i = 0; i < drupalMenuTree.length; i++) {
             const drupalMenu = drupalMenuTree[i];
             let menuSections: { [sectionHeader: string]: string[] };
+            let isSectioned: boolean = true;
 
-            if (drupalMenu.has_children) {
-                menuSections = menuSectionsFromDrupal(drupalMenu.subtree, drupalMenu.title);
-            } else {
+            if (drupalMenu.has_children) { // If a submenu exists
+                for (const section: DrupalMenu of drupalMenu.subtree) {
+                    if (!section.has_children) {
+                        isSectioned = false;
+                    }
+                }
+                menuSections = menuSectionsFromDrupalMenu(drupalMenu.subtree,
+                                                          drupalMenu.title,
+                                                          isSectioned);
+            } else { // No submenu exists, i.e. 'Volunteer' & 'Contribute'
                 menuSections = {};
             }
 
@@ -110,24 +117,32 @@ export default class App extends Vue {
         // parameter(s) needed:
         //      subTree     =
         //      parentTitle =
-        function menuSectionsFromDrupal(drupalSections: DrupalMenu[],
-                                        parentTitle: string): { [header: string]: string[] } {
-            const menuSections: { [header: string]: string[] } = {};
-            const sectionList: string[] = [];
+        function menuSectionsFromDrupalMenu(drupalSections: DrupalMenu[],
+                                            parentTitle: string,
+                                            hasSections: boolean): { [sectionTitle: string]: string[] } {
+            const menuSections: { [sectionTitle: string]: string[] } = {};
 
-            for (const drupalSection: DrupalMenu of drupalSections) {
-                // If section has links
-                if (drupalSection.has_children && drupalSection.depth === 2) {
-                    // Then add title of section to list of rendered menu sections
-                    for (const sectionLink: DrupalMenu of drupalSection.subtree) {
-                        sectionList.push(sectionLink.title);
+            if (hasSections) {
+                for (const drupalSection: DrupalMenu of drupalSections) {
+                    const sectionList: string[] = [];
+
+                    if (drupalSection.has_children && drupalSection.depth === 2) {
+                        // Then add title of section to list of rendered menu sections
+                        for (const sectionLink: DrupalMenu of drupalSection.subtree) {
+                            sectionList.push(sectionLink.title);
+                        }
+                        menuSections[drupalSection.title] = sectionList;
+                    } else if (!drupalSection.has_children && drupalSection.depth === 2) { // Else if submenu links
+                        sectionList.push(drupalSection.title);
+                        menuSections[parentTitle] = sectionList;
                     }
-                    menuSections[drupalSection.title] = sectionList;
-                } else if (!drupalSection.has_children) { // Else if submenu links
-
-                    sectionList.push(drupalSection.title);
-                    menuSections[parentTitle] = sectionList;
                 }
+            } else {
+                const menuList: string[] = [];
+                for (const link: DrupalMenu of drupalSections) {
+                    menuList.push(link.title);
+                }
+                menuSections[parentTitle] = menuList;
             }
 
             return menuSections;
@@ -220,6 +235,7 @@ export default class App extends Vue {
         return issues;
     }
 
+    // TODO create interface for article, so ID is recognized by INTELLIJ
     private getArticleIds(articleData: [{}]): string[] {
         const articleIds = [];
 

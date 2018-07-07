@@ -1,13 +1,13 @@
 <template>
     <div :class="{ active: menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
-        <ul id="submenu-container" v-for="(subheaders, header) in menu.subMenu">
+        <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
             <h1 v-if="menu.subMenu">
-                {{ header }}
+                {{ sectionName }}
             </h1>
-            <li v-for="subheader in subheaders">
-                <a v-on:click="activateMenu(menu)">
+            <li v-for="link in sectionLinks">
+                <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
                     <h2>
-                        {{ subheader }}
+                        {{ link }}
                     </h2>
                 </a>
             </li>
@@ -55,7 +55,7 @@
         text-decoration: underline;
     }
 
-    #submenu-container {
+    #section-container {
         padding: 15px 15px;
     }
 
