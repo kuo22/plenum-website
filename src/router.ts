@@ -27,12 +27,14 @@ export default new Router({
             component: TextArticle,
         },
         {
-            path: '/publications/:section/:publication/index',
+
+            path: '/publications/:publication/index',
             name: 'publication-table-of-contents',
             component: TableOfContents,
         },
         {
-            path: '/publications/:section/:publication/:article',
+            //
+            path: '/publications/:publication/:node',
             name: 'publication-article',
             component: TextArticle,
         },

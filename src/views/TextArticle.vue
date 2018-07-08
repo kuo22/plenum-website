@@ -80,6 +80,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
+import {API} from '../classes/API';
 
 @Component({
     components: {
@@ -90,54 +91,29 @@ import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
 export default class Article extends Vue {
     @Prop() private article: ArticlePeerReviewed;
     @Prop() private mainTitleOffScreen: boolean;
+    private api = new API();
     private $route: Route;
-    private year: string;
-    private articleId: number;
+    private issueTitle: string;
+    private drupalNodeID: string;
 
     constructor() {
         super();
-
-
     }
 
     // When view is mounted, retrieve article
     public mounted() {
         // https://github.com/nuxt-community/typescript-template/issues/23
-        this.year = this.$route.params.id;
-        this.articleId = this.$route.params.article_id - 1;
 
-        this.getArticle(this.year, this.articleId);
-    }
+        // TODO: use publication to confirm or get article, currently arbitrary
+        // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
+        this.issueTitle = this.$route.params.publication;
+        this.drupalNodeID = this.$route.params.node;
 
-    private getArticle(year: string, articleId: number) {
-        const articleJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/api/pubs/'
-            + this.year
-            + '?_format=json')
-            .then((response) =>
-                response.json().then((data) => ({
-                    data,
-                    status: response.status,
-                }),
-                ).then((res) => {
-                    this.parseData(res.data[this.articleId]);
-                }))
+        this.api.getArticle(this.drupalNodeID)
+            .then((article: ArticlePeerReviewed) => {
+                this.article = article;
+            })
             .catch();
-        // Throw DOM display that article does not exist
-    }
-
-    private parseData(data) {
-        this.article = new ArticlePeerReviewed(
-            data.field_title[0].value, // Title
-            data.field_author[0].value, // Author
-            data.field_abstract[0].value, // Abstract
-            data.body[this.articleId].processed, // Text body
-            data.field_references[0].value,
-            data.field_download_[0].url, // Download URL
-            data.field_copyright[0].value,
-            'University of Washington', // University
-            'Department of Geography', // School
-            data.field_subtitle[0].value, // Subtitle
-        );
     }
 }
 </script>
