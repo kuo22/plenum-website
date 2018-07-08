@@ -32,7 +32,7 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
             fetchMenuTree()
                 .then((menuTree: DrupalMenu[]) => {
                     commit('menusLoaded', menuTree);
-                    resolve();
+                    resolve(menuTree);
                 })
                 .catch((error) => {
                     commit('menusError');

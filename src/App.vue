@@ -12,7 +12,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import {State, Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
-import {DrupalMenu} from './types/types';
+import { DrupalMenu } from './types/types';
 
 const namespace: string = 'menuTree';
 
@@ -67,13 +67,6 @@ export default class App extends Vue {
     // parameter(s) needed:
     //      drupalMenuTree = tree of menu objects from drupal data
     // TODO: Replace contents with fetch command to wordpress API
-    /*
-        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
-        // Review how current Plenum website accesses this information
-        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
-
-
-         */
     private createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
         const menuItems: MainMenuItem[] = [];
         const menuColors: string[] = this.getUniformColors(20);
