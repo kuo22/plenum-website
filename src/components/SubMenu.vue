@@ -4,12 +4,15 @@
             <h1 v-if="menu.subMenu">
                 {{ sectionName }}
             </h1>
-            <li v-for="link in sectionLinks">
-                <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
-                    <h2>
-                        {{ link }}
-                    </h2>
-                </a>
+            <li v-for="menuLink in sectionLinks">
+                <router-link :to="'/' + menu.name.toLowerCase() +
+                                  '/' + menuLink.text.replace(new RegExp(' ', 'g'), '-').toLowerCase()">
+                    <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
+                        <h2>
+                            {{ menuLink.text }}
+                        </h2>
+                    </a>
+                </router-link>
             </li>
         </ul>
     </div>
@@ -44,6 +47,14 @@
 <style lang="scss" scoped>
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
+
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
 
     .active {
         left: 20px;

@@ -6,7 +6,15 @@
                @mouseleave="updateHoverState(false, item)"
             >
                 <li :style="changeBackground(item)" >
-                    <h1 v-on:click="open(item)">{{ item.name }}</h1>
+                    <h1 v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
+                        v-on:click="open(item)">
+                        {{ item.name }}
+                    </h1>
+                    <h1 v-else>
+                        <router-link :to="'/' + item.name.toLowerCase()">
+                            {{ item.name }}
+                        </router-link>
+                    </h1>
                 </li>
             </a>
         </ul>
@@ -83,6 +91,10 @@ export default class MainMenu extends Vue {
 
     li:hover {
         background: transparent;
+    }
+
+    a {
+        text-decoration: none;
     }
 
     a:hover {

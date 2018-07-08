@@ -45,10 +45,3 @@ export interface Issue extends DrupalNode {
     articles: Article[];
     articleIds: string[];
 }
-
-/*
-export interface MenuLink {
-
-}
-*/
-

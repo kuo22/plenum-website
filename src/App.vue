@@ -12,7 +12,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import {State, Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
-import { DrupalMenu } from './types/types';
+import {DrupalMenu} from './types/types';
 
 const namespace: string = 'menuTree';
 
@@ -22,6 +22,7 @@ import {error} from 'util';
 
 import * as hsluv from '../node_modules/hsluv/hsluv.js';
 import {MenuTreeState} from './types/storeTypes';
+import {SubmenuLink} from './classes/SubmenuLink';
 // TODO: move Menus out of view folder, it's a component!
 
 
@@ -79,7 +80,7 @@ export default class App extends Vue {
 
         for (let i = 0; i < drupalMenuTree.length; i++) {
             const drupalMenu = drupalMenuTree[i];
-            let menuSections: { [sectionHeader: string]: string[] };
+            let menuSections: { [sectionHeader: string]: SubmenuLink[] };
             let isSectioned: boolean = true;
 
             if (drupalMenu.has_children) { // If a submenu exists
@@ -99,6 +100,8 @@ export default class App extends Vue {
                 new MainMenuItem(
                     drupalMenu.title,
                     menuColors[i],
+                    // url
+                    drupalMenu.url,
                     menuSections,
                     //
                     // recurse to create menuItems, if
@@ -119,28 +122,31 @@ export default class App extends Vue {
         //      parentTitle =
         function menuSectionsFromDrupalMenu(drupalSections: DrupalMenu[],
                                             parentTitle: string,
-                                            hasSections: boolean): { [sectionTitle: string]: string[] } {
-            const menuSections: { [sectionTitle: string]: string[] } = {};
+                                            hasSections: boolean): { [sectionTitle: string]: SubmenuLink[] } {
+            const menuSections: { [sectionTitle: string]: SubmenuLink[] } = {};
 
             if (hasSections) {
                 for (const drupalSection: DrupalMenu of drupalSections) {
-                    const sectionList: string[] = [];
+                    const sectionList: SubmenuLink[] = [];
 
                     if (drupalSection.has_children && drupalSection.depth === 2) {
                         // Then add title of section to list of rendered menu sections
                         for (const sectionLink: DrupalMenu of drupalSection.subtree) {
-                            sectionList.push(sectionLink.title);
+                            const submenuLink: SubmenuLink = new SubmenuLink(sectionLink.title, sectionLink.url);
+                            sectionList.push(submenuLink);
                         }
                         menuSections[drupalSection.title] = sectionList;
                     } else if (!drupalSection.has_children && drupalSection.depth === 2) { // Else if submenu links
-                        sectionList.push(drupalSection.title);
+                        const submenuLink: SubmenuLink = new SubmenuLink(drupalSection.title, drupalSection.url);
+                        sectionList.push(submenuLink);
                         menuSections[parentTitle] = sectionList;
                     }
                 }
             } else {
-                const menuList: string[] = [];
+                const menuList: SubmenuLink[] = [];
                 for (const link: DrupalMenu of drupalSections) {
-                    menuList.push(link.title);
+                    const submenuLink: SubmenuLink = new SubmenuLink(link.title, link.url);
+                    menuList.push(submenuLink);
                 }
                 menuSections[parentTitle] = menuList;
             }

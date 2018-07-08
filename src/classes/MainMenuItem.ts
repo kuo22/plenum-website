@@ -1,4 +1,7 @@
 // An entry of the main menu
+
+import {SubmenuLink} from '@/classes/SubmenuLink';
+
 export class MainMenuItem {
 
     public name: string;        // Name of the menu item
@@ -6,24 +9,20 @@ export class MainMenuItem {
     public open: boolean;       // Menu's open state--if the submenu for the menu entry is 'open'
     public active: boolean;     // Menu's active state--if content from the menu/submenu is rendered/active
     public hoverState: boolean; // If the menu item is being hovered by cursor
-    public subMenu?: { [header: string]: string[] }; // The submenu content associated with the main menu entry
-    public url?: string;
+    public href: string;
+    public subMenu?: { [sectionHeader: string]: SubmenuLink[] }; // Submenu content
     // { [header: string]: string[] }
     // public submenus: { [header: string]: string[]};
 
-    constructor(name: string, color: string, subMenu?: { [header: string]: string[] }, url?: string) {
+    constructor(name: string, color: string, href: string, subMenu?: { [sectionHeader: string]: SubmenuLink[] }) {
         this.name = name;
         this.color = color;
         this.open = false;
         this.active = false;
         this.hoverState = false;
+        this.href = href;
         this.subMenu = subMenu;
-        this.url = url;
     }
-}
-
-interface MenuItem {
-    name: string;
 }
 
 

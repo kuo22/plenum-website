@@ -5,6 +5,7 @@ import {MenuTreeState, RootState} from '@/types/storeTypes';
 import {error} from 'util';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 
+// TODO: can a plain function be here? should this be private
 function parseMenuData(menuTree: any): DrupalMenu[] {
     const menus: DrupalMenu[] = [];
     if (menuTree.length > 0) {
