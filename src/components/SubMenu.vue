@@ -6,7 +6,8 @@
             </h1>
             <li v-for="menuLink in sectionLinks">
                 <router-link :to="'/' + menu.name.toLowerCase() +
-                                  '/' + menuLink.text.replace(new RegExp(' ', 'g'), '-').toLowerCase()">
+                                  '/' + menuLink.text.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                                  '/index'">
                     <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
                         <h2>
                             {{ menuLink.text }}
