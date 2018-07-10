@@ -2,22 +2,29 @@ import {ArticlePeerReviewed} from '@/classes/ArticlePeerReviewed';
 import fetcher from '@/fetcher';
 
 export class API {
-    private jsonAPI: string = '/jsonapi/node/';
-    private drupalAPI: string = '/node/';
-    private drupalType: string = 'article/';
-    private format: string = '';
+
+
+    private jsonAPIPath: string = '/jsonapi/node/';
+    private drupalAPIPath: string = '/node';
+    private articleEntityPath: string = '/article/';
+    private format: string = 'json';
 
 
     constructor() {
         // empty
     }
 
-    public async getArticle(drupalNodeID: string): Promise<any> {
-        return await this.fetchUUID(drupalNodeID)
+    // Call the Drupal API to get article data according to the provided drupal node ID
+    // and return a processed article
+    // parameters needed:
+    //      articleNodeID = the drupal node ID of an article
+    public async getArticle(articleNodeID: string): Promise<any> {
+        return await this.fetchUUID(articleNodeID)
             .then((uuid: string) => {
-                return this.fetchArticleByUUID(uuid)
-                    .then((fetchedArticle: ArticlePeerReviewed) => {
-                        return fetchedArticle;
+                // TODO make that API service get all UUIDs up front to prevent this second call to get UUID
+                return this.fetchNodeDataByUUID(uuid)
+                    .then((articleData: any) => {
+                        return this.createArticle(articleData);
                     })
                     .catch();
             })
@@ -33,51 +40,63 @@ export class API {
         //                 status: response.status,
         //             }),
         //         ).then((res) => {
-        //             this.parseData(res.data[this.articleId]);
+        //             this.createArticle(res.data[this.articleId]);
         //         }))
         //    .catch();
         // Throw DOM display that article does not exist
     }
 
 
+    // Calls the Drupal API to get and return the UUID of the provided Drupal node
+    // Response return example: "081b98ba-4ec8-429d-9152-2c231f45885a"
+    // parameters needed:
+    //      nodeID = the unique ID of the drupal content node
     private async fetchUUID(nodeID: string): Promise<any> {
         return await fetcher({
-            url: this.drupalAPI + nodeID,
+            url: this.drupalAPIPath + nodeID,
             params: {
-                _format: 'json',
+                _format: this.format,
             },
             timeout: 1000,
             // socketPath: ,
         }).then((response) => {
-            return response.data.uuid[0].value;
+            const uuid: string = response.data.uuid[0].value;
+            return uuid;
         });
     }
 
-    private async fetchArticleByUUID(uuid: string): Promise<any> {
+    // Calls the Drupal API for node data specified by the provided UUID
+    // and returns the slimmed data
+    // parameters needed:
+    //      uuid = the Drupal UUID of a Drupal node
+    private async fetchNodeDataByUUID(uuid: string): Promise<any> {
         return await fetcher( {
-            url: this.jsonAPI + this.drupalType + uuid,
+            url: this.jsonAPIPath + this.articleEntityPath + uuid,
             params: {
-                _format: 'json',
+                _format: this.format,
             },
             timeout: 1000,
         }).then((response) => {
-            return this.parseData(response.data.data);
+            return response.data.data;
         });
     }
 
-    private parseData(data: any): ArticlePeerReviewed {
+    // Creates an article from the provided data
+    // parameter(s) needed:
+    //      articleData = JSON data of an article from the Drupal API
+    private createArticle(articleData: any): ArticlePeerReviewed {
         return new ArticlePeerReviewed(
-            data.attributes.field_title, // Title
-            data.attributes.field_author, // Author
-            data.attributes.field_abstract, // Abstract
-            data.attributes.body[0].processed, // Text body
-            data.attributes.field_references.processed,
+            articleData.attributes.field_title, // Title
+            articleData.attributes.field_author, // Author
+            articleData.attributes.field_abstract, // Abstract
+            articleData.attributes.body[0].processed, // Text body
+            articleData.attributes.field_references.processed,
             '',
-            // data.relationships.field_download_.data, // Download URL
-            data.attributes.field_copyright,
+            // articleData.relationships.field_download_.articleData, // Download URL
+            articleData.attributes.field_copyright,
             'University of Washington', // University
             'Department of Geography', // School
-            data.attributes.field_subtitle, // Subtitle
+            articleData.attributes.field_subtitle, // Subtitle
         );
     }
 }

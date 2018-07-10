@@ -46,6 +46,8 @@ export default class App extends Vue {
 
     // When the app is created, tell the store to fetch menu data
     public async created(): void {
+        // populate app with app data from drupal
+        //      TODO: create a store variable of articles, menu, issues of menu,
         await this.fetchData()
             .then(() => {
                 this.menuItems = this.createMenuItems(this.drupalMenuTree);
