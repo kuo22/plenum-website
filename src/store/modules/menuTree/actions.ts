@@ -53,7 +53,7 @@ function createMenuTreeFromData(menuTree: any): DrupalMenu[] {
 // TODO: Replace contents with fetch command to wordpress API
 function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
     const menuItems: MainMenuItem[] = [];
-    const menuColors: string[] = getUniformColors(20, drupalMenuTree.length);
+    const menuColors: string[] = getUniformColors(30, drupalMenuTree.length);
 
     for (let i = 0; i < drupalMenuTree.length; i++) {
         const drupalMenu: DrupalMenu = drupalMenuTree[i];
@@ -145,13 +145,14 @@ function getUniformColors(start: number, numberOfColors: number): string[] {
     if (start > 90 || start < 0) {
         error('Number can\'t be 90 or greater. Number provided: ' + start);
     } else {
-        const L: number = 95;
-        const C: number = 50;
-        const hMax: number = 360;
+        const L: number = 90; // 95
+        const C: number = 25; // 50
+        const hMax: number = 360; // 360
 
         let index = 0;
+        start = 27;
         for (let i = start; i < 360; i += hMax / numberOfColors) {
-            uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
+            uniformColors[index] = hsluv.hsluvToRgb((hsluv.lchToHsluv([L, C, i])));
             index++;
         }
     }
