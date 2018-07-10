@@ -9,21 +9,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import {State, Action, Getter} from 'vuex-class';
+import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
-import { DrupalMenu } from './types/types';
+
+import { Issue } from './types/types';
+import { MainMenuItem } from './classes/MainMenuItem';
+import APIService from './API';
+
+// TODO: move Menus out of view folder, it's a component!
 
 const namespace: string = 'menuTree';
-
-import { Article, Issue, Author } from './types/types';
-import {MainMenuItem} from './classes/MainMenuItem';
-import {error} from 'util';
-
-import * as hsluv from '../node_modules/hsluv/hsluv.js';
-import {MenuTreeState} from './types/storeTypes';
-import {SubmenuLink} from './classes/SubmenuLink';
-// TODO: move Menus out of view folder, it's a component!
 
 
 @Component({
@@ -34,8 +30,8 @@ import {SubmenuLink} from './classes/SubmenuLink';
 })
 
 export default class App extends Vue {
-    @Action('fetchMenuData', { namespace }) public fetchData: any; // Action that calls Drupal API
-    @Getter('drupalMenuTree', { namespace }) public drupalMenuTree: DrupalMenu[]; //
+    @Action('createMenuItems', { namespace }) private createMenuItems: any;
+    @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
 
     private issues: Issue[] = [];
     private menuItems: MainMenuItem[] = [];
@@ -46,13 +42,10 @@ export default class App extends Vue {
 
     // When the app is created, tell the store to fetch menu data
     public async created(): void {
-        // populate app with app data from drupal
-        //      TODO: create a store variable of articles, menu, issues of menu,
-        await this.fetchData()
+        await this.createMenuItems()
             .then(() => {
-                this.menuItems = this.createMenuItems(this.drupalMenuTree);
+                this.menuItems = this.menuTree;
             })
-        // TODO: figure out why this catch is being triggered
             .catch();
 
         // getIssues
@@ -64,138 +57,6 @@ export default class App extends Vue {
         //     const issue: Issue = this.issues[i];
         // }
     }
-
-    // Returns a list of main menu objects derived from Drupal-provided data
-    // parameter(s) needed:
-    //      drupalMenuTree = tree of menu objects from drupal data
-    // TODO: Replace contents with fetch command to wordpress API
-    private createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
-        const menuItems: MainMenuItem[] = [];
-        const menuColors: string[] = this.getUniformColors(20);
-
-        for (let i = 0; i < drupalMenuTree.length; i++) {
-            const drupalMenu = drupalMenuTree[i];
-            let menuSections: { [sectionHeader: string]: SubmenuLink[] };
-            let isSectioned: boolean = true;
-
-            if (drupalMenu.has_children) { // If a submenu exists
-                for (const section: DrupalMenu of drupalMenu.subtree) {
-                    if (!section.has_children) {
-                        isSectioned = false;
-                    }
-                }
-                menuSections = menuSectionsFromDrupalMenu(drupalMenu.subtree,
-                                                          drupalMenu.title,
-                                                          isSectioned);
-            } else { // No submenu exists, i.e. 'Volunteer' & 'Contribute'
-                menuSections = {};
-            }
-
-            menuItems.push(
-                new MainMenuItem(
-                    drupalMenu.title,
-                    menuColors[i],
-                    // url
-                    drupalMenu.url,
-                    menuSections,
-                    //
-                    // recurse to create menuItems, if
-                    // object array with keys from first submenu
-                    // and array of values obtained from children of submenu
-                    // {
-                    //     test: ['test1', 'test2'],
-                    // },
-                ),
-            );
-        }
-
-        return menuItems;
-
-        // Returns a list of menu sections derived from the provided drupal-like menu
-        // parameter(s) needed:
-        //      subTree     =
-        //      parentTitle =
-        function menuSectionsFromDrupalMenu(drupalSections: DrupalMenu[],
-                                            parentTitle: string,
-                                            hasSections: boolean): { [sectionTitle: string]: SubmenuLink[] } {
-            const menuSections: { [sectionTitle: string]: SubmenuLink[] } = {};
-
-            if (hasSections) {
-                for (const drupalSection: DrupalMenu of drupalSections) {
-                    const sectionList: SubmenuLink[] = [];
-
-                    if (drupalSection.has_children && drupalSection.depth === 2) {
-                        // Then add title of section to list of rendered menu sections
-                        for (const sectionLink: DrupalMenu of drupalSection.subtree) {
-                            const submenuLink: SubmenuLink = new SubmenuLink(sectionLink.title, sectionLink.url);
-                            sectionList.push(submenuLink);
-                        }
-                        menuSections[drupalSection.title] = sectionList;
-                    } else if (!drupalSection.has_children && drupalSection.depth === 2) { // Else if submenu links
-                        const submenuLink: SubmenuLink = new SubmenuLink(drupalSection.title, drupalSection.url);
-                        sectionList.push(submenuLink);
-                        menuSections[parentTitle] = sectionList;
-                    }
-                }
-            } else {
-                const menuList: SubmenuLink[] = [];
-                for (const link: DrupalMenu of drupalSections) {
-                    const submenuLink: SubmenuLink = new SubmenuLink(link.title, link.url);
-                    menuList.push(submenuLink);
-                }
-                menuSections[parentTitle] = menuList;
-            }
-
-            return menuSections;
-        }
-    }
-
-    // Returns a collection of perceptually uniform colors in RGB form
-    // Colors are selected at equal intervals along the LCH uniform color space
-    // with the starting point along the gradient determined by the provided parameter
-    // parameter(s) needed:
-    //      start = starting point of color selection along a cylical color wheel
-    //                  must be 0 - 90
-    private getUniformColors(start: number): string[] {
-        const uniformColors: number[number[]] = [];
-        const uniformColorsAsString: string[] = [];
-
-        if (start > 90 || start < 0) {
-            error('Number can\'t be 90 or greater. Number provided: ' + start);
-        } else {
-            const L: number = 95;
-            const C: number = 50;
-            const hMax: number = 360;
-            const numberOfMenus: number = this.drupalMenuTree.length;
-
-            let index = 0;
-            for (let i = start; i < 360; i += hMax / numberOfMenus) {
-                uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
-                index++;
-            }
-        }
-
-        return this.colorToString(uniformColors);
-    }
-
-    // Returns an rgb style string of a provided color
-    // Provided color must be in the form of a matrix
-    // parameter(s) needed:
-    //      colors = set of colors in the form of a matrix
-    private colorToString(colors: number[number[]]): string[] {
-        const uniformColorsAsString: string[] = [];
-
-        for (const color of colors) {
-            const colorString: string = 'rgb(' +
-                color[0] * 255 + ', ' +
-                color[1] * 255 + ', ' +
-                color[2] * 255 + ')';
-            uniformColorsAsString.push(colorString);
-        }
-
-        return uniformColorsAsString;
-    }
-
 
 
     private getIssues(): void {

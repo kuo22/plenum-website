@@ -1,8 +1,19 @@
 import {ArticlePeerReviewed} from '@/classes/ArticlePeerReviewed';
-import fetcher from '@/fetcher';
+import axios, {AxiosStatic} from 'axios';
+import {DrupalMenu} from '@/types/types';
+import {Action} from 'vuex-class';
+import { Vue } from 'vue-property-decorator';
 
-export class API {
+const namespace: string = 'menuTree';
 
+class API extends Vue {
+    // @Action('setMenuTree', { namespace }) public setMenuTree: any; // Action that calls Drupal API
+    @Action('setMenuTree', { namespace }) public setMenuTree: any;
+
+    // Content Management System URL path
+    private port: string = '8888';
+    private CMSPath: string = 'http://localhost:' + this.port + '/plenum-drupal-dev/drupal-8.5.3';
+    private fetcher: AxiosStatic;
 
     private jsonAPIPath: string = '/jsonapi/node/';
     private drupalAPIPath: string = '/node';
@@ -11,7 +22,24 @@ export class API {
 
 
     constructor() {
-        // empty
+        super();
+
+        axios.defaults.baseURL = this.CMSPath;
+        this.fetcher = axios;
+
+    }
+
+    public async fetchMenuTree(): Promise<any> {
+        return await this.fetcher({
+            url: 'entity/menu/main/tree',
+            params: {
+                _format: 'json',
+            },
+            timeout: 1000,
+
+        }).then((response: any) => {
+            return response.data;
+        });
     }
 
     // Call the Drupal API to get article data according to the provided drupal node ID
@@ -28,22 +56,7 @@ export class API {
                     })
                     .catch();
             })
-            .catch();
-
-
-        // const articleJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/api/pubs/'
-        //     + this.year
-        //     + '?_format=json')
-        //     .then((response) =>
-        //         response.json().then((data) => ({
-        //                 data,
-        //                 status: response.status,
-        //             }),
-        //         ).then((res) => {
-        //             this.createArticle(res.data[this.articleId]);
-        //         }))
-        //    .catch();
-        // Throw DOM display that article does not exist
+            .catch(/* Throw DOM display error that article does not exist?*/);
     }
 
 
@@ -52,7 +65,7 @@ export class API {
     // parameters needed:
     //      nodeID = the unique ID of the drupal content node
     private async fetchUUID(nodeID: string): Promise<any> {
-        return await fetcher({
+        return await this.fetcher({
             url: this.drupalAPIPath + nodeID,
             params: {
                 _format: this.format,
@@ -70,7 +83,7 @@ export class API {
     // parameters needed:
     //      uuid = the Drupal UUID of a Drupal node
     private async fetchNodeDataByUUID(uuid: string): Promise<any> {
-        return await fetcher( {
+        return await this.fetcher( {
             url: this.jsonAPIPath + this.articleEntityPath + uuid,
             params: {
                 _format: this.format,
@@ -81,6 +94,7 @@ export class API {
         });
     }
 
+    // TODO: export article creation to store actions
     // Creates an article from the provided data
     // parameter(s) needed:
     //      articleData = JSON data of an article from the Drupal API
@@ -100,3 +114,7 @@ export class API {
         );
     }
 }
+
+const APIService = new API();
+
+export default APIService;

@@ -1,11 +1,10 @@
 import { GetterTree } from 'vuex';
 import { MenuTreeState } from '@/types/storeTypes';
 import { RootState } from '@/types/storeTypes';
-import {state} from '@/store/modules/menuTree/menuTree';
-import {DrupalMenu} from '@/types/types';
+import {MainMenuItem} from '@/classes/MainMenuItem';
 
 export const getters: GetterTree<MenuTreeState, RootState> = {
-    drupalMenuTree(state: MenuTreeState): DrupalMenu[] {
+    menuTree(state: MenuTreeState): MainMenuItem[] {
         return state.main;
     },
 };
