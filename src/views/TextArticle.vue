@@ -80,7 +80,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
-import {API} from '../classes/API';
+import {API} from '@/API';
 
 @Component({
     components: {

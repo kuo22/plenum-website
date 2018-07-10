@@ -1,4 +1,5 @@
-import {DrupalMenu} from '@/types/types';
+
+import {MainMenuItem} from '@/classes/MainMenuItem';
 
 // States
 
@@ -7,7 +8,7 @@ export interface RootState {
 }
 
 export interface MenuTreeState {
-    main: DrupalMenu[];
+    main: MainMenuItem[];
     error: boolean;
 }
 

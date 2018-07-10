@@ -5,7 +5,7 @@ import store from '@/store/index';
 import {StoreOptions} from 'vuex';
 import Vuex from 'vuex';
 import {RootState} from '@/types/storeTypes';
-import {index} from '@/store/modules/profile/profile';
+// import {index} from '@/store/modules/menuTree/menuTree';
 
 Vue.config.productionTip = false;
 

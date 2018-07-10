@@ -42,8 +42,6 @@ import {Action, Getter, State} from 'vuex-class';
 import {DrupalMenu} from '../types/types';
 import {MenuTreeState} from '../types/storeTypes';
 
-const namespace: string = 'menuTree';
-
 
 @Component({
     components: {
@@ -56,8 +54,6 @@ const namespace: string = 'menuTree';
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
     @Prop() private menuItems: MainMenuItem[]; // Main Menu Options
-    @State('menuTree') private menuTree: MenuTreeState;
-    @Getter('mainMenu', { namespace }) private mainMenu: any;
 
     constructor() {
         super();
@@ -94,18 +90,6 @@ export default class NavBar extends Vue {
         if (item.active) {
             item.open = false;
         }
-    }
-
-    private dataToMenuItems(data?: DrupalMenu[]): {[header: string]: string} {
-        for (const menu: DrupalMenu in data) {
-            if (!menu.has_children) {
-                // return nothing/ empty array
-            } else {
-                // TODO
-            }
-        }
-
-        return {};
     }
 }
 </script>
