@@ -16,6 +16,8 @@ import NavBar from '@/views/NavBar';
 import { Issue } from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
 
+import API from '@/API';
+
 // TODO: move Menus out of view folder, it's a component!
 
 const namespace: string = 'menuTree';
