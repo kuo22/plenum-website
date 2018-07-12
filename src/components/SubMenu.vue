@@ -1,21 +1,35 @@
 <template>
-    <div :class="{ active: menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
-        <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
-            <h1 v-if="menu.subMenu">
-                {{ sectionName }}
-            </h1>
-            <li v-for="menuLink in sectionLinks">
-                <router-link :to="'/' + menu.name.toLowerCase() +
-                                  '/' + menuLink.text.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                                  '/index'">
-                    <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
-                        <h2>
-                            {{ menuLink.text }}
-                        </h2>
-                    </a>
-                </router-link>
-            </li>
-        </ul>
+    <div id="submenu-container">
+        <div class="lefter" :class="{ active: menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
+            <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
+                <h1 v-if="menu.subMenu">
+                    {{ sectionName }}
+                </h1>
+                <li v-on:mouseover="menuItemHovered = true"
+                    v-on:mouseleave="menuItemHovered = false"
+                    v-for="menuLink in sectionLinks">
+                    <router-link :to="'/' + menu.name.toLowerCase() +
+                                      '/' + menuLink.text.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                                      '/index'">
+                        <a v-on:click="activateMenu(menu)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
+                            <h2>
+                                {{ menuLink.text }}
+                            </h2>
+                        </a>
+                    </router-link>
+                </li>
+            </ul>
+        </div>
+        <transition name="component-fade" mode="out-in">
+            <div v-if="menuItemHovered || menu.active" id="submenu-preview-container">
+                <div id="cover" class="preview-half">
+
+                </div>
+                <div id="index" class="preview-half">
+
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -32,6 +46,7 @@
     // Submenu associated with a unique main menu entry
     export default class SubMenu extends Vue {
         @Prop() private menu!: MainMenuItem; // Parent menu item
+        @Prop() private menuItemHovered: boolean = false;
 
         constructor() {
             super();
@@ -48,6 +63,7 @@
 <style lang="scss" scoped>
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
+    $preview-container: calc(100vw - #{$lefterWidth});
 
     a {
         text-decoration: none;
@@ -65,6 +81,23 @@
     .submenu a:hover {
         cursor: pointer;
         text-decoration: underline;
+    }
+
+    #cover {
+        border-right: 3pxn solid black;
+    }
+
+    .preview-half {
+        display: inline-block;
+        height: 100vh;
+        width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
+        float: left;
+    }
+
+    #submenu-preview-container {
+        display: inline-block;
+        width: $preview-container;
+        height: 100vh;
     }
 
     #section-container {
@@ -106,5 +139,13 @@
         #volunteer {
             left: 960px;
         }
+    }
+
+    .component-fade-enter-active, .component-fade-leave-active {
+        transition: opacity 0.5s ease;
+    }
+    .component-fade-enter, .component-fade-leave-to
+        /* .component-fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
     }
 </style>

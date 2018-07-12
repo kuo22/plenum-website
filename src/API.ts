@@ -42,6 +42,20 @@ class API extends Vue {
         });
     }
 
+    public async fetchCoverURL(nodeID: string): Promise<any> {
+        const url: string = 'node/' + nodeID;
+
+        return await this.fetcher({
+            url,
+            params: {
+                _format: 'json',
+            },
+            timeout: 1000,
+        }).then((response: any) => {
+            return response.field_cover_image.url;
+        });
+    }
+
     // Call the Drupal API to get article data according to the provided drupal node ID
     // and return a processed article
     // parameters needed:
