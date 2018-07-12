@@ -23,7 +23,7 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="lefter submenu" :class="{ active: item.active }"
+            <sub-menu class="submenu" :class="{ active: item.active }"
                       v-show="item.open || item.active"
                       v-bind:menu="item"
                       v-on:activateMenu="toggleActiveMenu"></sub-menu>
@@ -108,7 +108,13 @@ export default class NavBar extends Vue {
     }
 
     .submenu {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        outline: $border;
         left: $lefterWidth;
+        width: calc(100% - #{$lefterWidth});
     }
 </style>
 

@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
-        <transition name="fade" mode="in-out">
+        <transition name="component-fade" mode="out-in">
             <router-view class="view content-section"></router-view>
         </transition>
     </div>
@@ -69,26 +69,32 @@ export default class App extends Vue {
                         status: response.status,
                     }),
                 ).then((res) => {
-                    // console.log(res.data.data);
-                    this.issues = this.createIssues(res.data);
-
+                this.createIssues(res);
                     // this.parseData(res.data[this.articleId]);
                 }))
             .catch(); // Throw DOM display that article does not exist
     }
 
-    private createIssues(responseData): Issue[] {
+    private createIssues(responseData: any): Issue[] {
         const data = responseData.data;
         const issues: Issue[] = [];
 
         for (const issueData of data) {
+            let imageCoverURL = '';
+            // fetch issue cover image urls from api
+            API.fetchCoverURL(issueData.attributes.nid)
+                .then((coverURL) => {
+                    imageCoverURL = coverURL;
+                })
+                .catch();
             // create issue in vue
             // add issue to issue array in store?
             const issue: Issue = {
+                title: issueData.attributes.title,
+                coverImageURL: imageCoverURL,
                 articles: [],
                 nodeNumber: null,
                 uuid: issueData.attributes.uuid,
-                title: issueData.attributes.title,
                 articleIds: this.getArticleIds(issueData.relationships.field_articles.data),
             };
 
@@ -114,7 +120,7 @@ export default class App extends Vue {
 <style lang="scss">
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
-    $lefterWidth: 240px;
+    $lefterWidth: 2400px;
     $activeSubmenuWidth: 20px;
     $borderWidth: 3px;
 
@@ -161,10 +167,11 @@ export default class App extends Vue {
       bottom: 0;
   }
 
-  .fade-enter-active, .fade-leave-active {
-      transition: opacity .1s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-      opacity: 0;
-  }
+    .component-fade-enter-active, .component-fade-leave-active {
+        transition: opacity .3s ease;
+    }
+    .component-fade-enter, .component-fade-leave-to
+        /* .component-fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
 </style>
