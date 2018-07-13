@@ -40,7 +40,7 @@ export interface Article extends DrupalNode {
 }
 
 // A Plenum Issue, a collection of articles
-export interface Issue extends DrupalNode {
+export interface Collection extends DrupalNode {
     title: string;
     coverImageURL: string;
     articles: Article[];

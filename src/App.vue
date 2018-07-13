@@ -13,7 +13,7 @@ import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
 
-import { Issue } from './types/types';
+import { Collection } from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
 
 import API from '@/API';
@@ -34,7 +34,7 @@ export default class App extends Vue {
     @Action('createMenuItems', { namespace }) private createMenuItems: any;
     @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
 
-    private issues: Issue[] = [];
+    private issues: Collection[] = [];
     private menuItems: MainMenuItem[] = [];
 
     constructor() {
@@ -75,9 +75,9 @@ export default class App extends Vue {
             .catch(); // Throw DOM display that article does not exist
     }
 
-    private createIssues(responseData: any): Issue[] {
+    private createIssues(responseData: any): Collection[] {
         const data = responseData.data;
-        const issues: Issue[] = [];
+        const issues: Collection[] = [];
 
         for (const issueData of data) {
             let imageCoverURL = '';
@@ -89,7 +89,7 @@ export default class App extends Vue {
                 .catch();
             // create issue in vue
             // add issue to issue array in store?
-            const issue: Issue = {
+            const issue: Collection = {
                 title: issueData.attributes.title,
                 coverImageURL: imageCoverURL,
                 articles: [],
