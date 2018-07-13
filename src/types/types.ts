@@ -10,6 +10,7 @@ export interface DrupalMenu {
     url?: string; // link.url
     has_children: boolean; // has_children
     subtree?: DrupalMenu[]; // subtree
+    coverImageURL?: string;
 }
 
 // A Drupal content node

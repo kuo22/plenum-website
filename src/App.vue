@@ -69,7 +69,7 @@ export default class App extends Vue {
                         status: response.status,
                     }),
                 ).then((res) => {
-                this.createIssues(res);
+                    this.createIssues(res);
                     // this.parseData(res.data[this.articleId]);
                 }))
             .catch(); // Throw DOM display that article does not exist
@@ -82,11 +82,13 @@ export default class App extends Vue {
         for (const issueData of data) {
             let imageCoverURL = '';
             // fetch issue cover image urls from api
+
             API.fetchCoverURL(issueData.attributes.nid)
                 .then((coverURL) => {
                     imageCoverURL = coverURL;
                 })
                 .catch();
+
             // create issue in vue
             // add issue to issue array in store?
             const issue: Collection = {

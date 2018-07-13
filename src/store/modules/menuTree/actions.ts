@@ -10,7 +10,28 @@ import APIService from '../../../API';
 export const actions: ActionTree<MenuTreeState, RootState> = {
     createMenuItems({ commit }): Promise<any> {
         return APIService.fetchMenuTree()
-            .then((menuTreeData: any) => {
+            .then((menuTreeData) => { // : {}[]
+                for (const menuItemData of menuTreeData) {
+                    // const menuItemData: any = menuTreeData[i];
+                    if (menuItemData.link.title === 'Publications') {
+                        const submenuTree = menuItemData.subtree;
+                        for (const submenuSection of submenuTree) {
+                            // const submenuSection = submenuTree[j];
+                            for (const issueData of submenuSection.subtree) {
+                                const issueDataCleaned = submenuSection.subtree[k].link;
+                                if ('node' in issueDataCleaned.route_parameters) {
+                                    // Issue nodes accessed
+                                    // console.log(issueData.route_parameters.node);
+                                }
+                            }
+                        }
+                        // let issue = fetchIssue()
+                    }
+                    // menuTreeData[i].coverImageURL = APIService.fetchIssue(menuTreeData);
+                }
+                return menuTreeData;
+            }).then((menuTreeData: any) => {
+
                 const drupalMenuTree: DrupalMenu[] = createMenuTreeFromData(menuTreeData).sort(
                     (menu1, menu2) => {
                         return menu1.weight - menu2.weight;
@@ -27,10 +48,20 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
     },
 };
 
+// function fetchIssues(menuTreeData): Promise<any> {
+//
+// }
+
 function createMenuTreeFromData(menuTree: any): DrupalMenu[] {
     const menus: DrupalMenu[] = [];
+    const coverImageURL = '';
+
     if (menuTree.length > 0) {
+        const count = 0;
+
         for (const menuNode of menuTree) {
+            // const menuNode = menuTree[i];
+
             const newMenu: DrupalMenu = {
                 title: menuNode.link.title,
                 description: menuNode.link.description,
@@ -40,6 +71,15 @@ function createMenuTreeFromData(menuTree: any): DrupalMenu[] {
                 has_children: menuNode.has_children,
                 subtree: createMenuTreeFromData(menuNode.subtree),
             };
+
+            // if menuNode is a Drupal entity
+            if ('node' in menuNode.link.route_parameters) {
+                APIService.fetchCoverURL(menuNode.link.route_parameters.node)
+                    .then((coverImageURL) => {
+                        newMenu.coverImageURL = coverImageURL;
+                    });
+            }
+
             menus.push(newMenu);
         }
     }
@@ -78,7 +118,8 @@ function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
                 drupalMenu.title,
                 menuColors[i],
                 // url
-                drupalMenu.url,
+                // drupalMenu.url,
+                '',
                 menuSections,
                 //
                 // recurse to create menuItems, if

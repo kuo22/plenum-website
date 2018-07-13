@@ -21,7 +21,7 @@
             </ul>
         </div>
         <transition name="component-fade" mode="out-in">
-            <div v-if="menuItemHovered" id="submenu-preview-container"> <!-- -->
+            <div id="submenu-preview-container"> <!-- v-if="menuItemHovered"  -->
                 <div id="cover" class="preview-half">
 
                 </div>
@@ -46,7 +46,7 @@
     // Submenu associated with a unique main menu entry
     export default class SubMenu extends Vue {
         @Prop() private menu!: MainMenuItem; // Parent menu item
-        @Prop() private menuItemHovered: boolean;
+        @Prop() private menuItemHovered: boolean = false;
 
         constructor() {
             super();

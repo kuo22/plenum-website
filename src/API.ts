@@ -3,6 +3,7 @@ import axios, {AxiosStatic} from 'axios';
 import {DrupalMenu} from '@/types/types';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
+import {error} from 'util';
 
 const namespace: string = 'menuTree';
 
@@ -29,6 +30,8 @@ class API extends Vue {
 
     }
 
+    // Fetches the navigation hierarchy from the Drupal API
+    // and returns a promise for the data
     public async fetchMenuTree(): Promise<any> {
         return await this.fetcher({
             url: 'entity/menu/main/tree',
@@ -42,6 +45,8 @@ class API extends Vue {
         });
     }
 
+    // Fetch the cover image URL of a submenu link representing a Drupal entity
+    // and returns a promise for that URL
     public async fetchCoverURL(nodeID: string): Promise<any> {
         const url: string = 'node/' + nodeID;
 
@@ -52,7 +57,11 @@ class API extends Vue {
             },
             timeout: 1000,
         }).then((response: any) => {
-            return response.field_cover_image.url;
+            if ('field_cover_image' in response.data) {
+                return response.data.field_cover_image[0].url;
+            } else {
+                throw error('error');
+            }
         });
     }
 
