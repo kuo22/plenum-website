@@ -2,27 +2,26 @@ import {Article, Collection} from '@/types/types';
 
 export class SubmenuLink implements Collection {
     public title: string;
-    public href: string;
     public coverImageURL: string;
-    public articles: Article[];
-    public articleIds: string[];
+    public articles: { [nodeID: number]: Article };
 
     public nodeNumber: number;
     public uuid: string;
 
+    public href?: string;
 
-    constructor(text: string,
-                href: string,
+    constructor(title: string,
                 coverImageURL: string,
-                articles: Article[],
-                articleIds: string[],
+                articles: { [nodeID: number]: Article },
                 nodeNumber: number,
-                uuid: string) {
-        this.title = text;
-        this.href = href;
+                uuid: string,
+                href?: string) {
+        this.title = title;
+        if (href) {
+            this.href = href;
+        }
         this.coverImageURL = coverImageURL;
         this.articles = articles;
-        this.articleIds = articleIds;
 
         this.nodeNumber = nodeNumber;
         this.uuid = uuid;

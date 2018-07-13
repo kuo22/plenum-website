@@ -9,7 +9,8 @@ export interface DrupalMenu {
     depth: number; // depth
     url?: string; // link.url
     has_children: boolean; // has_children
-    subtree?: DrupalMenu[]; // subtree
+    subtree: DrupalMenu[]; // subtree
+    collection?: Collection;
     coverImageURL?: string;
 }
 
@@ -42,10 +43,9 @@ export interface Article extends DrupalNode {
 
 // A Plenum Issue, a collection of articles
 export interface Collection extends DrupalNode {
+    articles: { [nodeID: number]: Article };
     title: string;
     coverImageURL: string;
-    articles: Article[];
-    articleIds: string[];
 }
 
 /*

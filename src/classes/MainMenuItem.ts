@@ -14,7 +14,7 @@ export class MainMenuItem {
     // { [header: string]: string[] }
     // public submenus: { [header: string]: string[]};
 
-    constructor(name: string, color: string, href: string, subMenu?: { [sectionHeader: string]: SubmenuLink[] }) {
+    constructor(name: string, color: string, href: string, subMenu: { [sectionHeader: string]: SubmenuLink[] } = {}) {
         this.name = name;
         this.color = color;
         this.open = false;

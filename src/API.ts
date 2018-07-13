@@ -60,7 +60,7 @@ class API extends Vue {
             if ('field_cover_image' in response.data) {
                 return response.data.field_cover_image[0].url;
             } else {
-                throw error('error');
+                // console.log(response);
             }
         });
     }

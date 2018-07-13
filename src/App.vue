@@ -97,7 +97,7 @@ export default class App extends Vue {
                 articles: [],
                 nodeNumber: null,
                 uuid: issueData.attributes.uuid,
-                articleIds: this.getArticleIds(issueData.relationships.field_articles.data),
+                collectionContentIDs: this.getArticleIds(issueData.relationships.field_articles.data),
             };
 
             issues.push(issue);
