@@ -1,6 +1,8 @@
 <template>
     <div id="app">
-        <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
+        <transition appear>
+            <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
+        </transition>
         <transition name="component-fade" mode="out-in">
             <router-view class="view content-section"></router-view>
         </transition>
@@ -48,15 +50,6 @@ export default class App extends Vue {
                 this.menuItems = this.menuTree;
             })
             .catch();
-
-        // getIssues
-        // initialize store with issues
-
-
-        // this.getIssues();
-        // for (let i = 0; i <= this.issues.length; i++) {
-        //     const issue: Issue = this.issues[i];
-        // }
     }
 
 
@@ -159,6 +152,18 @@ export default class App extends Vue {
       height: 100vh;
       width: $lefterWidth;
       z-index: 4;
+  }
+
+  .before-appear {
+      opacity: 0;
+  }
+
+  .appear {
+      transition: opacity 0.3s ease-in;
+  }
+
+  .after-appear {
+      opacity: 1;
   }
 
   .content-section {
