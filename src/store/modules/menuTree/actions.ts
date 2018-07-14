@@ -8,15 +8,18 @@ import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 import APIService from '../../../API';
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
+
+    // Creates the app's navigation menus with data from Drupal
+    // parameter(s) needed:
+    //      { commit } = a reference to the this store variable's mutations
     async createMenuItems({ commit }): Promise<any> {
         return APIService.fetchMenuTree()
             .then((menuTreeData) => { // : {}[]
+                // Parse through all Drupal data for node representations of Drupal entities
                 for (const menuItemData of menuTreeData) {
-                    // const menuItemData: any = menuTreeData[i];
                     if (menuItemData.link.title === 'Publications') {
                         const submenuTree = menuItemData.subtree;
                         for (const submenuSection of submenuTree) {
-                            // const submenuSection = submenuTree[j];
                             for (const issueData of submenuSection.subtree) {
                                 const issueDataCleaned = issueData.link;
                                 if ('node' in issueDataCleaned.route_parameters) {
@@ -25,9 +28,7 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
                                 }
                             }
                         }
-                        // let issue = fetchIssue()
                     }
-                    // menuTreeData[i].coverImageURL = APIService.fetchIssue(menuTreeData);
                 }
                 return menuTreeData;
             }).then((menuTreeData: any) => {
@@ -91,7 +92,12 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
             menus.push(newMenu);
         }
     }
-    return menus;
+
+    return menus.sort(
+        (menu1, menu2) => {
+            return menu1.weight - menu2.weight;
+        },
+    );
 }
 
 // Returns a list of main menu objects derived from Drupal-provided data
@@ -109,9 +115,6 @@ function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
 
         if (drupalMenu.has_children) { // If a submenu exists
 
-
-
-            // section : DrupalMenu
             for (let i = 0; i < drupalMenu.subtree.length; i++) {
                 const section = drupalMenu.subtree[i];
                 if (!section.has_children) {
@@ -119,15 +122,12 @@ function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
                 }
             }
 
-
-
             menuSections = menuSectionsFromDrupalMenu(
                 drupalMenu.subtree,
                 drupalMenu.title + '',
                 isSectioned);
         } else { // No submenu exists, i.e. 'Volunteer' & 'Contribute'
             menuSections = {};
-
         }
 
         menuItems.push(

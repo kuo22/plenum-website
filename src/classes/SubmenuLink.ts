@@ -4,6 +4,9 @@ export class SubmenuLink implements Collection {
     public title: string;
     public coverImageURL: string;
     public articles: { [nodeID: number]: Article };
+    public active: boolean;
+    public hovered: boolean;
+    public hidden: boolean;
 
     public nodeNumber: number;
     public uuid: string;
@@ -25,5 +28,9 @@ export class SubmenuLink implements Collection {
 
         this.nodeNumber = nodeNumber;
         this.uuid = uuid;
+
+        this.active = false;
+        this.hovered = false;
+        this.hidden = false;
     }
 }

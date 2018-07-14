@@ -10,6 +10,7 @@ export class MainMenuItem {
     public active: boolean;     // Menu's active state--if content from the menu/submenu is rendered/active
     public hoverState: boolean; // If the menu item is being hovered by cursor
     public href: string;
+    public hidden: boolean;
     public subMenu?: { [sectionHeader: string]: SubmenuLink[] }; // Submenu content
     // { [header: string]: string[] }
     // public submenus: { [header: string]: string[]};
@@ -22,5 +23,6 @@ export class MainMenuItem {
         this.hoverState = false;
         this.href = href;
         this.subMenu = subMenu;
+        this.hidden = false;
     }
 }

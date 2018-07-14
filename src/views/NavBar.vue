@@ -23,7 +23,7 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="submenu" :class="{ active: item.active }"
+            <sub-menu class="submenu" :class="{ active: item.active, open: item.open, hidden: item.hidden }"
                       v-show="item.open || item.active"
                       v-bind:menu="item"
                       v-on:activateMenu="toggleActiveMenu"></sub-menu>
@@ -41,6 +41,7 @@ import {error} from 'util';
 import {Action, Getter, State} from 'vuex-class';
 import {DrupalMenu} from '../types/types';
 import {MenuTreeState} from '../types/storeTypes';
+import {SubmenuLink} from '../classes/SubmenuLink';
 
 
 @Component({
@@ -60,11 +61,16 @@ export default class NavBar extends Vue {
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
+    // parameter(s) needed:
+    //      item = main menu item to be opened or closed
     public toggleOpenMenu(item: MainMenuItem): void {
         const alreadyOpen: boolean = item.open;
 
         if (item.open) {
             item.open = false;
+            if (item.active) {
+                this.toggleActiveMenu(item, false);
+            }
         } else {
             for (const menuItem of this.menuItems) {
                 menuItem.open = false;
@@ -72,6 +78,7 @@ export default class NavBar extends Vue {
 
             if (item.subMenu) {
                 item.open = true;
+                item.hidden = false;
             } else {
                 this.toggleActiveMenu(item);
             }
@@ -79,16 +86,34 @@ export default class NavBar extends Vue {
         }
     }
 
-    private toggleActiveMenu(item: MainMenuItem): void {
+    // Toggles the active state of main menu item or optionally declares the active state
+    // parameter(s) needed:
+    //      item    = main menu item
+    //      active  = whether or not the main menu item is being actively used
+    private toggleActiveMenu(item: MainMenuItem, active?: boolean = !item.active): void {
         // Reset all submenus
         for (const menuItem of this.menuItems) {
             menuItem.active = false;
+            menuItem.hidden = true;
+            if (Object.keys(menuItem.subMenu).length > 0) {
+                this.resetSubmenuLinks(menuItem.subMenu);
+            }
         }
 
-        item.active = !item.active;
+        item.active = active;
+        item.hidden = false;
+    }
 
-        if (item.active) {
-            item.open = false;
+    // Resets all submenu links provided to be deactivated
+    // parameter(s) needed:
+    //      submenu = list of submenu links to be deactivated
+    private resetSubmenuLinks(submenu) {
+        for (const sectionLink in submenu) {
+            if (submenu.hasOwnProperty(sectionLink)) {
+            for (const link: SubmenuLink of submenu[sectionLink]) {
+                link.active = false;
+            }
+            }
         }
     }
 }
@@ -105,6 +130,7 @@ export default class NavBar extends Vue {
         height: 100%;
         outline: $border;
         width: $lefterWidth;
+        z-index: 2;
     }
 
     .submenu {
@@ -114,7 +140,7 @@ export default class NavBar extends Vue {
         height: 100%;
         outline: $border;
         left: $lefterWidth;
-        width: calc(100% - #{$lefterWidth});
+        width: calc(100% - calc(#{$lefterWidth} * 2));
     }
 </style>
 
@@ -187,18 +213,16 @@ export default class NavBar extends Vue {
     }
 
     .submenu-slide-leave {
-        z-index: 2;
+        z-index: 4;
     }
-
-
 
     .submenu-slide-leave-active {
         transition: all .8s ease;
-        z-index: 2;
+        z-index: 4;
     }
 
     .submenu-slide-leave-to {
-        z-index: 2;
+        z-index: 4;
         transform: translateX(-$lefterWidth);
     }
 
@@ -206,6 +230,14 @@ export default class NavBar extends Vue {
         /* .slide-fade-leave-active below version 2.1.8 */ {
         transform: translateX(-$lefterWidth);
         //opacity: 0;
+    }
+
+    .open {
+        z-index: 4;
+    }
+
+    .hidden {
+        display: none;
     }
 
 </style>
