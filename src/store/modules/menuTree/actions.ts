@@ -1,11 +1,12 @@
 import { ActionTree } from 'vuex';
-import {DrupalMenu} from '@/types/types';
+import {Article, Author, Collection, DrupalMenu} from '@/types/types';
 import {MenuTreeState, RootState} from '@/types/storeTypes';
 import {error} from 'util';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '@/classes/SubmenuLink';
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 import APIService from '../../../API';
+import {ArticlePeerReviewed} from '@/classes/ArticlePeerReviewed';
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
@@ -65,7 +66,6 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
     const coverImageURL = '';
 
     if (menuTree.length > 0) {
-        const count = 0;
 
         for (const menuNode of menuTree) {
             // const menuNode = menuTree[i];
@@ -82,9 +82,49 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
 
             // if menuNode is a Drupal entity
             if ('node' in menuNode.link.route_parameters) {
-                newMenu.coverImageURL = await APIService.fetchCoverURL(menuNode.link.route_parameters.node)
-                    .then((coverImageURL) => {
-                        return coverImageURL + ''; // newMenu.coverImageURL =
+                const nodeNumber = menuNode.link.route_parameters.node;
+                const contentData = await APIService.fetchContent(nodeNumber)
+                    .then((data) => {
+                        if (Object.keys(data).length > 0) {
+                        const articleUUIDs: string[] = [];
+
+                        for (const article of data.field_articles) {
+                                articleUUIDs.push(article.target_uuid);
+                            }
+
+                        newMenu.coverImageURL = data.field_cover_image[0].url + '';
+                        return APIService.fetchCollection(articleUUIDs);
+                        }
+                    }).then((articlesData) => {
+                        const articles: {[nodeID: number]: Article} = {};
+                        if (articlesData !== undefined) {
+                            for (const articleData of articlesData) {
+                                if ('field_download_' in articleData.relationships) {
+                                    createArticle(articleData)
+                                        .then((article: Article | void) => {
+                                            if (article) {
+                                                articles[articleData.attributes.nid] = article;
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            // console.log(error);
+                                        });
+
+                                } else {
+                                    // TODO: fill in or remove
+                                }
+                            }
+                        }
+
+                        const collection: Collection = {
+                            articles,
+                            title: newMenu.title,
+                            coverImageURL: newMenu.coverImageURL + '',
+                            nodeNumber,
+                            uuid: '',
+                        };
+                        newMenu.collection = collection;
+                        // return this.makeCollection(articles);
                     });
             } else {
                 newMenu.coverImageURL = '';
@@ -98,6 +138,35 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
             return menu1.weight - menu2.weight;
         },
     );
+}
+
+async function createArticle(articleData: any): Promise<Article | void> {
+    const authorName: string[] = (articleData.attributes.field_author.toString()).split(', ');
+    const author: Author = {
+        lastName: authorName[0],
+        firstName: authorName[1],
+    };
+
+    return await APIService.getDownloadURL(articleData.relationships.field_download_.links.related.toString())
+        .then((downloadURL: string) => {
+            const article: Article = {
+                author,
+                title: articleData.attributes.field_title,
+                subtitle: articleData.attributes.field_subtitle,
+                abstract: articleData.attributes.field_abstract,
+                body: articleData.attributes.body[0].processed,
+                refs: articleData.attributes.field_references.processed,
+                copyright: articleData.attributes.field_copyright,
+                downloadURL,
+                nodeNumber: articleData.attributes.nid,
+                uuid: articleData.attributes.uuid,
+            };
+
+            return article;
+        })
+        .catch((error) => {
+            // console.log(error);
+        });
 }
 
 // Returns a list of main menu objects derived from Drupal-provided data
@@ -179,9 +248,7 @@ function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
 
                         let submenuLink: SubmenuLink;
 
-
                         if (sectionLink.collection) {
-
                             submenuLink =
                                 new SubmenuLink(
                                     sectionLink.title,
@@ -192,8 +259,6 @@ function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
                                     sectionLink.url,
                                 );
                         } else {
-
-
                             submenuLink =
                                 new SubmenuLink(
                                     sectionLink.title,

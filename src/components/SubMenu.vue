@@ -29,8 +29,13 @@
                             <img :src="submenuLink.coverImageURL">
                         </div>
                     </div>
-                    <div id="index" class="preview-half">
-
+                    <div class="preview-half">
+                        <ul id="preview-index">
+                            <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
+                                <h2 class="title">{{ article.title }}</h2>
+                                <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </transition>
@@ -182,6 +187,37 @@ export default class SubMenu extends Vue {
         text-align: right;
         margin-bottom: 6px;
         padding: 2px;
+    }
+
+    #preview-index {
+        width: 90%;
+        height: 82vh;
+        max-width: 90%;
+        max-height: 82vh;
+        transform: translateY(9vh);
+        margin: auto;
+    }
+
+    #preview-index-entry {
+        width: 100%;
+        height: auto;
+        margin-bottom: 1em;
+    }
+
+    .title, .author {
+        font-family: 'PT Serif', serif;
+        font-weight: lighter;
+    }
+
+    .title {
+        font-size: 2.5em;
+        text-align: left;
+    }
+
+    .author {
+        font-style: italic;
+        font-size: 1.5em;
+        text-align: right;
     }
 
     .underlined {

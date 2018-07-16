@@ -109,11 +109,16 @@ export default class Article extends Vue {
         this.issueTitle = this.$route.params.publication;
         this.drupalNodeID = this.$route.params.node;
 
-        this.api.getArticle(this.drupalNodeID)
-            .then((article: ArticlePeerReviewed) => {
-                this.article = article;
-            })
-            .catch();
+        // Request article from store
+        // Within store, if article does not exist and
+        // API request returns 404, then show error message
+        // this.api.getArticle(this.drupalNodeID)
+        //     .then((article: ArticlePeerReviewed) => {
+        //         this.article = article;
+        //     })
+        //     .catch(
+        //         // reveal error message
+        //     );
     }
 }
 </script>

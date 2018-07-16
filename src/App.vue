@@ -76,7 +76,7 @@ export default class App extends Vue {
             let imageCoverURL = '';
             // fetch issue cover image urls from api
 
-            API.fetchCoverURL(issueData.attributes.nid)
+            API.fetchContent(issueData.attributes.nid)
                 .then((coverURL) => {
                     imageCoverURL = coverURL;
                 })
