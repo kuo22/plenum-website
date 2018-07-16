@@ -96,14 +96,14 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
                         return APIService.fetchCollection(articleUUIDs);
                         }
                     }).then((articlesData) => {
-                        const articles: {[nodeID: number]: Article} = {};
+                        const articles: Article[] = [];
                         if (articlesData !== undefined) {
                             for (const articleData of articlesData) {
                                 if ('field_download_' in articleData.relationships) {
                                     createArticle(articleData)
                                         .then((article: Article | void) => {
                                             if (article) {
-                                                articles[articleData.attributes.nid] = article;
+                                                articles.push(article);
                                             }
                                         })
                                         .catch((error) => {

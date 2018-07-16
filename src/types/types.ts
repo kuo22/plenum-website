@@ -43,7 +43,7 @@ export interface Article extends DrupalNode {
 
 // A Plenum Issue, a collection of articles
 export interface Collection extends DrupalNode {
-    articles: { [nodeID: number]: Article };
+    articles: Article[];
     title: string;
     coverImageURL: string;
 }

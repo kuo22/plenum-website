@@ -147,6 +147,7 @@ export default class SubMenu extends Vue {
         height: 100vh;
         width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
         float: left;
+        background: white;
     }
 
     #submenu-preview-container {
