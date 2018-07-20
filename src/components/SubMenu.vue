@@ -1,6 +1,8 @@
 <template>
     <div id="submenu-container">
+
         <div class="lefter" :class="{ 'submenu-active': menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
+
             <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
                 <h1 v-if="menu.subMenu">
                     {{ sectionName }}
@@ -20,6 +22,7 @@
                 </li>
             </ul>
         </div>
+
         <template v-for="sectionLinks in menu.subMenu">
             <transition v-for="submenuLink in sectionLinks" name="component-fade">
                 <div v-if="submenuLink.hovered || submenuLink.active" id="submenu-preview-container"
@@ -32,9 +35,11 @@
                     <div class="preview-half">
                         <ul id="preview-index">
                             <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
-                                <router-link :to="'/publications/' + article.nodeNumber">
-                                    <h2 class="title">{{ article.title }}</h2>
-                                    <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                                <router-link :to="'/articles/' + article.nodeNumber">
+                                    <a v-on:click="toggleOpen(menu)">
+                                        <h2 class="title">{{ article.title }}</h2>
+                                        <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                                    </a>
                                 </router-link>
                             </li>
                         </ul>
@@ -42,6 +47,7 @@
                 </div>
             </transition>
         </template>
+
     </div>
 </template>
 
@@ -70,6 +76,11 @@ export default class SubMenu extends Vue {
     @Emit('activateMenu')
     public activateMenu(item: MainMenuItem): void {
         /* tslint fix - 'no-empty blocks' */
+    }
+
+    @Emit('toggleOpen')
+    public toggleOpen(menu: MainMenuItem): void {
+        // Filler
     }
 
     // Activates the submenu link and emits an event announcing the submenu's use/ activation
@@ -152,7 +163,7 @@ export default class SubMenu extends Vue {
         background: white;
     }
 
-    #section-container li {
+    #section-container li a a h2 {
         margin-bottom: 6px;
         padding: 2px;
     }
@@ -165,7 +176,7 @@ export default class SubMenu extends Vue {
         width: $preview-container;
         height: 100vh;
         float: right;
-        background: transparent;
+        background: white;
         z-index: 2;
     }
 
@@ -174,7 +185,6 @@ export default class SubMenu extends Vue {
         width: $preview-container;
         height: 100vh;
         float: right;
-        background: transparent;
         z-index: 1;
     }
 
@@ -257,11 +267,11 @@ export default class SubMenu extends Vue {
     }
 
     .component-fade-enter-active {
-        transition: opacity 0.3s ease;
+        transition: opacity 0.1s ease;
     }
 
     .component-fade-leave-active {
-        transition: opacity 0.5s ease;
+        transition: opacity 0.3s ease;
     }
 
     .component-fade-enter-to,

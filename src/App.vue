@@ -115,7 +115,7 @@ export default class App extends Vue {
 <style lang="scss">
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
-    $lefterWidth: 2400px;
+    $lefterWidth: 240px;
     $activeSubmenuWidth: 20px;
     $borderWidth: 3px;
 

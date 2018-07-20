@@ -26,7 +26,8 @@
             <sub-menu class="submenu" :class="{ active: item.active, open: item.open, hidden: item.hidden }"
                       v-show="item.open || item.active"
                       v-bind:menu="item"
-                      v-on:activateMenu="toggleActiveMenu"></sub-menu>
+                      v-on:activateMenu="toggleActiveMenu"
+                        v-on:toggleOpen="toggleOpenMenu"></sub-menu>
         </transition>
     </div>
 </template>
@@ -130,7 +131,7 @@ export default class NavBar extends Vue {
         height: 100%;
         outline: $border;
         width: $lefterWidth;
-        z-index: 2;
+        z-index: 4;
     }
 
     .submenu {
@@ -217,7 +218,7 @@ export default class NavBar extends Vue {
     }
 
     .submenu-slide-leave-active {
-        transition: all .8s ease;
+        transition: all .5s ease;
         z-index: 4;
     }
 

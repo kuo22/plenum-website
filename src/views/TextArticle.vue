@@ -5,14 +5,15 @@
             <div class="article-info">
                 <div class="titles">
                     <h1 class="title">
-                        {{this.article.title}}
+                        {{ this.article.title }}
                     </h1>
                     <h2 class="subtitle">
                         {{this.article.subtitle}}
                     </h2>
                 </div>
+                <!-- make author card a component -->
                 <h3 class="author">
-                    <i>{{this.article.author}}</i>
+                    <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
                 </h3>
             </div>
 
@@ -38,7 +39,7 @@
                             </h2>
                         </div>
                         <h3 class="author">
-                            <i>{{this.article.author}}</i>
+                            <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
                         </h3>
                     </div>
 
@@ -61,7 +62,7 @@
                 <div id="copyright"
                      v-if="this.article.copyright">
                     <p>
-                        Copyright &#169; {{this.article.author}}.
+                        Copyright &#169; {{this.article.author.firstName}} {{this.article.author.lastName}}.
                         <br>
                         All rights reserved.
                     </p>
@@ -77,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import APIService from '@/API';
@@ -95,6 +96,7 @@ export default class TextArticle extends Vue {
     private issueTitle: string;
     private drupalNodeID: string;
 
+
     constructor() {
         super();
     }
@@ -108,10 +110,11 @@ export default class TextArticle extends Vue {
         this.issueTitle = this.$route.params.publication;
         this.drupalNodeID = this.$route.params.node;
 
-        await APIService.fetchContent(this.drupalNodeID)
-            .then((response) => {
-                // console.log(response);
-                // this.article =
+        // if Article does not exist in current store variable of all articles
+        // Then fetch article
+        await APIService.fetchArticle(this.drupalNodeID)
+            .then((response: Article) => {
+                this.article = response;
                 return response;
             });
 

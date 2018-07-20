@@ -1,4 +1,4 @@
-import {Article} from '@/types/types';
+import {Article, Author} from '@/types/types';
 import axios, {AxiosStatic} from 'axios';
 import {DrupalMenu} from '@/types/types';
 import {Action} from 'vuex-class';
@@ -91,7 +91,7 @@ class API extends Vue {
             },
             timeout: 1000,
         }).then((response) => {
-            return this.createArticle(response.data);
+            return this.createArticleDrupalAPIData(response.data);
         });
 
     }
@@ -108,7 +108,7 @@ class API extends Vue {
                 // TODO make that API service get all UUIDs up front to prevent this second call to get UUID
                 return this.fetchNodeDataByUUID(uuid)
                     .then((articleData: any) => {
-                        return this.createArticle(articleData);
+                        return this.createArticleJSONAPI(articleData);
                     })
                     .catch();
             })
@@ -143,20 +143,60 @@ class API extends Vue {
     // parameter(s) needed:
     //      articleData = JSON data of an article from the Drupal API
     // TODO: make type 'Article' not 'ArticlePeerReviewed'
-    public createArticle(articleData: any): Article {
-        return new Article(
-            articleData.attributes.field_title, // Title
-            articleData.attributes.field_author, // Author
-            articleData.attributes.field_abstract, // Abstract
-            articleData.attributes.body[0].processed, // Text body
-            articleData.attributes.field_references.processed,
-            '',
+    public createArticleJSONAPI(articleData: any): Article {
+        const authorName: string[] = articleData.attributes.field_author.split(', ');
+        const author: Author = {
+            firstName: authorName[1],
+            lastName: authorName[0],
+        };
+        let subtitle: string = '';
+        if ('field_subtitle' in articleData.attributes) {
+            subtitle = articleData.attributes.field_subtitle;
+        }
+
+        const article: Article = {
+            title: articleData.attributes.field_title, // Title
+            author, // Author
+            abstract: articleData.attributes.field_abstract, // Abstract
+            body: articleData.attributes.body[0].processed, // Text body
+            refs: articleData.attributes.field_references.processed,
+            downloadURL: '',
             // articleData.relationships.field_download_.articleData, // Download URL
-            articleData.attributes.field_copyright,
-            'University of Washington', // University
-            'Department of Geography', // School
-            articleData.attributes.field_subtitle, // Subtitle
-        );
+            copyright: articleData.attributes.field_copyright,
+            subtitle, // Subtitle
+            nodeNumber: 0,
+            uuid: '0',
+    };
+
+        return article;
+    }
+
+    public createArticleDrupalAPIData(articleData: any): Article {
+        const authorName: string[] = articleData.field_author[0].value.split(', ');
+        const author: Author = {
+            firstName: authorName[1],
+            lastName: authorName[0],
+        };
+
+        let subtitle: string = '';
+        if (articleData.field_subtitle.length > 0) {
+            subtitle = articleData.field_subtitle[0].value;
+        }
+        const article: Article = {
+            title: articleData.field_title[0].value, // Title
+            author, // Author
+            abstract: articleData.field_abstract[0].value, // Abstract
+            body: articleData.body[0].processed, // Text body
+            refs: articleData.field_references[0].processed,
+            downloadURL: '',
+            // articleData.relationships.field_download_.articleData, // Download URL
+            copyright: articleData.field_copyright[0].value,
+            subtitle, // Subtitle
+            nodeNumber: articleData.uid[0].target_id,
+            uuid: articleData.uuid[0].value,
+        };
+
+        return article;
     }
 
 
