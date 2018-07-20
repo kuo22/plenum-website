@@ -34,7 +34,7 @@ export default new Router({
         },
         {
             //
-            path: '/publications/:publication/:node',
+            path: '/articles/:node',
             name: 'publication-article',
             component: TextArticle,
         },

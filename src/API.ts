@@ -1,4 +1,4 @@
-import {ArticlePeerReviewed} from '@/classes/ArticlePeerReviewed';
+import {Article} from '@/types/types';
 import axios, {AxiosStatic} from 'axios';
 import {DrupalMenu} from '@/types/types';
 import {Action} from 'vuex-class';
@@ -81,11 +81,28 @@ class API extends Vue {
         });
     }
 
+    public async fetchArticle(nodeID: string): Promise<any> {
+        const url: string = 'node/' + nodeID;
+
+        return await this.fetcher({
+            url,
+            params: {
+                _format: 'json',
+            },
+            timeout: 1000,
+        }).then((response) => {
+            return this.createArticle(response.data);
+        });
+
+    }
+
+
     // Call the Drupal API to get article data according to the provided drupal node ID
     // and return a processed article
     // parameters needed:
     //      articleNodeID = the drupal node ID of an article
     public async getArticle(articleNodeID: string): Promise<any> {
+
         return await this.fetchUUID(articleNodeID)
             .then((uuid: string) => {
                 // TODO make that API service get all UUIDs up front to prevent this second call to get UUID
@@ -126,8 +143,8 @@ class API extends Vue {
     // parameter(s) needed:
     //      articleData = JSON data of an article from the Drupal API
     // TODO: make type 'Article' not 'ArticlePeerReviewed'
-    public createArticle(articleData: any): ArticlePeerReviewed {
-        return new ArticlePeerReviewed(
+    public createArticle(articleData: any): Article {
+        return new Article(
             articleData.attributes.field_title, // Title
             articleData.attributes.field_author, // Author
             articleData.attributes.field_abstract, // Abstract

@@ -32,8 +32,10 @@
                     <div class="preview-half">
                         <ul id="preview-index">
                             <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
-                                <h2 class="title">{{ article.title }}</h2>
-                                <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                                <router-link :to="'/publications/' + article.nodeNumber">
+                                    <h2 class="title">{{ article.title }}</h2>
+                                    <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                                </router-link>
                             </li>
                         </ul>
                     </div>
@@ -150,6 +152,11 @@ export default class SubMenu extends Vue {
         background: white;
     }
 
+    #section-container li {
+        margin-bottom: 6px;
+        padding: 2px;
+    }
+
     #submenu-preview-container {
         display: inline-block;
         position: absolute;
@@ -186,8 +193,6 @@ export default class SubMenu extends Vue {
 
     h2 {
         text-align: right;
-        margin-bottom: 6px;
-        padding: 2px;
     }
 
     #preview-index {

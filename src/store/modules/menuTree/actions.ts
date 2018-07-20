@@ -6,7 +6,6 @@ import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '@/classes/SubmenuLink';
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 import APIService from '../../../API';
-import {ArticlePeerReviewed} from '@/classes/ArticlePeerReviewed';
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
 

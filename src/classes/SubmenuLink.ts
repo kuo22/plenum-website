@@ -3,7 +3,7 @@ import {Article, Collection} from '@/types/types';
 export class SubmenuLink implements Collection {
     public title: string;
     public coverImageURL: string;
-    public articles: { [nodeID: number]: Article };
+    public articles: Article[];
     public active: boolean;
     public hovered: boolean;
     public hidden: boolean;
@@ -15,7 +15,7 @@ export class SubmenuLink implements Collection {
 
     constructor(title: string,
                 coverImageURL: string,
-                articles: { [nodeID: number]: Article },
+                articles: Article[],
                 nodeNumber: number,
                 uuid: string,
                 href?: string) {

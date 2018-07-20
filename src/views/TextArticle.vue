@@ -79,8 +79,8 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import { Route } from 'vue-router';
-import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
-import {API} from '@/API';
+import { Article } from '@/types/types';
+import APIService from '@/API';
 
 @Component({
     components: {
@@ -88,10 +88,9 @@ import {API} from '@/API';
     },
 })
 
-export default class Article extends Vue {
-    @Prop() private article: ArticlePeerReviewed;
+export default class TextArticle extends Vue {
+    @Prop() private article: Article;
     @Prop() private mainTitleOffScreen: boolean;
-    private api = new API();
     private $route: Route;
     private issueTitle: string;
     private drupalNodeID: string;
@@ -101,13 +100,20 @@ export default class Article extends Vue {
     }
 
     // When view is mounted, retrieve article
-    public mounted() {
+    public async mounted() {
         // https://github.com/nuxt-community/typescript-template/issues/23
 
         // TODO: use publication to confirm or get article, currently arbitrary
         // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
         this.issueTitle = this.$route.params.publication;
         this.drupalNodeID = this.$route.params.node;
+
+        await APIService.fetchContent(this.drupalNodeID)
+            .then((response) => {
+                // console.log(response);
+                // this.article =
+                return response;
+            });
 
         // Request article from store
         // Within store, if article does not exist and

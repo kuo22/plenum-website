@@ -48,6 +48,34 @@ export interface Collection extends DrupalNode {
     coverImageURL: string;
 }
 
+export class Article implements Article {
+    // public sectionTitles: string[];
+    // public sections: string[];
+
+    constructor(title: string,
+                author: string,
+                abstract: string,
+                body: string,
+                refs: string,
+                downloadURL: string,
+                copyright: boolean,
+                university?: string,
+                school?: string,
+                subtitle?: string) {
+
+        this.title = title;
+        this.author = author;
+        this.abstract = abstract;
+        this.body = body;
+        this.refs = refs;
+        this.downloadURL = downloadURL;
+        this.copyright = copyright;
+        this.university = university;
+        this.school = school;
+        this.subtitle = subtitle;
+    }
+}
+
 /*
 export interface MenuLink {
 
