@@ -27,7 +27,7 @@
                       v-show="item.open || item.active"
                       v-bind:menu="item"
                       v-on:activateMenu="toggleActiveMenu"
-                        v-on:toggleOpen="toggleOpenMenu"></sub-menu>
+                      v-on:toggleOpen="toggleOpenMenu"></sub-menu>
         </transition>
     </div>
 </template>

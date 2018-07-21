@@ -29,7 +29,7 @@
                      :class="{ 'submenu-link-active': submenuLink.active, hovered: submenuLink.hovered }"> <!--   -->
                     <div id="cover" class="preview-half">
                         <div id="cover-image-container">
-                            <img :src="submenuLink.coverImageURL">
+                            <img :class="{ 'preview-active': submenuLink.active }" :src="submenuLink.coverImageURL">
                         </div>
                     </div>
                     <div class="preview-half">
@@ -124,11 +124,18 @@ export default class SubMenu extends Vue {
     }
 
     #cover-image-container img {
-        max-width: 90%;
-        max-height: 82vh;
+        max-width: 92%;
+        max-height: 84vh;
         height: auto;
         transform: translateY(9vh);
         box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
+        transition: all 0.4s ease;
+    }
+
+    #cover-image-container img.preview-active {
+        max-width: 90%;
+        max-height: 82vh;
+        box-shadow: -2px 2px 10px -2px rgba(0, 0, 0, 0.41);
     }
 
     a {
@@ -150,6 +157,8 @@ export default class SubMenu extends Vue {
         text-decoration: underline;
     }
 
+
+
     #cover {
         border-right: 3px solid black;
         background: transparent;
@@ -163,9 +172,12 @@ export default class SubMenu extends Vue {
         background: white;
     }
 
+    #section-container li {
+        height: 40px;
+    }
+
     #section-container li a a h2 {
-        margin-bottom: 6px;
-        padding: 2px;
+        padding: 2px 2px 8px 2px;
     }
 
     #submenu-preview-container {
