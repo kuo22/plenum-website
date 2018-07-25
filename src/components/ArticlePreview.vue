@@ -63,20 +63,22 @@ export default class ArticlePreview extends Vue {
     }
 
     p {
-        line-height: 1.3em;
-        font-size: 1em;
+        line-height: 1.4em;
+        font-size: 1.2em;
         text-indent: 3em;
         text-align: justify;
+    }
+
+    #title-card {
+
     }
 
     #abstract-title {
         text-align: center;
         font-size: 1.2em;
+        margin-top: 2em;
         margin-bottom: 2em;
         line-height: 1.2em;
-    }
-
-    #title-card {
     }
 
     hr {
