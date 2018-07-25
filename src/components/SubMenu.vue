@@ -27,22 +27,36 @@
             <transition v-for="submenuLink in sectionLinks" name="component-fade">
                 <div v-if="submenuLink.hovered || submenuLink.active" id="submenu-preview-container"
                      :class="{ 'submenu-link-active': submenuLink.active, hovered: submenuLink.hovered }"> <!--   -->
-                    <div id="cover" class="preview-half">
-                        <div id="cover-image-container">
+                    <div id="cover" class="preview-half preview-container">
+                        <div class="cover-content-container">
                             <img :class="{ 'preview-active': submenuLink.active }" :src="submenuLink.coverImageURL">
                         </div>
+
                     </div>
-                    <div class="preview-half">
-                        <ul id="preview-index">
-                            <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
-                                <router-link :to="'/articles/' + article.nodeNumber">
-                                    <a v-on:click="toggleOpen(menu)">
-                                        <h2 class="title">{{ article.title }}</h2>
-                                        <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
-                                    </a>
-                                </router-link>
-                            </li>
-                        </ul>
+                    <div id="article-preview-container" class="preview-container">
+                        <div class="abstract preview-half" style="background: transparent">
+                            <div class="cover-content-container"
+                                 v-for="(article, articleID) in submenuLink.articles"
+                                 :class="{ visible: article.hovered }">
+                                <article-preview class="article-preview"
+                                                v-bind:article="article">
+                                </article-preview>
+                            </div>
+                        </div>
+                        <div id="index" class="preview-half">
+                            <ul id="preview-index">
+                                <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
+                                    <router-link :to="'/articles/' + article.nodeNumber">
+                                        <a v-on:click="toggleOpen(menu); article.hovered = false;"
+                                           v-on:mouseover="article.hovered = true"
+                                           v-on:mouseleave="article.hovered = false">
+                                            <h2 class="title">{{ article.title }}</h2>
+                                            <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
+                                        </a>
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </transition>
@@ -55,10 +69,11 @@
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
+import ArticlePreview from '@/components/ArticlePreview';
 
 @Component({
     components: {
-
+        ArticlePreview,
     },
 })
 
@@ -117,25 +132,47 @@ export default class SubMenu extends Vue {
     $lefterWidth: 240px;
     $preview-container: calc(100vw - #{$lefterWidth});
 
-    #cover-image-container {
-        width: 100%;
-        height: 100%;
+    .cover-content-container {
+        position: absolute;
+        top: 8%;
+        left: 4%;
+        width: 92%;
+        height: 84%;
         background: transparent;
+        transform: translateY(0vh);
     }
 
-    #cover-image-container img {
-        max-width: 92%;
-        max-height: 84vh;
+    .cover-content-container .article-preview {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .cover-content-container img {
+        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+        top: 0;
         height: auto;
-        transform: translateY(9vh);
         box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
         transition: all 0.4s ease;
     }
 
-    #cover-image-container img.preview-active {
-        max-width: 90%;
-        max-height: 82vh;
+    .cover-content-container img.preview-active {
+        max-width: 98%;
+        max-height: 98%;
+        top: 1%; // Half of max-height border
         box-shadow: -2px 2px 10px -2px rgba(0, 0, 0, 0.41);
+    }
+
+    .preview-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    #index {
+        border-left: 3px solid black;
     }
 
     a {
@@ -165,6 +202,7 @@ export default class SubMenu extends Vue {
     }
 
     .preview-half {
+        position: relative;
         display: inline-block;
         height: 100vh;
         width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
@@ -246,6 +284,20 @@ export default class SubMenu extends Vue {
         font-style: italic;
         font-size: 1.5em;
         text-align: right;
+    }
+
+    .visible {
+        opacity: 1;
+    }
+
+    .abstract .cover-content-container {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .abstract .cover-content-container.visible {
+        opacity: 1;
     }
 
     .underlined {
