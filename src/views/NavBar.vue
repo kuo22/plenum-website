@@ -24,22 +24,27 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="lefter submenu" :class="{ active: item.active }"
+            <sub-menu class="submenu" :class="{ active: item.active, open: item.open, hidden: item.hidden }"
                       v-show="item.open || item.active"
                       v-bind:menu="item"
-                      v-on:activateMenu="toggleActiveMenu"></sub-menu>
+                      v-on:activateMenu="toggleActiveMenu"
+                      v-on:toggleOpen="toggleOpenMenu"></sub-menu>
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
 import SubMenu from '@/components/SubMenu';
-import {MenuItem} from '../classes/MenuItem';
+import {MainMenuItem} from '../classes/MainMenuItem';
 import LogoAnimated from '@/components/LogoAnimated';
 import * as hsluv from '../../node_modules/hsluv/hsluv.js';
 import {error} from 'util';
+import {Action, Getter, State} from 'vuex-class';
+import {DrupalMenu} from '../types/types';
+import {MenuTreeState} from '../types/storeTypes';
+import {SubmenuLink} from '../classes/SubmenuLink';
 
 
 @Component({
@@ -54,20 +59,23 @@ import {error} from 'util';
 export default class NavBar extends Vue {
     @Prop() private itemName: string;
     private playLogo: boolean = false;
-    private menuItems: MenuItem[]; // Main Menu Options
+    @Prop() private menuItems: MainMenuItem[]; // Main Menu Options
 
     constructor() {
         super();
-
-        this.menuItems = this.getMenuItems();
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
-    public toggleOpenMenu(item: MenuItem): void {
+    // parameter(s) needed:
+    //      item = main menu item to be opened or closed
+    public toggleOpenMenu(item: MainMenuItem): void {
         const alreadyOpen: boolean = item.open;
 
         if (item.open) {
             item.open = false;
+            if (item.active) {
+                this.toggleActiveMenu(item, false);
+            }
         } else {
             for (const menuItem of this.menuItems) {
                 menuItem.open = false;
@@ -75,6 +83,7 @@ export default class NavBar extends Vue {
 
             if (item.subMenu) {
                 item.open = true;
+                item.hidden = false;
             } else {
                 this.toggleActiveMenu(item);
             }
@@ -82,101 +91,35 @@ export default class NavBar extends Vue {
         }
     }
 
-    private toggleActiveMenu(item: MenuItem): void {
+    // Toggles the active state of main menu item or optionally declares the active state
+    // parameter(s) needed:
+    //      item    = main menu item
+    //      active  = whether or not the main menu item is being actively used
+    private toggleActiveMenu(item: MainMenuItem, active?: boolean = !item.active): void {
         // Reset all submenus
         for (const menuItem of this.menuItems) {
             menuItem.active = false;
-        }
-
-        item.active = !item.active;
-
-        if (item.active) {
-            item.open = false;
-        }
-    }
-
-    // Returns a list of the main menu items
-    // TODO: Replace contents with fetch command to wordpress API
-    private getMenuItems(): MenuItem[] {
-
-        const uniformColorsAsRGBString: string[] = this.getUniformColors(20);
-
-        /*
-        let pagesJSON = await fetch(http://demo.wp-api.org/wp-json/wp/v2/pages);
-        // Review how current Plenum website accesses this information
-        // --Does the PHP template builder just do a direct reference to the local server? or call over the www?
-
-
-         */
-
-        return [
-            new MenuItem(
-                'About',
-                uniformColorsAsRGBString[0],
-                {
-                    About: ['About Plenum', 'About the Authors', 'About the Editors'],
-                },
-            ),
-            new MenuItem(
-                'Publications',
-                uniformColorsAsRGBString[1],
-                {
-                    'Peer-Reviewed': ['Edition 2017', 'Edition 2018'],
-                    'Showcase': ['GIS', 'Art', 'Book Reviews'],
-                },
-            ),
-            new MenuItem(
-                'Contribute',
-                uniformColorsAsRGBString[2],
-            ),
-            new MenuItem(
-                'Volunteer',
-                uniformColorsAsRGBString[3],
-            ),
-        ];
-    }
-
-    // Returns a collection of perceptually uniform colors in RGB form
-    private getUniformColors(start: number): string[] {
-        const uniformColors: number[number[]] = [];
-
-        if (start > 90) {
-            error('Number can\'t be 90 or greater. Number provided: ' + start);
-        } else {
-            const L: number = 95;
-            const C: number = 50;
-            const hMax: number = 360;
-            const numberOfMenus: number = 4;
-            let index = 0;
-            for (let i = start; i < 360; i += hMax / numberOfMenus) {
-                uniformColors[index] = (hsluv.hsluvToRgb(hsluv.lchToHsluv([L, C, i])));
-                index++;
+            menuItem.hidden = true;
+            if (Object.keys(menuItem.subMenu).length > 0) {
+                this.resetSubmenuLinks(menuItem.subMenu);
             }
         }
 
-        const uniformColorsAsString: string[] = [
-            'rgb(' +
-            uniformColors[0][0] * 255 + ', ' +
-            uniformColors[0][1] * 255 + ', ' +
-            uniformColors[0][2] * 255 + ')',
+        item.active = active;
+        item.hidden = false;
+    }
 
-            'rgb(' +
-            uniformColors[1][0] * 255 + ', ' +
-            uniformColors[1][1] * 255 + ', ' +
-            uniformColors[1][2] * 255 + ')',
-
-            'rgb(' +
-            uniformColors[2][0] * 255 + ', ' +
-            uniformColors[2][1] * 255 + ', ' +
-            uniformColors[2][2] * 255 + ')',
-
-            'rgb(' +
-            uniformColors[3][0] * 255 + ', ' +
-            uniformColors[3][1] * 255 + ', ' +
-            uniformColors[3][2] * 255 + ')',
-        ];
-
-        return uniformColorsAsString;
+    // Resets all submenu links provided to be deactivated
+    // parameter(s) needed:
+    //      submenu = list of submenu links to be deactivated
+    private resetSubmenuLinks(submenu) {
+        for (const sectionLink in submenu) {
+            if (submenu.hasOwnProperty(sectionLink)) {
+            for (const link: SubmenuLink of submenu[sectionLink]) {
+                link.active = false;
+            }
+            }
+        }
     }
 }
 </script>
@@ -192,10 +135,17 @@ export default class NavBar extends Vue {
         height: 100%;
         outline: $border;
         width: $lefterWidth;
+        z-index: 4;
     }
 
     .submenu {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        outline: $border;
         left: $lefterWidth;
+        width: calc(100% - calc(#{$lefterWidth} * 2));
     }
 </style>
 
@@ -268,18 +218,16 @@ export default class NavBar extends Vue {
     }
 
     .submenu-slide-leave {
-        z-index: 2;
+        z-index: 4;
     }
 
-
-
     .submenu-slide-leave-active {
-        transition: all .8s ease;
-        z-index: 2;
+        transition: all .5s ease;
+        z-index: 4;
     }
 
     .submenu-slide-leave-to {
-        z-index: 2;
+        z-index: 4;
         transform: translateX(-$lefterWidth);
     }
 
@@ -287,6 +235,14 @@ export default class NavBar extends Vue {
         /* .slide-fade-leave-active below version 2.1.8 */ {
         transform: translateX(-$lefterWidth);
         //opacity: 0;
+    }
+
+    .open {
+        z-index: 4;
+    }
+
+    .hidden {
+        display: none;
     }
 
 </style>

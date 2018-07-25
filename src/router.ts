@@ -26,6 +26,18 @@ export default new Router({
             name: 'text-article',
             component: TextArticle,
         },
+        {
+
+            path: '/publications/:publication/index',
+            name: 'publication-table-of-contents',
+            component: TableOfContents,
+        },
+        {
+            //
+            path: '/articles/:node',
+            name: 'publication-article',
+            component: TextArticle,
+        },
     ],
 
 });

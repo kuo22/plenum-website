@@ -1,53 +1,114 @@
 <template>
-    <div :class="{ active: menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
-        <ul id="submenu-container" v-for="(subheaders, header) in menu.subMenu">
-            <h1 v-if="menu.subMenu">
-                {{ header }}
-            </h1>
-            <li v-for="subheader in subheaders">
-                <a v-on:click="activateMenu(menu)">
-                    <h2>
-                        {{ subheader }}
-                    </h2>
-                </a>
-            </li>
-        </ul>
+    <div id="submenu-container">
+
+        <div class="lefter" :class="{ 'submenu-active': menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
+
+            <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
+                <h1 v-if="menu.subMenu">
+                    {{ sectionName }}
+                </h1>
+                <li v-on:mouseover="submenuLink.hovered = true"
+                    v-on:mouseleave="submenuLink.hovered = false"
+                    v-for="submenuLink in sectionLinks">
+                    <router-link :to="'/' + menu.name.toLowerCase() +
+                                      '/' + submenuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                                      '/index'">
+                        <a v-on:click="activateSubmenuLink(menu, sectionName, submenuLink)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
+                            <h2 :class="{ underlined: submenuLink.active }">
+                                {{ submenuLink.title }}
+                            </h2>
+                        </a>
+                    </router-link>
+                </li>
+            </ul>
+        </div>
+
+        <submenu-item-preview
+                v-bind:menu="menu"
+                v-on:toggleOpen="toggleOpen"></submenu-item-preview>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {MenuItem} from '@/classes/MenuItem';
+import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+import {MainMenuItem} from '@/classes/MainMenuItem';
+import {SubmenuLink} from '../classes/SubmenuLink';
+import ArticlePreview from '@/components/ArticlePreview';
+import SubmenuItemPreview from '@/components/SubmenuItemPreview';
 
-    @Component({
-        components: {
+@Component({
+    components: {
+        ArticlePreview,
+        SubmenuItemPreview,
+    },
+})
 
-        },
-    })
+// Submenu associated with a unique main menu entry
+export default class SubMenu extends Vue {
+    @Prop() private menu!: MainMenuItem; // Parent menu item
+    @Prop() private menuItemHovered: boolean;
+    @Prop() private previewImageURL: string = '';
 
-    // Submenu associated with a unique main menu entry
-    export default class SubMenu extends Vue {
-        @Prop() private menu!: MenuItem; // Parent menu item
+    constructor() {
+        super();
+    }
 
-        constructor() {
-            super();
+    // Emits an open event to the parent
+    @Emit('activateMenu')
+    public activateMenu(item: MainMenuItem): void {
+        /* tslint fix - 'no-empty blocks' */
+    }
+
+    @Emit('toggleOpen')
+    public toggleOpen(menu: MainMenuItem): void {
+        // Filler
+    }
+
+    // Activates the submenu link and emits an event announcing the submenu's use/ activation
+    // parameter(s) needed:
+    //      item        = main menu item to which this submenu belongs
+    //      sectionName = name of the submenu section of the activated submenu link
+    //      submenuLink = the submenu link to be activated
+    private activateSubmenuLink(item: MainMenuItem,
+                                sectionName: string,
+                                submenuLink: SubmenuLink) {
+
+        // Deactivate all other submenu links, besides the submenu link to be activated
+        for (let i = 0; i < this.menu.subMenu[sectionName].length; i++) {
+            const menuItem: SubmenuLink = this.menu.subMenu[sectionName][i];
+            if (menuItem.title !== submenuLink.title) {
+                this.menu.subMenu[sectionName][i].active = false;
+            }
         }
 
-        // Emits an open event to the parent
-        @Emit('activateMenu') public activateMenu(item: MenuItem): void {
-            /* tslint fix - 'no-empty blocks' */
+        // If submenu link is already active, turn it off, otherwise activate menu
+        if (submenuLink.active) {
+            submenuLink.active = false;
+        } else {
+            this.activateMenu(item);
+            submenuLink.active = true;
         }
 
     }
+}
 </script>
 
 <style lang="scss" scoped>
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
+    $preview-container: calc(100vw - #{$lefterWidth});
 
-    .active {
-        left: 20px;
-        z-index: 1;
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .submenu-active {
+        // left: 20px;
+        z-index: 4;
     }
 
     .submenu a:hover {
@@ -55,8 +116,13 @@
         text-decoration: underline;
     }
 
-    #submenu-container {
-        padding: 15px 15px;
+    .preview-half {
+        position: relative;
+        display: inline-block;
+        height: 100vh;
+        width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
+        float: left;
+        background: white;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -70,8 +136,22 @@
 
     h2 {
         text-align: right;
-        margin-bottom: 6px;
-        padding: 2px;
+    }
+
+    #section-container li {
+        height: 40px;
+    }
+
+    #section-container li a a h2 {
+        padding: 2px 2px 8px 2px;
+    }
+
+    #section-container {
+        padding: 15px 15px;
+    }
+
+    .underlined {
+        text-decoration: underline;
     }
 
     @if $viewAllSubMenus {

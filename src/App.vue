@@ -1,18 +1,28 @@
 <template>
     <div id="app">
-        <nav-bar id="menu-grid-section"></nav-bar>
-        <transition name="fade" mode="in-out">
+        <transition appear>
+            <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
+        </transition>
+        <transition name="component-fade" mode="out-in">
             <router-view class="view content-section"></router-view>
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
+import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
-import { Article, Issue, Author} from './types';
+
+import { Collection } from './types/types';
+import { MainMenuItem } from './classes/MainMenuItem';
+
+import API from '@/API';
+
 // TODO: move Menus out of view folder, it's a component!
+
+const namespace: string = 'menuTree';
 
 
 @Component({
@@ -23,18 +33,25 @@ import { Article, Issue, Author} from './types';
 })
 
 export default class App extends Vue {
-    private issues: Issue[] = [];
+    @Action('createMenuItems', { namespace }) private createMenuItems: any;
+    @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
+
+    private issues: Collection[] = [];
+    private menuItems: MainMenuItem[] = [];
 
     constructor() {
         super();
     }
 
-    public created(): void {
-        this.getIssues();
-        for (let i = 0; i <= this.issues.length; i++) {
-            const issue: Issue = this.issues[i];
-        }
+    // When the app is created, tell the store to fetch menu data
+    public async created(): void {
+        await this.createMenuItems()
+            .then(() => {
+                this.menuItems = this.menuTree;
+            })
+            .catch();
     }
+
 
     private getIssues(): void {
         const issuesJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/jsonapi/node/issue'
@@ -45,25 +62,35 @@ export default class App extends Vue {
                         status: response.status,
                     }),
                 ).then((res) => {
-                    // console.log(res.data.data);
-                    this.issues = this.createIssues(res.data);
-
+                    this.createIssues(res);
                     // this.parseData(res.data[this.articleId]);
                 }))
             .catch(); // Throw DOM display that article does not exist
     }
 
-    private createIssues(responseData): Issue[] {
+    private createIssues(responseData: any): Collection[] {
         const data = responseData.data;
-        const issues: Issue[] = [];
+        const issues: Collection[] = [];
 
         for (const issueData of data) {
+            let imageCoverURL = '';
+            // fetch issue cover image urls from api
+
+            API.fetchContent(issueData.attributes.nid)
+                .then((coverURL) => {
+                    imageCoverURL = coverURL;
+                })
+                .catch();
+
             // create issue in vue
             // add issue to issue array in store?
-            const issue: Issue = {
-                uuid: issueData.attributes.uuid,
+            const issue: Collection = {
                 title: issueData.attributes.title,
-                articleIds: this.getArticleIds(issueData.relationships.field_articles.data),
+                coverImageURL: imageCoverURL,
+                articles: [],
+                nodeNumber: null,
+                uuid: issueData.attributes.uuid,
+                collectionContentIDs: this.getArticleIds(issueData.relationships.field_articles.data),
             };
 
             issues.push(issue);
@@ -72,6 +99,7 @@ export default class App extends Vue {
         return issues;
     }
 
+    // TODO create interface for article, so ID is recognized by INTELLIJ
     private getArticleIds(articleData: [{}]): string[] {
         const articleIds = [];
 
@@ -126,6 +154,18 @@ export default class App extends Vue {
       z-index: 4;
   }
 
+  .before-appear {
+      opacity: 0;
+  }
+
+  .appear {
+      transition: opacity 0.3s ease-in;
+  }
+
+  .after-appear {
+      opacity: 1;
+  }
+
   .content-section {
       width: calc(100% - #{$lefterWidth});
       height: 100vh;
@@ -134,10 +174,11 @@ export default class App extends Vue {
       bottom: 0;
   }
 
-  .fade-enter-active, .fade-leave-active {
-      transition: opacity .1s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-      opacity: 0;
-  }
+    .component-fade-enter-active, .component-fade-leave-active {
+        transition: opacity .3s ease;
+    }
+    .component-fade-enter, .component-fade-leave-to
+        /* .component-fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
 </style>

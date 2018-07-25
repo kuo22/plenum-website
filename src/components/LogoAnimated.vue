@@ -28,8 +28,6 @@ export default class LogoAnimated extends Vue {
 
     // When this component is loaded, draw a canvas with an animatable Plenum logo
     public created() {
-
-
         this.p5 = new p5(this.logoSketch(1.0, 2.0), 'logo-animation-container');
     }
 

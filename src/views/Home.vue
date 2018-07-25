@@ -1,6 +1,6 @@
 <template>
     <div id="home">
-        Hello
+        Home Page w/ Highlight News
     </div>
 </template>
 

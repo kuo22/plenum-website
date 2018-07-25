@@ -5,14 +5,15 @@
             <div class="article-info">
                 <div class="titles">
                     <h1 class="title">
-                        {{this.article.title}}
+                        {{ this.article.title }}
                     </h1>
                     <h2 class="subtitle">
                         {{this.article.subtitle}}
                     </h2>
                 </div>
+                <!-- make author card a component -->
                 <h3 class="author">
-                    <i>{{this.article.author}}</i>
+                    <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
                 </h3>
             </div>
 
@@ -38,7 +39,7 @@
                             </h2>
                         </div>
                         <h3 class="author">
-                            <i>{{this.article.author}}</i>
+                            <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
                         </h3>
                     </div>
 
@@ -61,7 +62,7 @@
                 <div id="copyright"
                      v-if="this.article.copyright">
                     <p>
-                        Copyright &#169; {{this.article.author}}.
+                        Copyright &#169; {{this.article.author.firstName}} {{this.article.author.lastName}}.
                         <br>
                         All rights reserved.
                     </p>
@@ -77,9 +78,10 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import { Route } from 'vue-router';
-import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
+import { Article } from '@/types/types';
+import APIService from '@/API';
 
 @Component({
     components: {
@@ -87,57 +89,45 @@ import { ArticlePeerReviewed } from '@/classes/ArticlePeerReviewed';
     },
 })
 
-export default class Article extends Vue {
-    @Prop() private article: ArticlePeerReviewed;
+export default class TextArticle extends Vue {
+    @Prop() private article: Article;
     @Prop() private mainTitleOffScreen: boolean;
     private $route: Route;
-    private year: string;
-    private articleId: number;
+    private issueTitle: string;
+    private drupalNodeID: string;
+
 
     constructor() {
         super();
-
-
     }
 
     // When view is mounted, retrieve article
-    public mounted() {
+    public async mounted() {
         // https://github.com/nuxt-community/typescript-template/issues/23
-        this.year = this.$route.params.id;
-        this.articleId = this.$route.params.article_id - 1;
 
-        this.getArticle(this.year, this.articleId);
-    }
+        // TODO: use publication to confirm or get article, currently arbitrary
+        // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
+        this.issueTitle = this.$route.params.publication;
+        this.drupalNodeID = this.$route.params.node;
 
-    private getArticle(year: string, articleId: number) {
-        const articleJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/api/pubs/'
-            + this.year
-            + '?_format=json')
-            .then((response) =>
-                response.json().then((data) => ({
-                    data,
-                    status: response.status,
-                }),
-                ).then((res) => {
-                    this.parseData(res.data[this.articleId]);
-                }))
-            .catch();
-        // Throw DOM display that article does not exist
-    }
+        // if Article does not exist in current store variable of all articles
+        // Then fetch article
+        await APIService.fetchArticle(this.drupalNodeID)
+            .then((response: Article) => {
+                this.article = response;
+                return response;
+            });
 
-    private parseData(data) {
-        this.article = new ArticlePeerReviewed(
-            data.field_title[0].value, // Title
-            data.field_author[0].value, // Author
-            data.field_abstract[0].value, // Abstract
-            data.body[this.articleId].processed, // Text body
-            data.field_references[0].value,
-            data.field_download_[0].url, // Download URL
-            data.field_copyright[0].value,
-            'University of Washington', // University
-            'Department of Geography', // School
-            data.field_subtitle[0].value, // Subtitle
-        );
+        // Request article from store
+        // Within store, if article does not exist and
+        // API request returns 404, then show error message
+        // this.api.getArticle(this.drupalNodeID)
+        //     .then((article: ArticlePeerReviewed) => {
+        //         this.article = article;
+        //     })
+        //     .catch(
+        //         // reveal error message
+        //     );
     }
 }
 </script>
@@ -151,7 +141,7 @@ export default class Article extends Vue {
     $fontSize: 17px;
 
     #text-article-view {
-        font-family: 'PT Serif', serif;
+        font-family: 'Amiri', serif;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -315,6 +305,7 @@ export default class Article extends Vue {
         position: absolute;
         right: 0;
         bottom: 0;
+        padding: 3px 5px;
         margin: 0 15px 10px 0;
         text-decoration: underline;
         color: #0079ff;
