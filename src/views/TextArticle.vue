@@ -141,7 +141,7 @@ export default class TextArticle extends Vue {
     $fontSize: 17px;
 
     #text-article-view {
-        font-family: 'PT Serif', serif;
+        font-family: 'Amiri', serif;
     }
 
     h1, h2, h3, h4, h5, h6 {

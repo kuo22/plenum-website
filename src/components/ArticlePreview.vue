@@ -45,7 +45,7 @@ export default class ArticlePreview extends Vue {
         left: 10%;
         top: 5%;
         text-align: left;
-        font-family: "PT Serif", serif;
+        font-family: "Amiri", serif;
         font-weight: lighter;
         background: rgba(252, 252, 252, 0.5);
     }

@@ -271,7 +271,7 @@ export default class SubMenu extends Vue {
     }
 
     .title, .author {
-        font-family: 'PT Serif', serif;
+        font-family: 'Amiri', serif;
         font-weight: lighter;
     }
 
