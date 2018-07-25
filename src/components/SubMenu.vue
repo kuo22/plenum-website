@@ -172,7 +172,7 @@ export default class SubMenu extends Vue {
     }
 
     #index {
-        border-left: 3px solid black;
+        outline: 3px solid black;
     }
 
     a {
@@ -278,6 +278,7 @@ export default class SubMenu extends Vue {
     .title {
         font-size: 2.5em;
         text-align: left;
+        line-height: 1em;
     }
 
     .author {

@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div id="preview-container">
         <div id="abstract-card-container">
-            <h1 id="title">{{article.title}}</h1>
-            <h2 id="subtitle">{{article.subtitle}}</h2>
-            <h3 id="author">{{article.author.firstName}} {{article.author.lastName}}</h3>
+            <article-title-card id="title-card" v-bind:article="article"></article-title-card>
+
+            <hr>
 
             <h4 id="abstract-title">ABSTRACT</h4>
-            <p>{{article.abstract}}</p>
+            <p id="abstract">{{ article.abstract }}</p>
         </div>
     </div>
 </template>
@@ -14,10 +14,11 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Article} from '../types/types';
+import ArticleTitleCard from '@/components/ArticleTitleCard';
 
 @Component({
     components: {
-
+        ArticleTitleCard,
     },
 })
 
@@ -34,10 +35,16 @@ export default class ArticlePreview extends Vue {
 // filler
     }
 }
-
 </script>
 
 <style lang="scss" scoped>
+    #preview-container {
+        width: 85%;
+        margin: auto;
+        box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
+        background: rgba(250, 250, 250, 0.71);
+    }
+
     #abstract-card-container {
         position: relative;
         width: 80%;
@@ -50,28 +57,29 @@ export default class ArticlePreview extends Vue {
         background: rgba(252, 252, 252, 0.5);
     }
 
-    h1 {
-        font-weight: lighter;
-    }
-
-    h2 {
-        font-weight: lighter;
-    }
-
-    h3 {
-        font-weight: lighter;
-        font-style: italic;
-    }
-
     h4 {
         text-transform: uppercase;
         font-weight: bold;
     }
 
     p {
-        line-height: 1.5em;
+        line-height: 1.3em;
         font-size: 1em;
         text-indent: 3em;
         text-align: justify;
+    }
+
+    #abstract-title {
+        text-align: center;
+        font-size: 1.2em;
+        margin-bottom: 2em;
+        line-height: 1.2em;
+    }
+
+    #title-card {
+    }
+
+    hr {
+        margin: 3em;
     }
 </style>
