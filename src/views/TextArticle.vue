@@ -1,7 +1,7 @@
 <template>
     <div id="text-article-view">
         <span id="active-submenu-spacer"></span>
-        <div id="text-article">
+        <header>
             <div class="article-info">
                 <div class="titles">
                     <h1 class="title">
@@ -13,10 +13,11 @@
                 </div>
                 <!-- make author card a component -->
                 <h3 class="author">
-                    <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
+                    <em>{{this.article.author.firstName}} {{this.article.author.lastName}}</em>
                 </h3>
             </div>
-
+        </header>
+        <div id="text-article">
             <div id="article-page">
                 <div id="article">
                     <div id="abstract">
@@ -29,19 +30,19 @@
 
                     <hr>
 
-                    <div id="in-page-article-info" class="article-info">
-                        <div class="titles">
-                            <h1 class="title">
-                                {{this.article.title}}
-                            </h1>
-                            <h2 class="subtitle">
-                                {{this.article.subtitle}}
-                            </h2>
-                        </div>
-                        <h3 class="author">
-                            <i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>
-                        </h3>
-                    </div>
+                    <!--<div id="in-page-article-info" class="article-info">-->
+                        <!--<div class="titles">-->
+                            <!--<h1 class="title">-->
+                                <!--{{this.article.title}}-->
+                            <!--</h1>-->
+                            <!--<h2 class="subtitle">-->
+                                <!--{{this.article.subtitle}}-->
+                            <!--</h2>-->
+                        <!--</div>-->
+                        <!--<h3 class="author">-->
+                            <!--<i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>-->
+                        <!--</h3>-->
+                    <!--</div>-->
 
                     <div id="article-body">
                         <p v-html="this.article.body"></p>
@@ -69,6 +70,7 @@
                 </div>
 
                 <a id="download"
+                   :title="'Download the Article: ' + article.title"
                    v-bind:href="this.article.downloadURL"
                    target="_blank">Download Article</a>
 
@@ -139,6 +141,12 @@ export default class TextArticle extends Vue {
     $borderWidth: 3px;
     $activeMenuWidth: 20px;
     $fontSize: 17px;
+
+    header {
+        position: fixed;
+        z-index: 2;
+        width: calc(100% - #{$lefterWidth});
+    }
 
     #text-article-view {
         font-family: 'Amiri', serif;
@@ -229,11 +237,13 @@ export default class TextArticle extends Vue {
         left: calc(#{$activeMenuWidth} + #{$borderWidth});
         top: 0;
         width: calc(100% - #{$activeMenuWidth} - #{$borderWidth});
+        z-index: -1;
+        margin-top: 15%;
     }
 
     .article-info {
         text-align: left;
-        margin: 30px 0px 30px 20px;
+        padding: 30px 0px 30px 20px;
     }
 
     #in-page-article-info {
@@ -308,6 +318,6 @@ export default class TextArticle extends Vue {
         padding: 3px 5px;
         margin: 0 15px 10px 0;
         text-decoration: underline;
-        color: #0079ff;
+        color: #1b4eff;
     }
 </style>
