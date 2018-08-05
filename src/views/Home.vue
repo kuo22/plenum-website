@@ -1,7 +1,7 @@
 <template>
-    <div id="home">
-        Home Page w/ Highlight News
-    </div>
+    <main id="home">
+        <h1>Home Page w/ Highlight News</h1>
+    </main>
 </template>
 
 <script lang="ts">

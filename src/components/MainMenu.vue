@@ -1,22 +1,27 @@
 <template>
     <div id="main-menu">
         <ul id="menu">
-            <a v-for="item in menuItems"
-               @mouseenter="updateHoverState(true, item)"
-               @mouseleave="updateHoverState(false, item)"
-            >
-                <li :style="changeBackground(item)" >
-                    <h1 v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
-                        v-on:click="open(item)">
-                        {{ item.name }}
-                    </h1>
-                    <h1 v-else>
-                        <router-link :to="'/' + item.name.toLowerCase()">
-                            {{ item.name }}
-                        </router-link>
-                    </h1>
-                </li>
-            </a>
+            <li v-for="item in menuItems"
+                @mouseenter="updateHoverState(true, item)"
+                @mouseleave="updateHoverState(false, item)"
+                :style="changeBackground(item)"
+                class="menu-button">
+                    <a v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
+                       v-on:click="open(item)"
+                       @keyup.enter="open(item)"
+                       tabindex="0">
+                        <span class="menu-button-content"
+                              tabindex="-1">
+                            {{ item.name }}&nbsp;
+                        </span>
+                    </a>
+                    <router-link v-else :to="'/' + item.name.toLowerCase()"
+                                 tabindex="0">
+                        <span class="menu-button-content" tabindex="-1"> <!-- TODO: get ride of this hacky &nbsp; -->
+                            {{ item.name }}&nbsp;
+                        </span>
+                    </router-link>
+            </li>
         </ul>
     </div>
 </template>
@@ -74,6 +79,7 @@ export default class MainMenu extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    $menuItemHeight: 45px;
 
     h1, h2, h3, h4, h5, h6 {
         font-weight: bold;
@@ -83,21 +89,34 @@ export default class MainMenu extends Vue {
         padding: 15px;
     }
 
+    /*#menu li:focus-within {*/
+        /*outline: 3px dashed black;*/
+    /*}*/
+
+    #menu li a:focus {
+        outline: none;
+    }
+
+    #menu li a {
+        font-weight: bold;
+        font-size: 1.75em;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+    }
+
+    #menu li a span {
+        line-height: $menuItemHeight;
+    }
+
     li {
-        padding: 2px 7px;
-        margin: 15px 0px;
+        margin: 15px 0;
         text-align: right;
+        height: $menuItemHeight;
     }
 
     li:hover {
         background: transparent;
-    }
-
-    a {
-        text-decoration: none;
-    }
-
-    a:hover {
         cursor: pointer;
     }
 

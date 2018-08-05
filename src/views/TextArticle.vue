@@ -1,5 +1,5 @@
 <template>
-    <div id="text-article-view">
+    <main id="text-article-view">
         <span id="active-submenu-spacer"></span>
         <header>
             <div class="article-info">
@@ -76,7 +76,7 @@
 
             </footer>
         </div>
-    </div>
+    </main>
 </template>
 
 <script lang="ts">

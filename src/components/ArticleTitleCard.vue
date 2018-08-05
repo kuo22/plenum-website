@@ -1,8 +1,8 @@
 <template>
     <div>
-        <h1 id="title">{{article.title}}</h1>
-        <h2 id="subtitle">{{article.subtitle}}</h2>
-        <h3 id="author">{{article.author.firstName}} {{article.author.lastName}}</h3>
+        <h1 class="title">{{article.title}}</h1>
+        <span v-if="article.subtitle" class="subtitle">{{article.subtitle}}</span>
+        <p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>
     </div>
 </template>
 
@@ -33,30 +33,18 @@ export default class ArticleTitleCard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    #abstract-card-container {
-        position: relative;
-        width: 80%;
-        height: 90%;
-        left: 10%;
-        top: 5%;
-        text-align: left;
-        font-family: "Amiri", serif;
-        font-weight: lighter;
-        background: rgba(252, 252, 252, 0.5);
-    }
-
-    #title {
+    .title {
         font-weight: lighter;
         line-height: 1em;
     }
 
-    #subtitle {
+    .subtitle {
         font-weight: lighter;
         text-indent: 3em;
         line-height: 1.4em;
     }
 
-    #author {
+    .author {
         font-weight: lighter;
         font-style: italic;
         margin-top: 3px;

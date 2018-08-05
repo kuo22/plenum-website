@@ -1,26 +1,27 @@
 <template>
-    <div id="submenu-container">
+    <div>
 
         <div class="lefter" :class="{ 'submenu-active': menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
 
-            <ul id="section-container" v-for="(sectionLinks, sectionName) in menu.subMenu">
-                <h1 v-if="menu.subMenu">
-                    {{ sectionName }}
-                </h1>
-                <li v-on:mouseover="submenuLink.hovered = true"
-                    v-on:mouseleave="submenuLink.hovered = false"
-                    v-for="submenuLink in sectionLinks">
-                    <router-link :to="'/' + menu.name.toLowerCase() +
-                                      '/' + submenuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                                      '/index'">
-                        <a v-on:click="activateSubmenuLink(menu, sectionName, submenuLink)"><!-- TODO Change to 'openSection', within which the menu gets activated-->
-                            <h2 :class="{ underlined: submenuLink.active }">
-                                {{ submenuLink.title }}
-                            </h2>
-                        </a>
-                    </router-link>
-                </li>
-            </ul>
+            <map v-for="(sectionLinks, sectionName) in menu.subMenu"
+                 :title="sectionName + ' Content Navigation Menu'">
+                <ul class="section-container" >
+                    <li v-if="menu.subMenu">
+                        {{ sectionName }}
+                    </li>
+                    <li class="menu-button" v-on:mouseover="submenuLink.hovered = true"
+                        v-on:mouseleave="submenuLink.hovered = false"
+                        v-for="submenuLink in sectionLinks">
+                        <router-link :to="'/' + menu.name.toLowerCase() +
+                                          '/' + submenuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                                          '/index'"
+                                     @click.native="activateSubmenuLink(menu, sectionName, submenuLink)"
+                                     :class="{ underlined: submenuLink.active }">
+                            <span class="menu-button-content" tabindex="-1">{{ submenuLink.title }}</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </map>
         </div>
 
         <submenu-item-preview
@@ -98,6 +99,10 @@ export default class SubMenu extends Vue {
     $lefterWidth: 240px;
     $preview-container: calc(100vw - #{$lefterWidth});
 
+    .menu-button-content {
+        padding: 8px 5px 0 0;
+    }
+
     a {
         text-decoration: none;
     }
@@ -125,29 +130,46 @@ export default class SubMenu extends Vue {
         background: white;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h2, h3, h4, h5, h6 {
         font-weight: bold;
     }
 
-    h1 {
+    .section-container {
+        padding: 15px 15px;
+        font-weight: bold;
+        text-align: right;
+        font-size: 1.4em;
+    }
+
+    .section-container li:nth-child(1) {
         text-align: left;
-        padding-bottom: 15px;
+        font-size: 1.3em;
+        margin-bottom: 0.3em;
+    }
+
+    .section-container li {
+        height: 40px;
+    }
+
+    /*.section-container li:focus-within {*/
+        /*outline: 3px dashed black;*/
+    /*}*/
+
+    .section-container li:focus {
+        outline: none;
+    }
+
+    .section-container li a {
+        text-align: right;
+        display: block;
+    }
+
+    .section-container li a:focus {
+        outline: none;
     }
 
     h2 {
         text-align: right;
-    }
-
-    #section-container li {
-        height: 40px;
-    }
-
-    #section-container li a a h2 {
-        padding: 2px 2px 8px 2px;
-    }
-
-    #section-container {
-        padding: 15px 15px;
     }
 
     .underlined {

@@ -1,9 +1,9 @@
 <template>
-    <a>
-        <router-link to="/">
-            <div id="logo-animation-container"></div>
-        </router-link>
-    </a>
+    <router-link to="/" title="Return to Home"
+                 tabindex="0">
+        <div id="logo-animation-container"
+             tabindex="-1"></div>
+    </router-link>
 </template>
 
 <script lang="ts">
@@ -110,7 +110,7 @@ export default class LogoAnimated extends Vue {
                     function polygon(x, y, radius, npoints) {
                         const angle = p.TWO_PI / npoints;
                         p.beginShape();
-                        p.strokeWeight(20.0 / (npoints * (0.5 * npoints)));
+                        p.strokeWeight(20.0 / (npoints * (0.4 * npoints)));
                         p.stroke((npoints / 4.0) * 40.0 - 40.0);
 
                         for (let a = 0; a < p.TWO_PI; a += angle) {
@@ -145,4 +145,18 @@ export default class LogoAnimated extends Vue {
         height: 240px;
     }
 
+    a {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    a:focus > div {
+        outline: 3px dashed white;
+    }
+
+    a:focus,
+    a div:focus {
+        outline: none;
+    }
 </style>

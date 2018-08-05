@@ -1,12 +1,12 @@
 <template>
-    <div id="submenu-item-preview">
+    <div class="submenu-item-preview">
         <template v-for="sectionLinks in menu.subMenu">
             <transition v-for="submenuLink in sectionLinks" name="component-fade">
                 <div v-if="submenuLink.hovered || submenuLink.active" id="submenu-preview-container"
                      :class="{ 'submenu-link-active': submenuLink.active, hovered: submenuLink.hovered }">
                     <div id="cover" class="preview-half preview-container">
                         <div class="cover-content-container">
-                            <img :class="{ 'preview-active': submenuLink.active }" :src="submenuLink.coverImageURL">
+                            <img :alt="submenuLink.title + ' Cover Image'" :class="{ 'preview-active': submenuLink.active }" :src="submenuLink.coverImageURL">
                         </div>
 
                     </div>
@@ -20,16 +20,17 @@
                                 </article-preview>
                             </div>
                         </div>
-                        <div id="index" class="preview-half">
-                            <ul id="preview-index">
-                                <li v-for="(article, articleID) in submenuLink.articles" id="preview-index-entry">
-                                    <router-link :to="'/articles/' + article.nodeNumber">
-                                        <a v-on:click="toggleOpen(menu); article.hovered = false;"
-                                           v-on:mouseover="article.hovered = true"
-                                           v-on:mouseleave="article.hovered = false">
-                                            <h2 class="title">{{ article.title }}</h2>
-                                            <h3 class="author">{{ article.author.firstName }} {{ article.author.lastName }}</h3>
-                                        </a>
+                        <div id="index"
+                             class="preview-half">
+                            <ul id="preview-index"
+                                :title="'Navigation for ' + submenuLink.title + ' Content'">
+                                <li v-for="(article, articleID) in submenuLink.articles" class="preview-index-entry menu-button">
+                                    <router-link :to="'/articles/' + article.nodeNumber"
+                                                 @click.native="toggleOpen(menu); article.hovered = false;"
+                                                 @mouseover.native="article.hovered = true"
+                                                 @mouseleave.native="article.hovered = false">
+                                        <p class="title menu-button-content" tabindex="-1">{{ article.title }}</p>
+                                        <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
                                     </router-link>
                                 </li>
                             </ul>
@@ -171,7 +172,7 @@ export default class SubmenuItemPreview extends Vue {
         margin: auto;
     }
 
-    #preview-index-entry {
+    .preview-index-entry {
         width: 100%;
         height: auto;
         margin-bottom: 1em;
@@ -186,6 +187,7 @@ export default class SubmenuItemPreview extends Vue {
         font-size: 2.5em;
         text-align: left;
         line-height: 1em;
+        padding: 10px;
     }
 
     .author {

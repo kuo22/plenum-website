@@ -126,7 +126,6 @@ export default class App extends Vue {
         list-style-type: none;
     }
 
-
   #app {
     font-family: $menuFont;
     -webkit-font-smoothing: antialiased;

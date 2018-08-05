@@ -1,7 +1,7 @@
 <template>
-    <div id="table-of-contents">
+    <main id="table-of-contents">
         Hello
-    </div>
+    </main>
 </template>
 
 <script lang="ts">

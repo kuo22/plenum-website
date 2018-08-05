@@ -1,5 +1,6 @@
 <template>
-    <div v-on:mouseover="playLogo = true" v-on:mouseout="playLogo = false">
+    <div role="navigation" v-on:mouseover="playLogo = true"
+         v-on:mouseout="playLogo = false">
         <div id="main" class="lefter">
 
             <div id= "logo" class="grid-frame">

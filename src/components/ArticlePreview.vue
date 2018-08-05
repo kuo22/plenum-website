@@ -1,12 +1,12 @@
 <template>
-    <div id="preview-container">
-        <div id="abstract-card-container">
-            <article-title-card id="title-card" v-bind:article="article"></article-title-card>
+    <div class="preview-container">
+        <div class="abstract-card-container">
+            <article-title-card class="title-card" v-bind:article="article"></article-title-card>
 
             <hr>
 
-            <h4 id="abstract-title">ABSTRACT</h4>
-            <p id="abstract">{{ article.abstract }}</p>
+            <h2 class="abstract-title">ABSTRACT</h2>
+            <p class="abstract">{{ article.abstract }}</p>
         </div>
     </div>
 </template>
@@ -38,14 +38,14 @@ export default class ArticlePreview extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    #preview-container {
+    .preview-container {
         width: 85%;
         margin: auto;
         box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
         background: rgba(250, 250, 250, 0.71);
     }
 
-    #abstract-card-container {
+    .abstract-card-container {
         position: relative;
         width: 80%;
         height: 90%;
@@ -69,11 +69,16 @@ export default class ArticlePreview extends Vue {
         text-align: justify;
     }
 
-    #title-card {
+    .title-card {
 
     }
 
-    #abstract-title {
+    .abstract {
+        height: 66%;
+        overflow: hidden;
+    }
+
+    .abstract-title {
         text-align: center;
         font-size: 1.2em;
         margin-top: 2em;
