@@ -1,27 +1,37 @@
 <template>
     <div>
+        <div class="lefter"
+             :class="{ 'submenu-active': menu.active }"
+             :id="menu.name.toLowerCase()"
+             :style="{background: menu.color}">
 
-        <div class="lefter" :class="{ 'submenu-active': menu.active }" :id="menu.name.toLowerCase()" :style="{background: menu.color}">
-
-            <map v-for="(sectionLinks, sectionName) in menu.subMenu"
-                 :title="sectionName + ' Content Navigation Menu'">
-                <ul class="section-container" >
+            <nav v-for="(sectionLinks, sectionName) in menu.subMenu"
+                 :title="sectionName + ' Content Navigation Menu'"
+                 :aria-label="sectionName + ' Content Menu'"
+                 role="navigation">
+                <ul :aria-label="sectionName + ' Content Menu'"
+                    class="section-container"
+                    role="menu">
                     <li v-if="menu.subMenu">
                         {{ sectionName }}
                     </li>
-                    <li class="menu-button" v-on:mouseover="submenuLink.hovered = true"
+                    <li class="menu-button"
+                        v-on:mouseover="submenuLink.hovered = true"
                         v-on:mouseleave="submenuLink.hovered = false"
                         v-for="submenuLink in sectionLinks">
                         <router-link :to="'/' + menu.name.toLowerCase() +
                                           '/' + submenuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
                                           '/index'"
                                      @click.native="activateSubmenuLink(menu, sectionName, submenuLink)"
-                                     :class="{ underlined: submenuLink.active }">
+                                     :class="{ underlined: submenuLink.active }"
+                                     role="menuitem"
+                                     aria-haspopup="true"
+                                     :aria-expanded="submenuLink.active ? 'true' : 'false'">
                             <span class="menu-button-content" tabindex="-1">{{ submenuLink.title }}</span>
                         </router-link>
                     </li>
                 </ul>
-            </map>
+            </nav>
         </div>
 
         <submenu-item-preview

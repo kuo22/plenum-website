@@ -1,6 +1,10 @@
 <template>
-    <div id="main-menu">
-        <ul id="menu">
+    <nav id="main-menu-container"
+         role="navigation"
+         aria-label="Plenum Main Navigation">
+        <ul id="menu"
+            role="menubar"
+            aria-label="Plenum Main Navigation">
             <li v-for="item in menuItems"
                 @mouseenter="updateHoverState(true, item)"
                 @mouseleave="updateHoverState(false, item)"
@@ -9,21 +13,27 @@
                     <a v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
                        v-on:click="open(item)"
                        @keyup.enter="open(item)"
-                       tabindex="0">
+                       tabindex="0"
+                       role="menuitem"
+                       aria-haspopup="true"
+                       :aria-expanded="item.open ? 'true' : 'false'"> <!-- inspections error, this works properly -->
+
                         <span class="menu-button-content"
                               tabindex="-1">
                             {{ item.name }}&nbsp;
                         </span>
                     </a>
                     <router-link v-else :to="'/' + item.name.toLowerCase()"
-                                 tabindex="0">
+                                 tabindex="0"
+                                 role="link"
+                                 aria-haspopup="false">
                         <span class="menu-button-content" tabindex="-1"> <!-- TODO: get ride of this hacky &nbsp; -->
                             {{ item.name }}&nbsp;
                         </span>
                     </router-link>
             </li>
         </ul>
-    </div>
+    </nav>
 </template>
 
 <script lang="ts">
@@ -85,7 +95,7 @@ export default class MainMenu extends Vue {
         font-weight: bold;
     }
 
-    #main-menu {
+    #main-menu-container {
         padding: 15px;
     }
 

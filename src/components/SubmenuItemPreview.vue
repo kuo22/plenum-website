@@ -20,21 +20,26 @@
                                 </article-preview>
                             </div>
                         </div>
-                        <div id="index"
-                             class="preview-half">
+                        <nav id="index"
+                             class="preview-half"
+                             role="navigation"
+                             :aria-label="submenuLink.title + ' Content Menu'">
                             <ul id="preview-index"
-                                :title="'Navigation for ' + submenuLink.title + ' Content'">
+                                :title="submenuLink.title + ' Content Menu'"
+                                role="menu"
+                                :aria-label="submenuLink.title + ' Content Menu'">
                                 <li v-for="(article, articleID) in submenuLink.articles" class="preview-index-entry menu-button">
                                     <router-link :to="'/articles/' + article.nodeNumber"
                                                  @click.native="toggleOpen(menu); article.hovered = false;"
                                                  @mouseover.native="article.hovered = true"
-                                                 @mouseleave.native="article.hovered = false">
+                                                 @mouseleave.native="article.hovered = false"
+                                                 role="menuitem">
                                         <p class="title menu-button-content" tabindex="-1">{{ article.title }}</p>
                                         <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
                                     </router-link>
                                 </li>
                             </ul>
-                        </div>
+                        </nav>
                     </div>
                 </div>
             </transition>

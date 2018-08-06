@@ -1,13 +1,19 @@
-# To-do
+## Accessibility Resources
+* [WebAIM](https://webaim.org) - Testing Articles
+* [Getting Started with Web Accessibility in Vue](https://medium.com/@emilymears/getting-started-with-web-accessibility-in-vue-17e2c4ea0842)
+* [W3 HTML Techniques for Web Content Accessibility Guidelines 1.0](https://www.w3.org/TR/WCAG10-HTML-TECHS/#edef-MAP) - Index of Web Accessibility Standards
+* [Menu Navigation Concepts](https://www.w3.org/WAI/tutorials/menus/)
+
+##### Specific Resources
+* [Keyboard only focus](http://kizu.ru/en/blog/keyboard-only-focus/#x)
+
+## To-do
 
 
 ### Accessibility
 * [] Add alt attribute to all images (in Drupal too)
 * [] Contain website in one landmark? 
 https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
-* [x] Fix focus container size for main menu items
-* [x] Fix focusability on main menu elements
-* [x] Focusability on logo
 * [] Move focus to issue index after issue selection (insert articles into 'tabindex' order between submenu section link 'tabindex's)
 * [] Implement main tags in each main content view
 https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
@@ -15,15 +21,25 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
     https://dequeuniversity.com/rules/axe/3.0/page-has-heading-one?application=AxeChrome
 * [] Decide if it is necessary to remove tabindex in vue structure
         https://www.w3.org/TR/WCAG20-TECHS/F44.html
+* [] Add arrow key controls [example](https://forum.vuejs.org/t/navigate-through-list-using-arrowkeys/30689)
+* [x] Fix focus container size for main menu items
+* [x] Fix focusability on main menu elements
+* [x] Focusability on logo
 
-#### Logo
+#### Accessibility Manual Testing
+* [] [VoiceOver Testing Tutorial](https://webaim.org/articles/voiceover/)
+* [] [Screen Reader Testing Tutorial](https://webaim.org/articles/jaws/)
+* [] [Non-Visual Desktop Access Testing Tutorial](https://webaim.org/articles/nvda/)
+
+### Logo
 * [] Bug: Animation doesn't stop if article is requested
-* [x] Thicker lines
 * [] Embed 'PLENUM', same typeface as mock-up covers
+* [x] Thicker lines
 
 ### Aesthetics
 
 * [] Add transition to appearance of focus outline
+* [] Reduce outline size of submenu item focuses
 
 #### Responsiveness
 Design drafts for portable devices before implementing

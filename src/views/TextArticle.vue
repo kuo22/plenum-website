@@ -134,7 +134,7 @@ export default class TextArticle extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     $pageWidth: calc(50vw);
     $margin: calc(#{$pageWidth} / 8.5);
     $lefterWidth: 240px;
