@@ -5,7 +5,7 @@
         <ul id="menu"
             role="menubar"
             aria-label="Plenum Main Navigation">
-            <li v-for="item in menuItems"
+            <li v-for="(item, key) in menuItems"
                 @mouseenter="updateHoverState(true, item)"
                 @mouseleave="updateHoverState(false, item)"
                 :style="changeBackground(item)"
@@ -13,7 +13,7 @@
                     <a v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
                        v-on:click="open(item)"
                        @keyup.enter="open(item)"
-                       tabindex="0"
+                       :tabindex="key === 0 ? '0' : '-1'"
                        role="menuitem"
                        aria-haspopup="true"
                        :aria-expanded="item.open ? 'true' : 'false'"> <!-- inspections error, this works properly -->
@@ -24,9 +24,9 @@
                         </span>
                     </a>
                     <router-link v-else :to="'/' + item.name.toLowerCase()"
-                                 tabindex="0"
                                  role="link"
-                                 aria-haspopup="false">
+                                 aria-haspopup="false"
+                                 :tabindex="key === 0 ? '0' : '-1'">
                         <span class="menu-button-content" tabindex="-1"> <!-- TODO: get ride of this hacky &nbsp; -->
                             {{ item.name }}&nbsp;
                         </span>

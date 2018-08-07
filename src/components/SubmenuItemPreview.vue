@@ -28,11 +28,12 @@
                                 :title="submenuLink.title + ' Content Menu'"
                                 role="menu"
                                 :aria-label="submenuLink.title + ' Content Menu'">
-                                <li v-for="(article, articleID) in submenuLink.articles" class="preview-index-entry menu-button">
+                                <li v-for="(article, index) in submenuLink.articles" class="preview-index-entry menu-button">
                                     <router-link :to="'/articles/' + article.nodeNumber"
                                                  @click.native="toggleOpen(menu); article.hovered = false;"
                                                  @mouseover.native="article.hovered = true"
                                                  @mouseleave.native="article.hovered = false"
+                                                 :tabindex="index === 0 ? '0' : '-1'"
                                                  role="menuitem">
                                         <p class="title menu-button-content" tabindex="-1">{{ article.title }}</p>
                                         <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>

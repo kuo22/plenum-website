@@ -4,34 +4,14 @@
              :class="{ 'submenu-active': menu.active }"
              :id="menu.name.toLowerCase()"
              :style="{background: menu.color}">
-
-            <nav v-for="(sectionLinks, sectionName) in menu.subMenu"
-                 :title="sectionName + ' Content Navigation Menu'"
-                 :aria-label="sectionName + ' Content Menu'"
-                 role="navigation">
-                <ul :aria-label="sectionName + ' Content Menu'"
-                    class="section-container"
-                    role="menu">
-                    <li v-if="menu.subMenu">
-                        {{ sectionName }}
-                    </li>
-                    <li class="menu-button"
-                        v-on:mouseover="submenuLink.hovered = true"
-                        v-on:mouseleave="submenuLink.hovered = false"
-                        v-for="submenuLink in sectionLinks">
-                        <router-link :to="'/' + menu.name.toLowerCase() +
-                                          '/' + submenuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                                          '/index'"
-                                     @click.native="activateSubmenuLink(menu, sectionName, submenuLink)"
-                                     :class="{ underlined: submenuLink.active }"
-                                     role="menuitem"
-                                     aria-haspopup="true"
-                                     :aria-expanded="submenuLink.active ? 'true' : 'false'">
-                            <span class="menu-button-content" tabindex="-1">{{ submenuLink.title }}</span>
-                        </router-link>
-                    </li>
-                </ul>
-            </nav>
+            <submenu-section-menu
+                v-for="(sectionLinks, sectionName) in menu.subMenu"
+                v-on:activateSubmenuLink="activateSubmenuLink"
+                :menuTitle="sectionName"
+                :menuItems="sectionLinks"
+                :parentMenu="menu">
+            </submenu-section-menu>
+            <!-- CREATE A UNIVERSAL CLASS THAT MANAGES FOCUS WITHIN COMPONENTS-->
         </div>
 
         <submenu-item-preview
@@ -46,11 +26,13 @@ import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import ArticlePreview from '@/components/ArticlePreview';
 import SubmenuItemPreview from '@/components/SubmenuItemPreview';
+import SubmenuSectionMenu from '@/components/SubmenuSectionMenu';
 
 @Component({
     components: {
         ArticlePreview,
         SubmenuItemPreview,
+        SubmenuSectionMenu,
     },
 })
 
@@ -145,25 +127,26 @@ export default class SubMenu extends Vue {
     }
 
     .section-container {
+
+    }
+
+    nav {
         padding: 15px 15px;
         font-weight: bold;
         text-align: right;
         font-size: 1.4em;
     }
 
-    .section-container li:nth-child(1) {
+    .section-label {
         text-align: left;
         font-size: 1.3em;
         margin-bottom: 0.3em;
+        display: block;
     }
 
     .section-container li {
         height: 40px;
     }
-
-    /*.section-container li:focus-within {*/
-        /*outline: 3px dashed black;*/
-    /*}*/
 
     .section-container li:focus {
         outline: none;

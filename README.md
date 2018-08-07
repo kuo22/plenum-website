@@ -56,6 +56,8 @@ Design drafts for portable devices before implementing
 
 
 ### Main Content Area
+* [] Implement horizontal fixed window splitter (slider to move sections of the webpage)
+  * [Fixed Window Splitter](https://www.w3.org/TR/wai-aria-practices/#windowsplitter)
 
 ### Navigation
 * [] Give easy access to active issue article index

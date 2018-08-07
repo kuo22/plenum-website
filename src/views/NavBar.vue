@@ -25,7 +25,8 @@
         </div>
 
         <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="submenu" :class="{ active: item.active, open: item.open, hidden: item.hidden }"
+            <sub-menu class="submenu"
+                      :class="{ active: item.active, open: item.open, hidden: item.hidden }"
                       v-show="item.open || item.active"
                       v-bind:menu="item"
                       v-on:activateMenu="toggleActiveMenu"
