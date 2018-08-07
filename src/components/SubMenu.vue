@@ -64,7 +64,8 @@ export default class SubMenu extends Vue {
     //      submenuLink = the submenu link to be activated
     private activateSubmenuLink(item: MainMenuItem,
                                 sectionName: string,
-                                submenuLink: SubmenuLink) {
+                                submenuLink: SubmenuLink,
+                                keyboardEvent: boolean) {
 
         // Deactivate all other submenu links, besides the submenu link to be activated
         for (let i = 0; i < this.menu.subMenu[sectionName].length; i++) {
@@ -82,6 +83,11 @@ export default class SubMenu extends Vue {
             submenuLink.active = true;
         }
 
+        if (keyboardEvent) {
+            setTimeout(() => {
+                document.getElementById('first' + submenuLink.title).focus();
+            }, 10);
+        }
     }
 }
 </script>

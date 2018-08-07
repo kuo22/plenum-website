@@ -11,12 +11,13 @@
                 :style="changeBackground(item)"
                 class="menu-button">
                     <a v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
-                       v-on:click="open(item)"
-                       @keyup.enter="open(item)"
-                       :tabindex="index === 0 ? '0' : '-1'"
+                       v-on:click="open(item, false)"
+                       :tabindex="index === 0 || index === focused ? '0' : '-1'"
                        role="menuitem"
                        aria-haspopup="true"
                        :aria-expanded="item.open ? 'true' : 'false'"
+                       @keyup.enter.prevent="open(item, true)"
+                       @keyup.right.prevent="open(item, true)"
                        @keydown.down.prevent="moveDown"
                        @keydown.up.prevent="moveUp"
                        v-focus="index === focused"
@@ -31,7 +32,7 @@
                     <router-link v-else :to="'/' + item.name.toLowerCase()"
                                  role="link"
                                  aria-haspopup="false"
-                                 :tabindex="index === 0 ? '0' : '-1'"
+                                 :tabindex="index === 0 || index === focused ? '0' : '-1'"
                                  @keydown.down.prevent.native="moveDown"
                                  @keydown.up.prevent.native="moveUp"
                                  v-focus="index === focused"
@@ -95,7 +96,7 @@ export default class MainMenu extends Vue {
     }
 
     // Emits an open event to the parent
-    @Emit('open') public open(item: MainMenuItem): void {
+    @Emit('open') public open(item: MainMenuItem, keyboardEvent: boolean): void {
         /* tslint fix - 'no-empty blocks' */
     }
 

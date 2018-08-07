@@ -70,7 +70,7 @@ export default class NavBar extends Vue {
     // Sets the open menu and if the menu to open is already open, it closes
     // parameter(s) needed:
     //      item = main menu item to be opened or closed
-    public toggleOpenMenu(item: MainMenuItem): void {
+    public toggleOpenMenu(item: MainMenuItem, keyboardEvent: boolean): void {
         const alreadyOpen: boolean = item.open;
 
         if (item.open) {
@@ -90,6 +90,13 @@ export default class NavBar extends Vue {
                 this.toggleActiveMenu(item);
             }
 
+        }
+        // If menu interaction was from the keyboard, move focus to submenu immediately
+        // after submenu is revealed (200ms)
+        if (keyboardEvent) {
+            setTimeout(() => {
+                document.getElementById('first' + item.name).focus();
+            }, 200);
         }
     }
 

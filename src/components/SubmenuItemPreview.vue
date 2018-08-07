@@ -30,6 +30,7 @@
                                 :aria-label="submenuLink.title + ' Content Menu'">
                                 <li v-for="(article, index) in submenuLink.articles" class="preview-index-entry menu-button">
                                     <router-link :to="'/articles/' + article.nodeNumber"
+                                                 :id="index === 0 ? 'first' + submenuLink.title : null"
                                                  @click.native="toggleOpen(menu); article.hovered = false;"
                                                  @mouseover.native="article.hovered = true"
                                                  @mouseleave.native="article.hovered = false"

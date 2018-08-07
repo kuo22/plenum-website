@@ -12,18 +12,25 @@
                 class="section-container"
                 role="menu">
                 <li class="menu-button"
-                    v-for="(menuLink, key) in menuItems"
+                    v-for="(menuLink, index) in menuItems"
                     v-on:mouseover="menuLink.hovered = true"
                     v-on:mouseleave="menuLink.hovered = false">
                     <router-link :to="'/' + parentMenu.name.toLowerCase() +
                                       '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
                                       '/index'"
-                                 @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink)"
                                  :class="{ underlined: menuLink.active }"
-                                 :tabindex="key === 0 ? '0' : '-1'"
+                                 :tabindex="index === 0 || index === focused ? '0' : '-1'"
+                                 :id="index === 0 ? 'first' + parentMenu.name : null"
                                  role="menuitem"
                                  aria-haspopup="true"
-                                 :aria-expanded="menuLink.active ? 'true' : 'false'">
+                                 :aria-expanded="menuLink.active ? 'true' : 'false'"
+                                 @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
+                                 @keydown.right.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                                 @keydown.down.prevent.native="moveDown"
+                                 @keydown.up.prevent.native="moveUp"
+                                 v-focus="index === focused"
+                                 @focus.native="focused = index; menuLink.hovered = true;"
+                                 @blur.native="focused = null; menuLink.hovered = false;">
                         <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}</span>
                     </router-link>
                 </li>
@@ -35,8 +42,10 @@
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {MainMenuItem} from '@/classes/MainMenuItem';
     import {SubmenuLink} from '../classes/SubmenuLink';
+    import { mixin as focusMixin } from 'vue-focus';
 
     @Component({
+        mixins: [focusMixin],
         components: {
         },
     })
@@ -46,6 +55,7 @@
         @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
         @Prop() private menuTitle!: string;
         @Prop() private parentMenu: MainMenuItem;
+        @Prop() private focused: number;
         @Prop() private menuItemHovered: boolean;
         @Prop() private previewImageURL: string = '';
 
@@ -58,6 +68,15 @@
                                    menuTitle: string,
                                    menuLink: SubmenuLink) {
             // Filler
+        }
+
+        // TODO: import these functions as mixin? to use in all menu components
+        private moveDown() {
+            this.focused = this.focused === this.menuItems.length - 1 ? 0 : this.focused + 1;
+        }
+
+        private moveUp() {
+            this.focused = this.focused === 0 ? this.menuItems.length - 1 : this.focused - 1;
         }
     }
 </script>
