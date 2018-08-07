@@ -67,6 +67,7 @@
     $lefterWidth: 240px;
     $preview-container: calc(100vw - #{$lefterWidth});
 
+    // TODO: clean up unnecessary css leftover from SubMenu component as template
     .menu-button-content {
         padding: 8px 5px 0 0;
     }

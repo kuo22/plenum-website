@@ -5,7 +5,7 @@
         <ul id="menu"
             role="menubar"
             aria-label="Plenum Main Navigation">
-            <li v-for="(item, key) in menuItems"
+            <li v-for="(item, index) in menuItems"
                 @mouseenter="updateHoverState(true, item)"
                 @mouseleave="updateHoverState(false, item)"
                 :style="changeBackground(item)"
@@ -13,10 +13,15 @@
                     <a v-if="Object.getOwnPropertyNames(item.subMenu).length > 1"
                        v-on:click="open(item)"
                        @keyup.enter="open(item)"
-                       :tabindex="key === 0 ? '0' : '-1'"
+                       :tabindex="index === 0 ? '0' : '-1'"
                        role="menuitem"
                        aria-haspopup="true"
-                       :aria-expanded="item.open ? 'true' : 'false'"> <!-- inspections error, this works properly -->
+                       :aria-expanded="item.open ? 'true' : 'false'"
+                       @keydown.down.prevent="moveDown"
+                       @keydown.up.prevent="moveUp"
+                       v-focus="index === focused"
+                       @focus="focused = index"
+                       @blur="focused = null"> <!-- inspections error, this works properly -->
 
                         <span class="menu-button-content"
                               tabindex="-1">
@@ -26,7 +31,12 @@
                     <router-link v-else :to="'/' + item.name.toLowerCase()"
                                  role="link"
                                  aria-haspopup="false"
-                                 :tabindex="key === 0 ? '0' : '-1'">
+                                 :tabindex="index === 0 ? '0' : '-1'"
+                                 @keydown.down.prevent.native="moveDown"
+                                 @keydown.up.prevent.native="moveUp"
+                                 v-focus="index === focused"
+                                 @focus.native="focused = index"
+                                 @blur.native="focused = null">
                         <span class="menu-button-content" tabindex="-1"> <!-- TODO: get ride of this hacky &nbsp; -->
                             {{ item.name }}&nbsp;
                         </span>
@@ -39,16 +49,19 @@
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
+import { mixin as focusMixin } from 'vue-focus';
 
 @Component({
-        components: {
+    mixins: [focusMixin],
+    components: {
 
-        },
-    })
+    },
+})
 
 // Main navigation menu for the app
 export default class MainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
+    @Prop() private focused: number;
 
     constructor() {
         super();
@@ -84,6 +97,14 @@ export default class MainMenu extends Vue {
     // Emits an open event to the parent
     @Emit('open') public open(item: MainMenuItem): void {
         /* tslint fix - 'no-empty blocks' */
+    }
+
+    private moveDown() {
+        this.focused = this.focused === this.menuItems.length - 1 ? 0 : this.focused + 1;
+    }
+
+    private moveUp() {
+        this.focused = this.focused === 0 ? this.menuItems.length - 1 : this.focused - 1;
     }
 }
 </script>
