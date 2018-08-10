@@ -3,6 +3,7 @@
 * [Getting Started with Web Accessibility in Vue](https://medium.com/@emilymears/getting-started-with-web-accessibility-in-vue-17e2c4ea0842)
 * [W3 HTML Techniques for Web Content Accessibility Guidelines 1.0](https://www.w3.org/TR/WCAG10-HTML-TECHS/#edef-MAP) - Index of Web Accessibility Standards
 * [Menu Navigation Concepts](https://www.w3.org/WAI/tutorials/menus/)
+* [Menubar Example](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html)
 
 ##### Specific Resources
 * [Keyboard only focus](http://kizu.ru/en/blog/keyboard-only-focus/#x)

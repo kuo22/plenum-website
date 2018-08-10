@@ -21,6 +21,7 @@
                          @keydown.enter.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
                          @keydown.right.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
                          @keydown.space.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.esc.prevent.native="exitMenu(menuTitle)"
                          @keydown.left.prevent.native="exitMenu(menuTitle)"
                          @keydown.down.prevent.native="moveDown"
                          @keydown.up.prevent.native="moveUp"
@@ -56,7 +57,7 @@ import SubmenuItemPreview from '@/components/SubmenuItemPreview';
 })
 
 // Submenu associated with a unique main menu entry
-export default class SubmenuSectionMenu extends Vue {
+export default class FlyOutSectionMenu extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
     @Prop() private parentMenu: MainMenuItem;

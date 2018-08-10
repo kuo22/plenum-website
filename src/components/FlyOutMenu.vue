@@ -34,14 +34,14 @@
                     {{ menuTitle }}
                 </span>
             </a>
-            <submenu-section-menu
+            <fly-out-section-menu
                     :menuTitle="menuTitle"
                     :menuItems="sectionLinks"
                     :parentMenu="menu"
                     v-on:activateSubmenuLink="activateSubmenuLink"
                     v-on:toggleOpen="toggleOpen"
                     v-on:articleSelected="openArticle">
-            </submenu-section-menu>
+            </fly-out-section-menu>
         </li>
     </ul>
 </template>
@@ -51,18 +51,18 @@ import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import ArticlePreview from '@/components/ArticlePreview';
-import SubmenuSectionMenu from '@/components/SubmenuSectionMenu';
+import FlyOutSectionMenu from '@/components/FlyOutSectionMenu';
 import { mixin as focusMixin } from 'vue-focus';
 
 @Component({
     mixins: [focusMixin],
     components: {
         ArticlePreview,
-        SubmenuSectionMenu,
+        FlyOutSectionMenu,
     },
 })
 
-// Submenu associated with a unique main menu entry
+// Flyout submenu associated with a unique main menu entry
 export default class FlyOutMenu extends Vue {
     @Prop() private menu!: MainMenuItem; // Parent menu item
     @Prop() private menuItemHovered: boolean;

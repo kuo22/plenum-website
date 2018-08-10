@@ -21,6 +21,7 @@
                    @click="menu.open ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
                    @keydown.enter.prevent="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
                    @keydown.space="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
+                   @keydown.esc="menu.open ? closeMainMenuFlyOut(menu, index, true) : null"
                    @keydown.right="menu.open ? focusToFlyOut(menu) : openMainMenuFlyOut(menu, true)"
                    @keydown.left="menu.open ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
                    @keydown.up.prevent="moveUp"
@@ -93,9 +94,9 @@ export default class MainMenu extends Vue {
     @Emit('open') public open(item: MainMenuItem, keyboardEvent: boolean): void {
         /* TODO: tslint fix - 'no-empty blocks' */
     }
+
     // Changes the background color of a menu item based on its hover state
     // parameter(s) needed:
-
     //      menuitem = menu item to be changed
     public changeBackground(menuItem: MainMenuItem): {} {
         let bg = {};
@@ -117,11 +118,11 @@ export default class MainMenu extends Vue {
 
         return bg;
     }
+
     // Closes the flyout submenu for the provided main menu item
     // parameter(s):
     //      menuItem         = parent menu item of the to-be closed flyout submenu
     //      menuItemIndex    = index of the main menu item in the main menu list
-
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
     public closeMainMenuFlyOut(menuItem: MainMenuItem, menuItemIndex: number, wasKeyboardEvent?: boolean = false) {
         menuItem.open = false;
@@ -135,10 +136,10 @@ export default class MainMenu extends Vue {
             }, 10);
         }
     }
+
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
     // parameter(s) needed:
     //      menu           = parent menu of the flyout to be focused on
-
     //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
     public focusToFlyOut(menu: MainMenuItem, toLastMenuItem?: boolean = false) {
         const index: number = toLastMenuItem ? Object.keys(menu.subMenu).length - 1 : 0;
@@ -146,11 +147,11 @@ export default class MainMenu extends Vue {
             document.getElementById(menu.name + '-fly-out-menu-item-' + index.toString()).focus();
         }, 10);
     }
+
     // Sets the open menu and if the menu to open is already open, it closes
     // parameter(s):
     //      menuItem        = main menu item to be opened or closed
     //      isKeyBoardEvent = whether or not the native DOM event was from a key press or not
-
     //      toLastMenuItem  = whether or not focus goes to the last menu item; defaults to first menu item
     public openMainMenuFlyOut(menuItem: MainMenuItem,
                               isKeyboardEvent: boolean,
