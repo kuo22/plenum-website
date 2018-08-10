@@ -151,6 +151,7 @@ export default class App extends Vue {
       height: 100vh;
       width: $lefterWidth;
       z-index: 4;
+      background: white;
   }
 
   .before-appear {

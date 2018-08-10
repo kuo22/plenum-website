@@ -11,8 +11,10 @@
                 </router-link-->
             </div>
 
-            <main-menu v-bind:menuItems="menuItems"
-                       v-on:open="toggleOpenMenu"></main-menu>
+            <nav role="navigation"
+                 aria-label="Plenum Main Navigation">
+                <main-menu v-bind:menuItems="menuItems"></main-menu>
+            </nav>
 
             <div class="grid-frame" id="about-brief">
                 <p>
@@ -24,21 +26,21 @@
 
         </div>
 
-        <transition name="submenu-slide" v-for="item in menuItems">
-            <sub-menu class="submenu"
-                      :class="{ active: item.active, open: item.open, hidden: item.hidden }"
-                      v-show="item.open || item.active"
-                      v-bind:menu="item"
-                      v-on:activateMenu="toggleActiveMenu"
-                      v-on:toggleOpen="toggleOpenMenu"></sub-menu>
-        </transition>
+        <!--&lt;!&ndash; TODO: move the submenu into the mainmenu component &ndash;&gt;-->
+        <!--<transition name="submenu-slide" v-for="item in menuItems">-->
+            <!--<sub-menu class="submenu"-->
+                      <!--:class="{ active: item.active, open: item.open, hidden: item.hidden }"-->
+                      <!--v-show="item.open || item.active"-->
+                      <!--v-bind:menu="item"-->
+                      <!--v-on:activateMenu="toggleActiveMenu"-->
+                      <!--v-on:toggleOpen="toggleOpenMenu"></sub-menu>-->
+        <!--</transition>-->
     </div>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import MainMenu from '@/components/MainMenu';
-import SubMenu from '@/components/SubMenu';
 import {MainMenuItem} from '../classes/MainMenuItem';
 import LogoAnimated from '@/components/LogoAnimated';
 import * as hsluv from '../../node_modules/hsluv/hsluv.js';
@@ -52,7 +54,6 @@ import {SubmenuLink} from '../classes/SubmenuLink';
 @Component({
     components: {
         MainMenu,
-        SubMenu,
         LogoAnimated,
     },
 })
@@ -65,70 +66,6 @@ export default class NavBar extends Vue {
 
     constructor() {
         super();
-    }
-
-    // Sets the open menu and if the menu to open is already open, it closes
-    // parameter(s) needed:
-    //      item = main menu item to be opened or closed
-    public toggleOpenMenu(item: MainMenuItem, keyboardEvent: boolean): void {
-        const alreadyOpen: boolean = item.open;
-
-        if (item.open) {
-            item.open = false;
-            if (item.active) {
-                this.toggleActiveMenu(item, false);
-            }
-        } else {
-            for (const menuItem of this.menuItems) {
-                menuItem.open = false;
-            }
-
-            if (item.subMenu) {
-                item.open = true;
-                item.hidden = false;
-            } else {
-                this.toggleActiveMenu(item);
-            }
-
-        }
-        // If menu interaction was from the keyboard, move focus to submenu immediately
-        // after submenu is revealed (200ms)
-        if (keyboardEvent) {
-            setTimeout(() => {
-                document.getElementById('first' + item.name).focus();
-            }, 200);
-        }
-    }
-
-    // Toggles the active state of main menu item or optionally declares the active state
-    // parameter(s) needed:
-    //      item    = main menu item
-    //      active  = whether or not the main menu item is being actively used
-    private toggleActiveMenu(item: MainMenuItem, active?: boolean = !item.active): void {
-        // Reset all submenus
-        for (const menuItem of this.menuItems) {
-            menuItem.active = false;
-            menuItem.hidden = true;
-            if (Object.keys(menuItem.subMenu).length > 0) {
-                this.resetSubmenuLinks(menuItem.subMenu);
-            }
-        }
-
-        item.active = active;
-        item.hidden = false;
-    }
-
-    // Resets all submenu links provided to be deactivated
-    // parameter(s) needed:
-    //      submenu = list of submenu links to be deactivated
-    private resetSubmenuLinks(submenu) {
-        for (const sectionLink in submenu) {
-            if (submenu.hasOwnProperty(sectionLink)) {
-            for (const link: SubmenuLink of submenu[sectionLink]) {
-                link.active = false;
-            }
-            }
-        }
     }
 }
 </script>
@@ -146,16 +83,6 @@ export default class NavBar extends Vue {
         width: $lefterWidth;
         z-index: 4;
     }
-
-    .submenu {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        outline: $border;
-        left: $lefterWidth;
-        width: calc(100% - calc(#{$lefterWidth} * 2));
-    }
 </style>
 
 <style lang="scss" scoped>
@@ -163,6 +90,12 @@ export default class NavBar extends Vue {
     $border: 3px solid black;
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
+
+    nav[role=navigation] {
+        height: calc(100% - (#{$lefterWidth} * 2) - 15px - 3px); // subtracting padding and border width
+        background: white;
+        padding: 15px 15px 0 15px;
+    }
 
     #main {
         z-index: 5;
@@ -173,6 +106,7 @@ export default class NavBar extends Vue {
         width: $lefterWidth;
         height: $lefterWidth;
         text-align: center;
+        background: white;
     }
 
     #logo {
@@ -191,6 +125,13 @@ export default class NavBar extends Vue {
         max-height: 80%;
     }
 
+    #about-brief {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        border-top: $border;
+    }
+
     #about-brief p {
         padding: 15px;
         vertical-align: middle;
@@ -200,58 +141,6 @@ export default class NavBar extends Vue {
         line-height: 20px;
         font-weight: bold;
         text-indent: unset;
-    }
-
-    #about-brief {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        border-top: $border;
-    }
-
-    .submenu {
-        z-index: 3;
-    }
-
-    .submenu-slide-enter {
-        z-index: 4;
-    }
-
-    .submenu-slide-enter-active {
-        transition: all .5s ease;
-        z-index: 4;
-    }
-
-    .submenu-slide-enter-to {
-        z-index: 4;
-    }
-
-    .submenu-slide-leave {
-        z-index: 4;
-    }
-
-    .submenu-slide-leave-active {
-        transition: all .5s ease;
-        z-index: 4;
-    }
-
-    .submenu-slide-leave-to {
-        z-index: 4;
-        transform: translateX(-$lefterWidth);
-    }
-
-    .submenu-slide-enter //, .submenu-slide-leave-to
-        /* .slide-fade-leave-active below version 2.1.8 */ {
-        transform: translateX(-$lefterWidth);
-        //opacity: 0;
-    }
-
-    .open {
-        z-index: 4;
-    }
-
-    .hidden {
-        display: none;
     }
 
 </style>

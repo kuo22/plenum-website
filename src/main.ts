@@ -9,6 +9,17 @@ import {RootState} from '@/types/storeTypes';
 
 Vue.config.productionTip = false;
 
+const alphabet: number[] = [];
+for (let i = 48; i <= 90; i++) {
+    alphabet.push(i);
+}
+
+Vue.config.keyCodes = {
+    home: 36,
+    end: 35,
+    alphabet,
+};
+
 new Vue({
     router,
     store,

@@ -1,5 +1,5 @@
 <template>
-    <div class="submenu-item-preview">
+    <ul class="submenu-item-preview">
         <template v-for="sectionLinks in menu.subMenu">
             <transition v-for="submenuLink in sectionLinks" name="component-fade">
                 <div v-if="submenuLink.hovered || submenuLink.active" id="submenu-preview-container"
@@ -29,13 +29,22 @@
                                 role="menu"
                                 :aria-label="submenuLink.title + ' Content Menu'">
                                 <li v-for="(article, index) in submenuLink.articles" class="preview-index-entry menu-button">
+                                    <!-- TODO: make seperate nav component for each article list -->
+                                    <!-- TODO: create and use a closeMenu(menu: MainMenuItem, router-link url?: string) -->
                                     <router-link :to="'/articles/' + article.nodeNumber"
-                                                 :id="index === 0 ? 'first' + submenuLink.title : null"
-                                                 @click.native="toggleOpen(menu); article.hovered = false;"
+                                                 :id="index === 0 ? 'first-' + submenuLink.title.replace(' ', '-') : null"
+                                                 :tabindex="index === 0 || index === focused ? '0' : '-1'"
+                                                 role="menuitem"
+                                                 @click.native="articleSelected(menu, '/articles/' + article.nodeNumber); article.hovered = false;"
+                                                 @keydown.right.native="articleSelected(menu, '/articles/' + article.nodeNumber); article.hovered = false;"
+                                                 @keydown.enter.native="articleSelected(menu, '/articles/' + article.nodeNumber); article.hovered = false;"
                                                  @mouseover.native="article.hovered = true"
                                                  @mouseleave.native="article.hovered = false"
-                                                 :tabindex="index === 0 ? '0' : '-1'"
-                                                 role="menuitem">
+                                                 @keydown.down.prevent.native="moveDown"
+                                                 @keydown.up.prevent.native="moveUp"
+                                                 v-focus="index === focused"
+                                                 @focus.native="focused = index; article.hovered = true;"
+                                                 @blur.native="focused = null; article.hovered = false;">
                                         <p class="title menu-button-content" tabindex="-1">{{ article.title }}</p>
                                         <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
                                     </router-link>
@@ -46,15 +55,17 @@
                 </div>
             </transition>
         </template>
-    </div>
+    </ul>
 </template>
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '../classes/MainMenuItem';
 import ArticlePreview from '@/components/ArticlePreview';
+import { mixin as focusMixin } from 'vue-focus';
 
 @Component({
+    mixins: [focusMixin],
     components: {
         ArticlePreview,
     },
@@ -63,19 +74,29 @@ import ArticlePreview from '@/components/ArticlePreview';
 // Submenu associated with a unique main menu entry
 export default class SubmenuItemPreview extends Vue {
     @Prop() private menu: MainMenuItem;
+    @Prop() private focused: number;
 
     constructor() {
         super();
     }
 
-    // When this component is loaded, draw a canvas with an animatable Plenum logo
-    public created() {
-// filler
-    }
-
     @Emit('toggleOpen')
     public toggleOpen(menu: MainMenuItem): void {
         // Filler
+    }
+
+    @Emit('articleSelected')
+    public articleSelected(menu: MainMenuItem, routerLinkLocation: string) {
+        // Filler
+    }
+
+    // TODO: import these functions as mixin? to use in all menu components
+    private moveDown() {
+        this.focused = this.focused === this.menuItems.length - 1 ? 0 : this.focused + 1;
+    }
+
+    private moveUp() {
+        this.focused = this.focused === 0 ? this.menuItems.length - 1 : this.focused - 1;
     }
 }
 </script>
@@ -101,6 +122,7 @@ export default class SubmenuItemPreview extends Vue {
         height: 84%;
         background: transparent;
         transform: translateY(0vh);
+        text-align: center;
     }
 
     .cover-content-container .article-preview {

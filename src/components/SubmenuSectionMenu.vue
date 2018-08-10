@@ -1,112 +1,146 @@
 <template>
-        <!--submenu-section-menu></submenu-section-menu--><!-- CREATE A UNIVERSAL CLASS THAT MANAGES FOCUS WITHIN COMPONENTS-->
-        <nav :title="menuTitle + ' Content Navigation Menu'"
-             :aria-labelledby="menuTitle"
-             role="navigation">
-            <label :v-if="this.parentMenu.subMenu"
-                   class="section-label"
-                   :id="menuTitle">
-                {{ menuTitle }}
-            </label>
-            <ul :aria-labelledby="menuTitle"
-                class="section-container"
-                role="menu">
-                <li class="menu-button"
-                    v-for="(menuLink, index) in menuItems"
-                    v-on:mouseover="menuLink.hovered = true"
-                    v-on:mouseleave="menuLink.hovered = false">
-                    <router-link :to="'/' + parentMenu.name.toLowerCase() +
-                                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                                      '/index'"
-                                 :class="{ underlined: menuLink.active }"
-                                 :tabindex="index === 0 || index === focused ? '0' : '-1'"
-                                 :id="index === 0 ? 'first' + parentMenu.name : null"
-                                 role="menuitem"
-                                 aria-haspopup="true"
-                                 :aria-expanded="menuLink.active ? 'true' : 'false'"
-                                 @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
-                                 @keydown.right.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                                 @keydown.down.prevent.native="moveDown"
-                                 @keydown.up.prevent.native="moveUp"
-                                 v-focus="index === focused"
-                                 @focus.native="focused = index; menuLink.hovered = true;"
-                                 @blur.native="focused = null; menuLink.hovered = false;">
-                        <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}</span>
-                    </router-link>
-                </li>
-            </ul>
-        </nav>
+    <ul :aria-labelledby="menuTitle"
+        class="submenu-section-menu"
+        role="menu">
+        <li class="menu-button"
+            role="none"
+            v-for="(menuLink, index) in menuItems"
+            v-on:mouseover="menuLink.hovered = true"
+            v-on:mouseleave="menuLink.hovered = false">
+            <router-link :to="'/' + parentMenu.name.toLowerCase() +
+                              '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                              '/index'"
+                         :id="index === 0 ? menuTitle.toString().replace(' ','-') + '-first' : null"
+                         :class="{ underlined: menuLink.active }"
+                         :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                         role="menuitem"
+                         aria-haspopup="true"
+                         :aria-expanded="menuLink.active ? 'true' : 'false'"
+
+                         @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
+                         @keydown.enter.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.right.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.space.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.left.prevent.native="exitMenu(menuTitle)"
+                         @keydown.down.prevent.native="moveDown"
+                         @keydown.up.prevent.native="moveUp"
+                         @keydown.home.prevent.native="focusedIndex = 0"
+                         @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+
+                         v-focus="index === focusedIndex"
+                         @focus.native="focusedIndex = index; menuLink.hovered = true;"
+                         @blur.native="menuLink.hovered = false;">
+                <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}&nbsp;</span>
+            </router-link>
+            <submenu-item-preview
+                    v-bind:menu="parentMenu"
+                    v-on:toggleOpen="toggleOpen"
+                    v-on:articleSelected="openArticle">
+            </submenu-item-preview>
+        </li>
+    </ul>
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {MainMenuItem} from '@/classes/MainMenuItem';
-    import {SubmenuLink} from '../classes/SubmenuLink';
-    import { mixin as focusMixin } from 'vue-focus';
+import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+import {MainMenuItem} from '@/classes/MainMenuItem';
+import {SubmenuLink} from '../classes/SubmenuLink';
+import { mixin as focusMixin } from 'vue-focus';
+import SubmenuItemPreview from '@/components/SubmenuItemPreview';
 
-    @Component({
-        mixins: [focusMixin],
-        components: {
-        },
-    })
+@Component({
+    mixins: [focusMixin],
+    components: {
+        SubmenuItemPreview,
+    },
+})
 
 // Submenu associated with a unique main menu entry
-    export default class SubmenuSectionMenu extends Vue {
-        @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
-        @Prop() private menuTitle!: string;
-        @Prop() private parentMenu: MainMenuItem;
-        @Prop() private focused: number;
-        @Prop() private menuItemHovered: boolean;
-        @Prop() private previewImageURL: string = '';
+export default class SubmenuSectionMenu extends Vue {
+    @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
+    @Prop() private menuTitle!: string;
+    @Prop() private parentMenu: MainMenuItem;
+    @Prop() private focusedIndex!: number;
+    @Prop() private menuItemHovered: boolean;
+    @Prop() private previewImageURL: string = '';
 
-        constructor() {
-            super();
-        }
+    constructor() { super(); }
 
-        @Emit('activateSubmenuLink')
-        public activateSubmenuLink(item: MainMenuItem,
-                                   menuTitle: string,
-                                   menuLink: SubmenuLink) {
-            // Filler
-        }
+    @Emit('activateSubmenuLink')
+    public activateSubmenuLink(item: MainMenuItem,
+                               menuTitle: string,
+                               menuLink: SubmenuLink): void { /* Filler */ }
 
-        // TODO: import these functions as mixin? to use in all menu components
-        private moveDown() {
-            this.focused = this.focused === this.menuItems.length - 1 ? 0 : this.focused + 1;
-        }
+    @Emit('toggleOpen')
+    public toggleOpen(menu: MainMenuItem): void { /* Filler */ }
 
-        private moveUp() {
-            this.focused = this.focused === 0 ? this.menuItems.length - 1 : this.focused - 1;
+    @Emit('openArticle')
+    public openArticle(menu: MainMenuItem, routerLinkLocation: string): void { /* Filler */ }
+
+    // Moves focus to this menu parent menu item (the menu title)
+    private exitMenu() {
+        const parentMenuItems: string[] = Object.keys(this.parentMenu.subMenu);
+        for (let i = 0; i <= parentMenuItems.length - 1; i++) {
+            if (parentMenuItems[i] === this.menuTitle) {
+                document.getElementById(this.parentMenu.name + '-fly-out-menu-item-' + i).focus();
+            }
         }
     }
+
+    // Move focus down one menu item, or return to first menu item if at the end
+    private moveDown() {
+        this.focusedIndex = this.focusedIndex === this.menuItems.length - 1 ? 0 : this.focusedIndex + 1;
+    }
+
+    // Move focus up one menu item, or return to last menu item if at the first
+    private moveUp() {
+        this.focusedIndex = this.focusedIndex === 0 ? this.menuItems.length - 1 : this.focusedIndex - 1;
+    }
+}
 </script>
 
 <style lang="scss" scoped>
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
     $preview-container: calc(100vw - #{$lefterWidth});
+    $focusPadding: 8px;
 
     // TODO: clean up unnecessary css leftover from SubMenu component as template
-    .menu-button-content {
-        padding: 8px 5px 0 0;
-    }
-
     a {
         text-decoration: none;
+        outline: none;
     }
 
     a:hover {
         text-decoration: underline;
     }
 
-    .submenu-active {
-        // left: 20px;
-        z-index: 4;
+    a[role=menuitem] {
+        // width: calc(100% - #{$focusPadding});
+    }
+
+    a[role=menuitem] * {
+        // padding-right: #{$focusPadding};
+        width: 100%;
+        height: 100%;
+    }
+
+    .submenu-section-menu .menu-button {
+        height: 2.5em;
     }
 
     .submenu a:hover {
         cursor: pointer;
         text-decoration: underline;
+    }
+
+    .submenu-section-menu li {
+        line-height: 45px;
+    }
+
+    .submenu-active {
+        // left: 20px;
+        z-index: 4;
     }
 
     .preview-half {
@@ -116,28 +150,6 @@
         width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
         float: left;
         background: white;
-    }
-
-    h2, h3, h4, h5, h6 {
-        font-weight: bold;
-    }
-
-    .section-container {
-
-    }
-
-    nav {
-        padding: 15px 15px;
-        font-weight: bold;
-        text-align: right;
-        font-size: 1.4em;
-    }
-
-    .section-label {
-        text-align: left;
-        font-size: 1.3em;
-        margin-bottom: 0.3em;
-        display: block;
     }
 
     .section-container li {
@@ -150,6 +162,7 @@
 
     .section-container li a {
         text-align: right;
+        font-size: 1.3em;
         display: block;
     }
 
@@ -157,33 +170,7 @@
         outline: none;
     }
 
-    h2 {
-        text-align: right;
-    }
-
     .underlined {
         text-decoration: underline;
-    }
-
-    @if $viewAllSubMenus {
-        #about, #publications, #contribute, #volunteer {
-            display: block !important;
-        }
-
-        #about {
-            left: $lefterWidth;
-        }
-
-        #publications {
-            left: 480px;
-        }
-
-        #contribute {
-            left: 720px;
-        }
-
-        #volunteer {
-            left: 960px;
-        }
     }
 </style>
