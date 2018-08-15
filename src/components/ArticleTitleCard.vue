@@ -1,8 +1,8 @@
 <template>
     <div>
         <h1 class="title">{{article.title}}</h1>
-        <span v-if="article.subtitle" class="subtitle">{{article.subtitle}}</span>
-        <p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>
+        <div v-if="article.subtitle" class="subtitle">{{article.subtitle}}</div>
+        <!--<p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>-->
     </div>
 </template>
 
@@ -40,8 +40,8 @@ export default class ArticleTitleCard extends Vue {
 
     .subtitle {
         font-weight: lighter;
-        text-indent: 3em;
-        line-height: 1.4em;
+        text-indent: 2em;
+        font-size: 1.3em;
     }
 
     .author {

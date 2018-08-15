@@ -10,17 +10,18 @@
             <router-link :to="'/' + parentMenu.name.toLowerCase() +
                               '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
                               '/index'"
-                         :id="index === 0 ? menuTitle.toString().replace(' ','-') + '-first' : null"
+                         :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
                          :class="{ underlined: menuLink.active }"
                          :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
                          role="menuitem"
                          aria-haspopup="true"
                          :aria-expanded="menuLink.active ? 'true' : 'false'"
 
                          @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
-                         @keydown.enter.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                         @keydown.right.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                         @keydown.space.prevent.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.right.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                         @keydown.space.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
                          @keydown.esc.prevent.native="exitMenu(menuTitle)"
                          @keydown.left.prevent.native="exitMenu(menuTitle)"
                          @keydown.down.prevent.native="moveDown"
@@ -33,11 +34,42 @@
                          @blur.native="menuLink.hovered = false;">
                 <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}&nbsp;</span>
             </router-link>
-            <submenu-item-preview
-                    v-bind:menu="parentMenu"
-                    v-on:toggleOpen="toggleOpen"
-                    v-on:articleSelected="openArticle">
-            </submenu-item-preview>
+
+            <!-- TODO: Add title bar that includes basic info about the issue (title, editors, published date, download all button?) -->
+            <!-- div class="collection-title-bar">
+
+            </div-->
+            <transition name="preview-fade">
+                <div class="collection-preview"
+                     :class="{'collection-active': menuLink.active }"
+                     v-show="menuLink.active"
+                     role="presentation"> <!--, hovered: menuLink.hovered-->
+
+                    <div class="cover-image-preview preview-half">
+                        <div class="preview-content-container">
+                            <img :alt="menuLink.title + ' Cover Image'"
+                                 :class="{ 'preview-active': menuLink.active }"
+                                 :src="menuLink.coverImageURL">
+                        </div>
+                    </div>
+
+                    <div class="toc-preview-container"
+                         role="presentation">
+                        <article-previews class="preview-half"
+                                          v-bind:articles="menuLink.articles"
+                                          v-bind:parentCollection="menuLink"></article-previews>
+                        <table-of-contents
+                                class="preview-half"
+                                v-bind:parentCollection="menuLink"
+                                v-bind:mainMenuAncestor="parentMenu"
+                                v-on:toggleOpen="toggleOpen"
+                                v-on:articleSelected="openArticle"
+                                v-on:exitMenu="focusOnSubmenusParentMenuItem">
+                        </table-of-contents>
+                    </div>
+
+                </div>
+            </transition>
         </li>
     </ul>
 </template>
@@ -47,12 +79,16 @@ import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import { mixin as focusMixin } from 'vue-focus';
-import SubmenuItemPreview from '@/components/SubmenuItemPreview';
+import TableOfContents from '@/components/TableOfContents';
+import ArticleTitleCard from './ArticleTitleCard';
+import ArticlePreviews from './ArticlePreviews';
 
 @Component({
     mixins: [focusMixin],
     components: {
-        SubmenuItemPreview,
+        ArticlePreviews,
+        ArticleTitleCard,
+        TableOfContents,
     },
 })
 
@@ -61,6 +97,7 @@ export default class FlyOutSectionMenu extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
     @Prop() private parentMenu: MainMenuItem;
+    // TODO: include a parentMenu variable in all menu item classes; create a class for the flyout section menus?
     @Prop() private focusedIndex!: number;
     @Prop() private menuItemHovered: boolean;
     @Prop() private previewImageURL: string = '';
@@ -77,6 +114,27 @@ export default class FlyOutSectionMenu extends Vue {
 
     @Emit('openArticle')
     public openArticle(menu: MainMenuItem, routerLinkLocation: string): void { /* Filler */ }
+
+    // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
+    // parameter(s) needed:
+    //      menu           = parent menu of the flyout to be focused on
+    //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
+    private focusToTOC(menu: SubmenuLink) {
+        setTimeout(() => {
+            document.getElementById(menu.title.replace(' ', '') + '-entry-0').focus();
+        }, 5);
+    }
+
+    // Focus on the provided parental menu item
+        // TODO: Rename method
+    private focusOnSubmenusParentMenuItem(providedMenuItem: SubmenuLink)  {
+        // TODO: make more efficient, all of this jsut to figure out the index of the provided menu item?
+        for (let index = 0; index <= this.menuItems.length - 1; index++) {
+            if (this.menuItems[index].title === providedMenuItem.title) {
+                document.getElementById(this.menuTitle.replace(' ', '') + '-section-menu-item-' + index).focus();
+            }
+        }
+    }
 
     // Moves focus to this menu parent menu item (the menu title)
     private exitMenu() {
@@ -103,7 +161,8 @@ export default class FlyOutSectionMenu extends Vue {
 <style lang="scss" scoped>
     $viewAllSubMenus: false;
     $lefterWidth: 240px;
-    $preview-container: calc(100vw - #{$lefterWidth});
+    $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
+    $preview-height: 90vh;
     $focusPadding: 8px;
 
     // TODO: clean up unnecessary css leftover from SubMenu component as template
@@ -144,14 +203,90 @@ export default class FlyOutSectionMenu extends Vue {
         z-index: 4;
     }
 
+    .collection-title-bar {
+        width: $preview-width;
+        height: calc(100vh - #{$preview-height});
+    }
+
+    .toc-preview-container {
+        width: $preview-width;
+        height: $preview-height;
+        position: absolute;
+        // background: rgba(255, 255, 255, 0.5);
+    }
+
+    .collection-preview {
+        display: inline-block;
+        position: absolute;
+        left: calc(#{$lefterWidth} + 3px); // + outline width
+        top: calc(100vh - #{$preview-height});
+        width: $preview-width;
+        height: $preview-height;
+        float: right;
+        background: white;
+        z-index: 2;
+        outline: 3px solid black;
+    }
+
+    .collection-preview.collection-active {
+        z-index: 1;
+    }
+
+    .collection-preview.hovered {
+        z-index: 3;
+    }
+
+    /* COLLECTION IMAGE AND ARTICLE ABSTRACT PREVIEW START */
+
+    .preview-content-container {
+        position: absolute;
+        top: 8%;
+        left: 4%;
+        width: 92%;
+        height: 84%;
+        transform: translateY(0vh);
+        text-align: center;
+    }
+
+    .preview-content-container .article-preview {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .preview-content-container img {
+        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+        top: 0;
+        height: auto;
+        box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
+        transition: all 0.4s ease;
+    }
+
+    .preview-content-container img.preview-active {
+        max-width: 98%;
+        max-height: 98%;
+        top: 1%; // Half of max-height border
+        box-shadow: -2px 2px 10px -2px rgba(0, 0, 0, 0.41);
+    }
+
     .preview-half {
         position: relative;
-        display: inline-block;
-        height: 100vh;
-        width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
+        height: $preview-height;
+        width: calc((#{$preview-width}) / 2);
         float: left;
-        background: white;
+        background: transparent;
+        // border-right: 3px solid black;
     }
+
+    /*.preview-container {*/
+        /*position: absolute;*/
+        /*top: 0;*/
+        /*left: 0;*/
+    /*}*/
+    
+    /* COLLECTION IMAGE AND ARTICLE ABSTRACT PREVIEW END */
 
     .section-container li {
         height: 40px;
@@ -173,5 +308,29 @@ export default class FlyOutSectionMenu extends Vue {
 
     .underlined {
         text-decoration: underline;
+    }
+
+    .preview-fade-enter {
+        opacity: 0;
+    }
+
+    .preview-fade-enter-active {
+        transition: opacity 150ms ease-in;
+    }
+
+    .preview-fade-enter-to {
+        opacity: 1;
+    }
+
+    .preview-face-leave {
+        opacity: 1;
+    }
+
+    .preview-fade-leave-active {
+        transition: opacity 150ms ease-out;
+    }
+
+    .preview-fade-leave-to {
+        opacity: 0;
     }
 </style>

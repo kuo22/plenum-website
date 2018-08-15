@@ -40,7 +40,7 @@
                     :parentMenu="menu"
                     v-on:activateSubmenuLink="activateSubmenuLink"
                     v-on:toggleOpen="toggleOpen"
-                    v-on:articleSelected="openArticle">
+                    v-on:openArticle="openArticle">
             </fly-out-section-menu>
         </li>
     </ul>
@@ -50,7 +50,7 @@
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
-import ArticlePreview from '@/components/ArticlePreview';
+import ArticlePreview from '@/components/ArticlePreviews';
 import FlyOutSectionMenu from '@/components/FlyOutSectionMenu';
 import { mixin as focusMixin } from 'vue-focus';
 
@@ -96,7 +96,7 @@ export default class FlyOutMenu extends Vue {
     // parameter(s):
     //      menuTitle = title of the menu to be entered
     private enterSubmenu(menuTitle: string) {
-        document.getElementById(menuTitle.toString().replace(' ', '-') + '-first').focus();
+        document.getElementById(menuTitle.replace(' ', '') + '-section-menu-item-0').focus();
     }
 
     // TODO: import these functions as mixin? to use in all menu components
@@ -135,7 +135,6 @@ export default class FlyOutMenu extends Vue {
                                 sectionName: string,
                                 submenuLink: SubmenuLink,
                                 isKeyboardEvent: boolean) {
-
         // Deactivate all other submenu links, besides the submenu link to be activated
         for (let i = 0; i < this.menu.subMenu[sectionName].length; i++) {
             const menuItem: SubmenuLink = this.menu.subMenu[sectionName][i];
@@ -153,8 +152,8 @@ export default class FlyOutMenu extends Vue {
             if (isKeyboardEvent) {
                 // Barely delay to give time for the menu to enter the DOM
                 setTimeout(() => {
-                    document.getElementById('first-' + submenuLink.title.replace(' ', '-')).focus();
-                }, 10);
+                    document.getElementById(submenuLink.title.replace(' ', '') + '-entry-0').focus();
+                }, 5);
             }
         }
     }

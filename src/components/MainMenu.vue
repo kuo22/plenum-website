@@ -62,7 +62,8 @@
                               v-bind:menu="menu"
                               v-on:activateMenu="toggleActiveMenu"
                               v-on:toggleOpen="openMainMenuFlyOut"
-                              v-on:closeMainMenuFlyOut="closeMainMenuFlyOut">
+                              v-on:closeMainMenuFlyOut="closeMainMenuFlyOut"
+                              v-on:openArticle="openArticle">
                     </fly-out-menu>
                 </transition>
         </li>
@@ -93,6 +94,23 @@ export default class MainMenu extends Vue {
     // Emits an open event to the parent
     @Emit('open') public open(item: MainMenuItem, keyboardEvent: boolean): void {
         /* TODO: tslint fix - 'no-empty blocks' */
+    }
+
+    public openArticle(menu: MainMenuItem, routerLinkLocation: string) {
+        const menuIndex: number = this.getIndexOfMenuItem(menu);
+        this.closeMainMenuFlyOut(menu, menuIndex, true); // TODO: get 'true' via parameters
+        this.$router.push(routerLinkLocation);
+    }
+
+    public getIndexOfMenuItem(menu: MainMenuItem): number {
+        let index = -1;
+        for (let i = 0; i < this.menuItems.length - 1; i++) {
+            if (this.menuItems[i].name === menu.name) {
+                index = i;
+            }
+        }
+
+        return index;
     }
 
     // Changes the background color of a menu item based on its hover state
@@ -137,17 +155,6 @@ export default class MainMenu extends Vue {
         }
     }
 
-    // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
-    // parameter(s) needed:
-    //      menu           = parent menu of the flyout to be focused on
-    //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
-    public focusToFlyOut(menu: MainMenuItem, toLastMenuItem?: boolean = false) {
-        const index: number = toLastMenuItem ? Object.keys(menu.subMenu).length - 1 : 0;
-        setTimeout(() => {
-            document.getElementById(menu.name + '-fly-out-menu-item-' + index.toString()).focus();
-        }, 10);
-    }
-
     // Sets the open menu and if the menu to open is already open, it closes
     // parameter(s):
     //      menuItem        = main menu item to be opened or closed
@@ -173,6 +180,17 @@ export default class MainMenu extends Vue {
         }
     }
 
+    // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
+    // parameter(s) needed:
+    //      menu           = parent menu of the flyout to be focused on
+    //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
+    private focusToFlyOut(menu: MainMenuItem, toLastMenuItem?: boolean = false) {
+        const index: number = toLastMenuItem ? Object.keys(menu.subMenu).length - 1 : 0;
+        setTimeout(() => {
+            document.getElementById(menu.name + '-fly-out-menu-item-' + index.toString()).focus();
+        }, 10);
+    }
+
     // Toggles the active state of main menu item or optionally declares the active state
     // parameter(s):
     //      item    = main menu item
@@ -194,7 +212,7 @@ export default class MainMenu extends Vue {
     // Resets all submenu links provided to be deactivated
     // parameter(s) needed:
     //      submenu = list of submenu links to be deactivated
-
+    // TODO: this isn't actually changing the submenu...
     private resetSubmenuLinks(submenu) {
         for (const sectionLink in submenu) {
             if (submenu.hasOwnProperty(sectionLink)) {
@@ -294,7 +312,7 @@ export default class MainMenu extends Vue {
     }
 
     .submenu-slide-enter-active {
-        transition: all .5s ease;
+        transition: all .4s ease;
         z-index: 4;
     }
 
@@ -307,7 +325,7 @@ export default class MainMenu extends Vue {
     }
 
     .submenu-slide-leave-active {
-        transition: all .5s ease;
+        transition: all .4s ease;
         z-index: 4;
     }
 

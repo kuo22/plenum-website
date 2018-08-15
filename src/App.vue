@@ -4,13 +4,15 @@
             <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
         </transition>
         <transition name="component-fade" mode="out-in">
-            <router-view class="view content-section"></router-view>
+            <router-view class="view content-section"
+                         @click.native="closeFlyOut"
+                         @focus.native="closeFlyOut"></router-view>
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import NavBar from '@/views/NavBar';
@@ -36,8 +38,8 @@ export default class App extends Vue {
     @Action('createMenuItems', { namespace }) private createMenuItems: any;
     @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
 
-    private issues: Collection[] = [];
-    private menuItems: MainMenuItem[] = [];
+    @Prop() private issues: Collection[] = [];
+    @Prop() private menuItems: MainMenuItem[] = [];
 
     constructor() {
         super();
@@ -52,6 +54,18 @@ export default class App extends Vue {
             .catch();
     }
 
+    // Closes the flyout menu
+    private closeFlyOut(): void {
+        for (const menuItemIndex: number in this.menuItems) {
+            if (this.menuItems.hasOwnProperty(menuItemIndex)) {
+                this.menuItems[menuItemIndex].open = false;
+                this.menuItems[menuItemIndex].active = false;
+                setTimeout(() => {
+                    this.menuItems[menuItemIndex].hidden = true;
+                }, 400);
+            }
+        }
+    }
 
     private getIssues(): void {
         const issuesJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/jsonapi/node/issue'
