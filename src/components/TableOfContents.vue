@@ -53,7 +53,7 @@ import {Article} from '../types/types';
 // Submenu associated with a unique main menu entry
 export default class TableOfContents extends Vue {
     @Prop() private parentCollection!: SubmenuLink;
-    @Prop() private mainMenuAncestor: MainMenuItem;
+    @Prop() private mainMenuAncestor!: MainMenuItem;
     @Prop() private focusedIndex: number;
     private scrollPosition: number;
 

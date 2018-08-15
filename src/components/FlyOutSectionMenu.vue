@@ -5,8 +5,7 @@
         <li class="menu-button"
             role="none"
             v-for="(menuLink, index) in menuItems"
-            v-on:mouseover="menuLink.hovered = true"
-            v-on:mouseleave="menuLink.hovered = false">
+            >
             <router-link :to="'/' + parentMenu.name.toLowerCase() +
                               '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
                               '/index'"
@@ -17,6 +16,9 @@
                          role="menuitem"
                          aria-haspopup="true"
                          :aria-expanded="menuLink.active ? 'true' : 'false'"
+
+                         @mouseover.native="menuLink.hovered = true"
+                         @mouseleave.native="menuLink.hovered = false"
 
                          @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
                          @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
@@ -30,8 +32,7 @@
                          @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
 
                          v-focus="index === focusedIndex"
-                         @focus.prevent.native="focusOnMenuItem(index)"
-                         @blur.native="menuLink.hovered = false">
+                         @focus.prevent.native="focusOnMenuItem(index)">
                 <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}&nbsp;</span>
             </router-link>
 
@@ -43,7 +44,7 @@
                 <div class="collection-preview"
                      :class="{'collection-active': menuLink.active }"
                      v-show="menuLink.active || menuLink.hovered"
-                     @mouseleave="toggleOffAllArticleItemHovers"
+                     @mouseleave="toggleOffAllArticleItemHovers(index)"
                      role="presentation"> <!--, hovered: menuLink.hovered-->
 
                     <div class="cover-image-preview preview-half">
@@ -99,7 +100,6 @@ export default class FlyOutSectionMenu extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
     @Prop() private parentMenu!: MainMenuItem;
-    // TODO: include a parentMenu variable in all menu item classes; create a class for the flyout section menus?
     @Prop() private focusedIndex!: number;
     @Prop() private menuItemHovered!: boolean;
     @Prop() private previewImageURL: string = '';
@@ -117,7 +117,9 @@ export default class FlyOutSectionMenu extends Vue {
     @Emit('openArticle')
     public openArticle(menu: MainMenuItem, routerLinkLocation: string): void { /* Filler */ }
 
-    private toggleOffAllArticleItemHovers(): void {
+    // Turn off all toggled on hover attributes of the table of content entries in order to hide the article previews
+    // and return the preview to the collection image
+    private toggleOffAllArticleItemHovers(index: number): void {
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].active) {
                 for (let j = 0; j < this.menuItems[i].articles.length; j++) {
@@ -125,8 +127,12 @@ export default class FlyOutSectionMenu extends Vue {
                 }
             }
         }
+        this.menuItems[index].hovered = false;
     }
-    // TODO: does this work?
+
+    // Send focus to a specific collection menu item depending on the provided index number of the menu item
+    // parameter:
+    //      index: position of the menu item in the menu list
     private focusOnMenuItem(index: number) {
         this.focusedIndex = index;
         this.menuItems[index].hovered = true;
