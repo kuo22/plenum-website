@@ -143,10 +143,10 @@ export default class MainMenu extends Vue {
     //      menuItemIndex    = index of the main menu item in the main menu list
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
     public closeMainMenuFlyOut(menuItem: MainMenuItem, menuItemIndex: number, wasKeyboardEvent?: boolean = false) {
-        menuItem.open = false;
         if (menuItem.active) {
             this.toggleActiveMenu(menuItem, false);
         }
+        this.menuItems[menuItemIndex].open = false;
         if (wasKeyboardEvent) {
             setTimeout(() => {
                 document.getElementById('main-menu-item-' + menuItemIndex).focus(); // FOCUS ON MAIN MENU ITEM
@@ -163,14 +163,15 @@ export default class MainMenu extends Vue {
     public openMainMenuFlyOut(menuItem: MainMenuItem,
                               isKeyboardEvent: boolean,
                               toLastMenuItem?: boolean = false): void {
+        const index: number = this.getIndexOfMenuItem(menuItem);
         // Close all flyouts
         for (const menuItem of this.menuItems) {
-            menuItem.open = false;
+            this.menuItems[index].open = false;
         }
 
         if (menuItem.subMenu) {
-            menuItem.open = true;
-            menuItem.hidden = false; // TODO: what is the purpose of hidden?
+            this.menuItems[index].open = true;
+            this.menuItems[index].hidden = false; // TODO: what is the purpose of hidden?
         } else {
             this.toggleActiveMenu(menuItem);
         }
@@ -197,27 +198,35 @@ export default class MainMenu extends Vue {
     //      active  = whether or not the main menu item is being actively used
     private toggleActiveMenu(item: MainMenuItem, active?: boolean = !item.active): void {
         // Reset all submenus
-        for (const menuItem of this.menuItems) {
-            menuItem.active = false;
-            menuItem.hidden = true;
-            if (Object.keys(menuItem.subMenu).length > 0) {
-                this.resetSubmenuLinks(menuItem.subMenu);
+        const index: number = this.getIndexOfMenuItem(item);
+
+        this.menuItems[index].active = active;
+        this.menuItems[index].hidden = false;
+
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (i !== index) {
+                this.menuItems[i].active = false;
+                this.menuItems[i].hidden = true;
+            } else {
+                if (Object.keys(this.menuItems[index].subMenu).length > 0) {
+                    this.resetSubmenuLinks(index);
+                }
             }
         }
-
-        item.active = active;
-        item.hidden = false;
     }
 
     // Resets all submenu links provided to be deactivated
     // parameter(s) needed:
     //      submenu = list of submenu links to be deactivated
-    // TODO: this isn't actually changing the submenu...
-    private resetSubmenuLinks(submenu) {
-        for (const sectionLink in submenu) {
-            if (submenu.hasOwnProperty(sectionLink)) {
-                for (const link: SubmenuLink of submenu[sectionLink]) {
-                    link.active = false;
+    private resetSubmenuLinks(index: number) {
+        for (const submenuItemKey: string in this.menuItems[index].subMenu) {
+            if (this.menuItems[index].subMenu.hasOwnProperty(submenuItemKey)) {
+                for (let j = 0; j < this.menuItems[index].subMenu[submenuItemKey].length; j++) {
+                    this.menuItems[index].subMenu[submenuItemKey][j].active = false;
+                    // console.log(
+                    //     this.menuItems[index].subMenu[submenuItemKey][j].title
+                    //     + ' '
+                    //     + this.menuItems[index].subMenu[submenuItemKey][j].active);
                 }
             }
         }

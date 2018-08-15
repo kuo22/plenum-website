@@ -135,18 +135,17 @@ export default class FlyOutMenu extends Vue {
                                 sectionName: string,
                                 submenuLink: SubmenuLink,
                                 isKeyboardEvent: boolean) {
+        let activatedFlag: boolean = true;
         // Deactivate all other submenu links, besides the submenu link to be activated
         for (let i = 0; i < this.menu.subMenu[sectionName].length; i++) {
             const menuItem: SubmenuLink = this.menu.subMenu[sectionName][i];
-            if (menuItem.title !== submenuLink.title) {
-                this.menu.subMenu[sectionName][i].active = false;
+            this.menu.subMenu[sectionName][i].active = (menuItem.title === submenuLink.title) && !submenuLink.active;
+            if ((menuItem.title === submenuLink.title) && !submenuLink.active) {
+                activatedFlag = false;
             }
         }
 
-        // If submenu link is already active, turn it off, otherwise activate menu
-        if (submenuLink.active) {
-            submenuLink.active = false;
-        } else {
+        if (activatedFlag) {
             this.activateMenu(item);
             submenuLink.active = true;
             if (isKeyboardEvent) {
