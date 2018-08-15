@@ -13,8 +13,7 @@
 
                              role="menuitem"
 
-                             @mouseover.native="focusArticle(article, index); article.hovered = true;"
-                             @mouseleave.native="article.hovered = false"
+                             @mouseover.native="toggleLingerHover(index)"
 
                              @click.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
                              @keydown.right.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
@@ -76,6 +75,22 @@ export default class TableOfContents extends Vue {
     @Emit('exitMenu')
     public exitMenu(parentMenu: SubmenuLink): void {
         // Filler
+    }
+
+    private deactivateAllHovers(): void {
+        for (let i = 0; i < this.parentCollection.articles.length; i++) {
+            this.parentCollection.articles[i].hovered = false;
+        }
+    }
+
+    private toggleLingerHover(index: number): void {
+        for (let i = 0; i < this.parentCollection.articles.length; i++) {
+            if (i !== index) {
+                this.parentCollection.articles[i].hovered = false;
+            } else {
+                this.parentCollection.articles[index].hovered = true;
+            }
+        }
     }
 
     private focusArticle(article: Article, index: number): void {

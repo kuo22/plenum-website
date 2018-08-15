@@ -85,6 +85,10 @@ export default class ArticlePreview extends Vue {
         width: 0.5em;
     }
 
+    /*.article-previews {*/
+        /*background: white;*/
+    /*}*/
+
     .preview-container {
         width: 85%;
         margin: auto;
@@ -95,8 +99,8 @@ export default class ArticlePreview extends Vue {
     .preview-content-container {
         position: absolute;
         top: 5%;
-        left: 7%;
-        width: 86%;
+        left: 4%;
+        width: 92%;
         height: 90%;
         background: #fafafa;
         box-shadow: 3px 3px 8px 1px #d5d5d5;

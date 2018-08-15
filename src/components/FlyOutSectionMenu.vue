@@ -30,8 +30,8 @@
                          @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
 
                          v-focus="index === focusedIndex"
-                         @focus.native="focusedIndex = index; menuLink.hovered = true;"
-                         @blur.native="menuLink.hovered = false;">
+                         @focus.prevent.native="focusOnMenuItem(index)"
+                         @blur.native="menuLink.hovered = false">
                 <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}&nbsp;</span>
             </router-link>
 
@@ -42,7 +42,8 @@
             <transition name="preview-fade">
                 <div class="collection-preview"
                      :class="{'collection-active': menuLink.active }"
-                     v-show="menuLink.active"
+                     v-show="menuLink.active || menuLink.hovered"
+                     @mouseleave="toggleOffAllArticleItemHovers"
                      role="presentation"> <!--, hovered: menuLink.hovered-->
 
                     <div class="cover-image-preview preview-half">
@@ -59,6 +60,7 @@
                                           v-bind:articles="menuLink.articles"
                                           v-bind:parentCollection="menuLink"></article-previews>
                         <table-of-contents
+                                ref="tableOfContents"
                                 class="preview-half"
                                 v-bind:parentCollection="menuLink"
                                 v-bind:mainMenuAncestor="parentMenu"
@@ -96,10 +98,10 @@ import ArticlePreviews from './ArticlePreviews';
 export default class FlyOutSectionMenu extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
-    @Prop() private parentMenu: MainMenuItem;
+    @Prop() private parentMenu!: MainMenuItem;
     // TODO: include a parentMenu variable in all menu item classes; create a class for the flyout section menus?
     @Prop() private focusedIndex!: number;
-    @Prop() private menuItemHovered: boolean;
+    @Prop() private menuItemHovered!: boolean;
     @Prop() private previewImageURL: string = '';
 
     constructor() { super(); }
@@ -114,6 +116,21 @@ export default class FlyOutSectionMenu extends Vue {
 
     @Emit('openArticle')
     public openArticle(menu: MainMenuItem, routerLinkLocation: string): void { /* Filler */ }
+
+    private toggleOffAllArticleItemHovers(): void {
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (this.menuItems[i].active) {
+                for (let j = 0; j < this.menuItems[i].articles.length; j++) {
+                    this.menuItems[i].articles[j].hovered = false;
+                }
+            }
+        }
+    }
+    // TODO: does this work?
+    private focusOnMenuItem(index: number) {
+        this.focusedIndex = index;
+        this.menuItems[index].hovered = true;
+    }
 
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
     // parameter(s) needed:
