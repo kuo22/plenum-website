@@ -6,23 +6,28 @@
     >
         <li
             v-for="(menu, index) in menuItems"
-            :key="index"
             :id="menu.name.toLowerCase().replace(' ', '-') + '-main-menu-item'"
+            :key="index"
+
+            class="menu-button"
+            :style="changeBackground(menu)"
+
             @mouseenter="menu.hoverState = true"
             @mouseleave="menu.hoverState = false"
-            :style="changeBackground(menu)"
-            class="menu-button"
         >
 
             <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
             <a
                 v-if="Object.getOwnPropertyNames(menu.subMenu).length > 1"
                 :id="'main-menu-item-' + index"
+                :key="'link-to-' + menu.name.replace(' ', '-')"
 
                 role="menuitem"
                 aria-haspopup="true"
                 :aria-expanded="menu.open ? 'true' : 'false'"
                 :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
+                v-focus="index === focusedIndex"
 
                 @click="menu.open ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
                 @keydown.enter.prevent="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
@@ -35,8 +40,6 @@
                 @keydown.home.prevent.native="focusedIndex = 0"
                 @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
                 @keydown.alphabet="focusByLetter($event.key, index)"
-
-                v-focus="index === focusedIndex"
                 @focus="focusedIndex = index"
             >
                 <span
@@ -49,15 +52,17 @@
             <router-link
                  v-else :to="'/' + menu.name.toLowerCase()"
                  :id="'main-menu-item-' + index"
+                 :key="'link-to-' + menu.name.toLowerCase().replace(' ', '-')"
+
+                 v-focus="index === focusedIndex"
 
                  role="link"
                  aria-haspopup="false"
                  :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
-
-                 v-focus="index === focusedIndex"
                  @focus.native="focusedIndex = index"
             >
                 <span
@@ -70,14 +75,16 @@
 
             <transition name="submenu-slide">
                 <main-menu-fly-out
+                          v-show="menu.open || menu.active"
+
                           class="submenu"
                           :class="{ active: menu.active, open: menu.open, hidden: menu.hidden }"
-                          v-show="menu.open || menu.active"
-                          v-bind:menu="menu"
-                          v-on:activateMenu="toggleActiveMenu"
-                          v-on:toggleOpen="openMainMenuFlyOut"
-                          v-on:closeMainMenuFlyOut="closeMainMenuFlyOut"
-                          v-on:openArticle="openArticle"
+                          :menu="menu"
+
+                          @activateMenu="toggleActiveMenu"
+                          @toggleOpen="openMainMenuFlyOut"
+                          @closeMainMenuFlyOut="closeMainMenuFlyOut"
+                          @openArticle="openArticle"
                 >
                 </main-menu-fly-out>
             </transition>
@@ -102,7 +109,7 @@ import { SubmenuLink } from '../classes/SubmenuLink';
 // Main navigation
 export default class TheMainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
-    @Prop() private focusedIndex!: number; // Index of the focused menu item
+    private focusedIndex: number = -1; // Index of the focused menu item; Initialize to non-existant index value
 
     constructor() { super(); }
 

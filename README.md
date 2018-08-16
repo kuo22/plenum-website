@@ -1,17 +1,39 @@
-## Accessibility Resources
-* [WebAIM](https://webaim.org) - Testing Articles
-* [Getting Started with Web Accessibility in Vue](https://medium.com/@emilymears/getting-started-with-web-accessibility-in-vue-17e2c4ea0842)
-* [W3 HTML Techniques for Web Content Accessibility Guidelines 1.0](https://www.w3.org/TR/WCAG10-HTML-TECHS/#edef-MAP) - Index of Web Accessibility Standards
-* [Menu Navigation Concepts](https://www.w3.org/WAI/tutorials/menus/)
-* [Menubar Example](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html)
+# To-do
 
-##### Specific Resources
-* [Keyboard only focus](http://kizu.ru/en/blog/keyboard-only-focus/#x)
+## Organize CSS
 
-## To-do
+ [Implement Vue CSS Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
+1. Box
+2. Border
+3. Background
+4. Text
+5. Other
 
+##### Files Todo
+* [] components/*
+* [] views/*
+* [] App.vue
 
-### Accessibility
+######Organize CSS Resources
+* [Get BEM](http://getbem.com/introduction/)
+* [SMACSS](https://smacss.com/book/formatting)
+
+___
+
+## "Props Up Events Down"
+
+[Restructure Vue to Use Props Down Events Up](https://vuejs.org/v2/style-guide/#Implicit-parent-child-communication-use-with-caution)
+
+##### Files Todo
+* [] components/*
+* [] views/*
+* [] App.vue
+
+###### Restructuring Resources
+
+___
+
+## Accessibility
 * [] Add alt attribute to all images (in Drupal too)
 * [] Contain website in one landmark? 
 https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
@@ -32,39 +54,56 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
 * [] [Screen Reader Testing Tutorial](https://webaim.org/articles/jaws/)
 * [] [Non-Visual Desktop Access Testing Tutorial](https://webaim.org/articles/nvda/)
 
-### Logo
-* [] Bug: Animation doesn't stop if article is requested
+###### Accessibility Resources
+* [WebAIM](https://webaim.org) - Testing Articles
+* [Getting Started with Web Accessibility in Vue](https://medium.com/@emilymears/getting-started-with-web-accessibility-in-vue-17e2c4ea0842)
+* [W3 HTML Techniques for Web Content Accessibility Guidelines 1.0](https://www.w3.org/TR/WCAG10-HTML-TECHS/#edef-MAP) - Index of Web Accessibility Standards
+* [Menu Navigation Concepts](https://www.w3.org/WAI/tutorials/menus/)
+* [Menubar Example](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html)
+* [Keyboard only focus](http://kizu.ru/en/blog/keyboard-only-focus/#x)
+
+___
+
+## Design
+
+#### [Fetching after Navigation](https://router.vuejs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
+* Add loading filler
+
+#### Logo
 * [] Embed 'PLENUM', same typeface as mock-up covers
-* [x] Thicker lines
-
-### Aesthetics
-
-* [] Add transition to appearance of focus outline
-* [] Reduce outline size of submenu item focuses
 
 #### Responsiveness
 Design drafts for portable devices before implementing
 * [] Add min-height to main menu and navbar
 * [] Add width-change points
+* [] [Implement this method to scale fonts?](https://forum.vuejs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
 
-###### Menu
-* [] Give overflow to preview abstract
-    * Implement this method to scale fonts https://forum.vuejs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442
-
-###### Bugs
-* [] Fix grid blink on activation of submenu preview
-* [] Article menu styling conflicts with text article view
-
-
-### Main Content Area
+#### Main Content Area
 * [] Implement horizontal fixed window splitter (slider to move sections of the webpage)
   * [Fixed Window Splitter](https://www.w3.org/TR/wai-aria-practices/#windowsplitter)
 
+### Article Page
+* [] Fix font-size in entire design to something more pleasing
+* [] Add 'pagination' to previous and next articles
+___
+
+## Bugs
+
+#### Fix 'Vue Warnings'
+Address all Vue warnings that appear in console during runtime; otherwise, justify why it must remain.
+
+#### CSS
+* [] Article menu styling conflicts with text article view
+
 ### Navigation
-* [] Give easy access to active issue article index
+* [] 'Publication' menu-item receives focus after article is opened with mouse click,
+[according to WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html), focus 
+doesn't move anywhere after link activation (article selection). Maybe send focus to the 'main' landmark?
 * [] Test efficacy of submenu slide via CSS transitions rather than Vue transitions
 * [] Change transition of issue preview box shadow to improve jumpiness
 
-### Article Page
-* [] Fix font-size in entire design
-* [] Add 'pagination' to previous and next articles
+___
+
+## Unit Testing
+[DO IT](https://vuejs.org/v2/guide/unit-testing.html)
+* Continue reviewing the VueJS Basics

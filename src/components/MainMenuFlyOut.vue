@@ -67,8 +67,7 @@ import { mixin as focusMixin } from 'vue-focus';
 export default class MainMenuFlyOut extends Vue {
     @Prop() private menu!: MainMenuItem; // Parent menu item
     @Prop() private menuItemHovered: boolean;
-    @Prop() private previewImageURL: string = '';
-    @Prop() private focusedIndex!: number;
+    private focusedIndex: number = -1;
 
     constructor() { super(); }
 

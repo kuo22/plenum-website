@@ -1,19 +1,20 @@
 <template>
-    <main id="text-article-view">
+    <main :v-if="article"
+          id="text-article-view">
         <span id="active-submenu-spacer"></span>
         <header>
             <div class="article-info">
                 <div class="titles">
                     <h1 class="title">
-                        {{ this.article.title }}
+                        {{ article.title }}
                     </h1>
                     <h2 class="subtitle">
-                        {{this.article.subtitle}}
+                        {{  article.subtitle }}
                     </h2>
                 </div>
                 <!-- make author card a component -->
                 <h3 class="author">
-                    <em>{{this.article.author.firstName}} {{this.article.author.lastName}}</em>
+                    <em>{{ article.author.firstName }} {{ article.author.lastName }}</em>
                 </h3>
             </div>
         </header>
@@ -24,7 +25,7 @@
                         <h4 id="abstract-title">ABSTRACT</h4>
                         <!--span class="tab"></span-->
                         <p>
-                            {{this.article.abstract}}
+                            {{ article.abstract }}
                         </p>
                     </div>
 
@@ -45,7 +46,7 @@
                     <!--</div>-->
 
                     <div id="article-body">
-                        <p v-html="this.article.body"></p>
+                        <p v-html="article.body"></p>
                     </div>
 
                     <hr>
@@ -53,26 +54,32 @@
                     <div id="bibliography">
                         <h4>BIBLIOGRAPHY</h4>
 
-                        <p v-html="this.article.refs"></p>
+                        <p v-html="article.refs"></p>
                     </div>
                 </div>
             </div>
 
             <footer>
 
-                <div id="copyright"
-                     v-if="this.article.copyright">
+                <div
+                    id="copyright"
+                    v-if="article.copyright"
+                >
                     <p>
-                        Copyright &#169; {{this.article.author.firstName}} {{this.article.author.lastName}}.
+                        Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
                         <br>
                         All rights reserved.
                     </p>
                 </div>
 
-                <a id="download"
-                   :title="'Download the Article: ' + article.title"
-                   v-bind:href="this.article.downloadURL"
-                   target="_blank">Download Article</a>
+                <a
+                    id="download"
+                    :title="'Download the Article: ' + article.title"
+                    :href="article.downloadURL"
+                    target="_blank"
+                >
+                    Download Article
+                </a>
 
             </footer>
         </div>
@@ -92,11 +99,14 @@ import APIService from '@/API';
 })
 
 export default class TextArticle extends Vue {
-    @Prop() private article: Article;
     @Prop() private mainTitleOffScreen: boolean;
+
+    private articleLoading: boolean = false;
+    private article: Article = null;
+    private articleError: boolean = null;
+
     private $route: Route;
-    private issueTitle: string;
-    private drupalNodeID: string;
+    // private issueTitle: string = this.$route.params.publication;
 
 
     constructor() {
@@ -104,21 +114,26 @@ export default class TextArticle extends Vue {
     }
 
     // When view is mounted, retrieve article
-    public async mounted() {
+    public created() {
+        this.fetchArticle();
+    }
+
+    @Watch('$route')
+    private onRouteChanged(val, oldVal) {
+        this.fetchArticle();
+    }
+
+    //
+    private fetchArticle() {
+        this.articleError = this.article = null;
+        this.articleLoading = true;
+
         // https://github.com/nuxt-community/typescript-template/issues/23
 
         // TODO: use publication to confirm or get article, currently arbitrary
         // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
-        this.issueTitle = this.$route.params.publication;
-        this.drupalNodeID = this.$route.params.node;
 
-        // if Article does not exist in current store variable of all articles
-        // Then fetch article
-        await APIService.fetchArticle(this.drupalNodeID)
-            .then((response: Article) => {
-                this.article = response;
-                return response;
-            });
+        const drupalNodeID = this.$route.params.node;
 
         // Request article from store
         // Within store, if article does not exist and
@@ -130,6 +145,17 @@ export default class TextArticle extends Vue {
         //     .catch(
         //         // reveal error message
         //     );
+
+        // if Article does not exist in current store variable of all articles
+        // Then fetch article
+        APIService.fetchArticle(drupalNodeID)
+            .then((response: Article) => {
+                this.article = response;
+                return response;
+            }).catch((error) => {
+                // TODO: plan for error
+                this.articleError = error.toString();
+            });
     }
 }
 </script>

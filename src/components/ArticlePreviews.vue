@@ -4,21 +4,21 @@
         role="presentation"
     > <!-- TODO: is role necessary? -->
         <div
-            class="preview-content-container"
             v-for="(article, index) in articles"
-            :key="index"
             v-show="showPreviewManager(article, index)"
+            :key="index"
+            class="preview-content-container"
         >
             <div class="abstract-card-container">
                 <article-title-card
                     class="title-card"
-                    v-bind:article="article"
+                    :article="article"
                 ></article-title-card>
 
                 <h3 class="abstract-title">ABSTRACT</h3>
                 <p
-                    class="abstract"
                     :id="parentCollection.title.replace(' ', '') +'preview' + index"
+                    class="abstract"
                 >
                     {{ article.abstract }}
                 </p>
@@ -41,19 +41,12 @@ import {SubmenuLink} from '../classes/SubmenuLink';
 
 // Submenu associated with a unique main menu entry
 export default class ArticlePreview extends Vue {
-    @Prop() private articles: Article[];
-    @Prop() private parentCollection: SubmenuLink;
-    @Prop() private activeArticleIndex: number;
+    @Prop({ type: Array < Article > [] }) private articles!: Article[];
+    @Prop({ type: SubmenuLink }) private parentCollection!: SubmenuLink;
 
-    constructor() {
-        super();
-    }
+    constructor() { super(); }
 
-    // When this component is loaded, draw a canvas with an animatable Plenum logo
-    public created() {
-// filler
-    }
-
+    //
     private showPreviewManager(article: Article, index: number): boolean {
         return article.hovered  || (document.getElementById(
             this.parentCollection.title.replace(' ', '') + '-entry-' + index) === document.activeElement

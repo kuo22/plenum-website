@@ -28,9 +28,7 @@ export default class TheLogo extends Vue {
     private p5: p5;
     @Prop() private playLogo: boolean;
 
-    constructor() {
-        super();
-    }
+    constructor() { super(); }
 
     // When this component is loaded, draw a canvas with an animatable Plenum logo
     public created() {

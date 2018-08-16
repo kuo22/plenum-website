@@ -2,11 +2,11 @@
     <div id="app">
         <transition appear>
             <the-nav-bar
-                    :menuItems="menuItems"
+                    :menuItems="menuTree"
                     id="menu-grid-section"
-            >
-            </the-nav-bar>
+            ></the-nav-bar>
         </transition>
+
         <transition
                 name="component-fade"
                 mode="out-in"
@@ -47,9 +47,8 @@ const namespace: string = 'menuTree';
 export default class App extends Vue {
     @Action('createMenuItems', { namespace }) private createMenuItems: any;
     @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
-
-    @Prop({ default: [] }) private issues: Collection[];
-    @Prop({ default: [] }) private menuItems: MainMenuItem[];
+    @Prop({ default() { return []; } }) private issues: Collection[];
+    // @Prop() private menuItems: MainMenuItem[];
 
     constructor() { super(); }
 
@@ -57,7 +56,7 @@ export default class App extends Vue {
     public async created(): void {
         await this.createMenuItems()
             .then(() => {
-                this.menuItems = this.menuTree;
+                // this.menuItems = this.menuTree;
             })
             .catch();
     }

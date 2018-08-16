@@ -5,26 +5,29 @@
         role="menu"
     >
         <li
-            class="menu-button"
-            role="none"
             v-for="(menuLink, index) in menuItems"
             :key="index"
+
+            class="menu-button"
+            role="none"
         >
             <router-link
                 :to="'/' + parentMenu.name.toLowerCase() +
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
                      '/index'"
+
                 :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
                 :class="{ underlined: menuLink.active }"
-                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
                 role="menuitem"
                 aria-haspopup="true"
                 :aria-expanded="menuLink.active ? 'true' : 'false'"
+                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
+                v-focus="index === focusedIndex"
 
                 @mouseover.native="menuLink.hovered = true"
                 @mouseleave.native="menuLink.hovered = false"
-
                 @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
                 @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
                 @keydown.right.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
@@ -35,8 +38,6 @@
                 @keydown.up.prevent.native="moveUp"
                 @keydown.home.prevent.native="focusedIndex = 0"
                 @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
-
-                v-focus="index === focusedIndex"
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
@@ -54,11 +55,13 @@
             <!-- TODO move to article preview component? -->
             <transition name="preview-fade">
                 <div
+                    v-show="menuLink.active || menuLink.hovered"
+
+                    role="presentation"
                     class="collection-preview"
                     :class="{'collection-active': menuLink.active }"
-                    v-show="menuLink.active || menuLink.hovered"
+
                     @mouseleave="toggleOffAllArticleItemHovers(index)"
-                    role="presentation"
                 > <!--, hovered: menuLink.hovered-->
 
                     <div class="cover-image-preview preview-half">
@@ -77,17 +80,17 @@
                     >
                         <article-previews
                             class="preview-half"
-                            v-bind:articles="menuLink.articles"
-                            v-bind:parentCollection="menuLink"
+                            :articles="menuLink.articles"
+                            :parentCollection="menuLink"
                         ></article-previews>
                         <table-of-contents
                                 ref="tableOfContents"
                                 class="preview-half"
-                                v-bind:parentCollection="menuLink"
-                                v-bind:mainMenuAncestor="parentMenu"
-                                v-on:toggleOpen="toggleOpen"
-                                v-on:articleSelected="openArticle"
-                                v-on:exitMenu="focusOnSubmenusParentMenuItem"
+                                :parentCollection="menuLink"
+                                :mainMenuAncestor="parentMenu"
+                                @toggleOpen="toggleOpen"
+                                @articleSelected="openArticle"
+                                @exitMenu="focusOnSubmenusParentMenuItem"
                         ></table-of-contents>
                     </div>
 
@@ -120,9 +123,8 @@ export default class MainMenuFlyOutSections extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
     @Prop() private parentMenu!: MainMenuItem;
-    @Prop() private focusedIndex!: number;
     @Prop() private menuItemHovered!: boolean;
-    @Prop() private previewImageURL: string = '';
+    private focusedIndex: number = -1;
 
     constructor() { super(); }
 

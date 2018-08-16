@@ -18,9 +18,11 @@
                 <router-link
                     :to="'/articles/' + article.nodeNumber"
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
-                    :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
                     role="menuitem"
+                    :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
+                    v-focus="index === focusedIndex"
 
                     @mouseover.native="toggleLingerHover(index)"
 
@@ -36,7 +38,6 @@
                     @keydown.end.prevent.native="focusedIndex = parentCollection.articles.length - 1"
                     @keydown.alphabet.native="focusByLetter($event.key, index)"
 
-                    v-focus="index === focusedIndex"
                     @focus.native="focusedIndex = index; article.hovered = true;"
                     @blur.native="article.hovered = false"
                 >
@@ -69,7 +70,7 @@ import {Article} from '../types/types';
 export default class TableOfContents extends Vue {
     @Prop() private parentCollection!: SubmenuLink;
     @Prop() private mainMenuAncestor!: MainMenuItem;
-    @Prop() private focusedIndex: number;
+    private focusedIndex: number = -1;
     private scrollPosition: number;
 
     constructor() {

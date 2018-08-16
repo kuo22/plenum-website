@@ -1,7 +1,7 @@
 <template>
     <div
-        v-on:mouseover="playLogo = true"
-        v-on:mouseout="playLogo = false"
+        @mouseover="playLogo = true"
+        @mouseout="playLogo = false"
     >
         <div
             id="main"
@@ -13,15 +13,11 @@
                 class="grid-frame"
             >
                 <the-logo :playLogo="playLogo"></the-logo>
-                <!--router-link to="/">
-                    <span class="logo-helper"></span>
-                    <img src="@/assets/plenum-logo-raster.png">
-                </router-link-->
             </div>
 
             <nav role="navigation"
                  aria-label="Plenum Main Navigation">
-                <the-main-menu v-bind:menuItems="menuItems"></the-main-menu>
+                <the-main-menu :menuItems="menuItems"></the-main-menu>
             </nav>
 
             <div
@@ -36,21 +32,11 @@
             </div>
 
         </div>
-
-        <!--&lt;!&ndash; TODO: move the submenu into the mainmenu component &ndash;&gt;-->
-        <!--<transition name="submenu-slide" v-for="item in menuItems">-->
-            <!--<sub-menu class="submenu"-->
-                      <!--:class="{ active: item.active, open: item.open, hidden: item.hidden }"-->
-                      <!--v-show="item.open || item.active"-->
-                      <!--v-bind:menu="item"-->
-                      <!--v-on:activateMenu="toggleActiveMenu"-->
-                      <!--v-on:toggleOpen="toggleOpenMenu"></sub-menu>-->
-        <!--</transition>-->
     </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import TheMainMenu from '@/components/TheMainMenu';
 import {MainMenuItem} from '../classes/MainMenuItem';
 import TheLogo from '@/components/TheLogo';
@@ -65,13 +51,16 @@ import TheLogo from '@/components/TheLogo';
 
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class TheNavBar extends Vue {
-    @Prop() private itemName: string;
+    @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
     private playLogo: boolean = false;
-    @Prop() private menuItems: MainMenuItem[]; // Main Menu Options
 
-    constructor() {
-        super();
+    constructor() { super(); }
+
+    @Emit('update:playLogo')
+    private logoHovered(isHovered: boolean) {
+        // Filler
     }
+
 }
 </script>
 
