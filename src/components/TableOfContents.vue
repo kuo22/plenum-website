@@ -8,6 +8,7 @@
             role="menu"
             :title="parentCollection.title + ' Content Menu'"
             :aria-label="parentCollection.title + ' Content Menu'"
+            @mouseover="focusedIndex = -1"
         >
             <li
                 v-for="(article, index) in parentCollection.articles"

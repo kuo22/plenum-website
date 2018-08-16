@@ -3,6 +3,7 @@
         id="main-menu"
         role="menubar"
         aria-label="Plenum Main Navigation"
+        @mouseover="focusedIndex = -1"
     >
         <li
             v-for="(menu, index) in menuItems"
@@ -119,8 +120,7 @@ export default class TheMainMenu extends Vue {
     }
 
     public openArticle(menu: MainMenuItem, routerLinkLocation: string) {
-        const menuIndex: number = this.getIndexOfMenuItem(menu);
-        this.closeMainMenuFlyOut(menu, menuIndex, true); // TODO: get 'true' via parameters
+        this.closeMainMenuFlyOut(menu, null, false); // TODO: get 'true' via parameters
         this.$router.push(routerLinkLocation);
     }
 
@@ -159,22 +159,32 @@ export default class TheMainMenu extends Vue {
         return bg;
     }
 
-    // Closes the flyout submenu for the provided main menu item
+    // Closes the flyout submenu for the provided main menu item and optionally moves focus to the parent menu item
     // parameter(s):
     //      menuItem         = parent menu item of the to-be closed flyout submenu
     //      menuItemIndex    = index of the main menu item in the main menu list
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
-    public closeMainMenuFlyOut(menuItem: MainMenuItem, menuItemIndex: number, wasKeyboardEvent?: boolean = false) {
+    public closeMainMenuFlyOut(menuItem: MainMenuItem,
+                               menuItemIndex: number,
+                               returnFocusToMainMenuItem?: boolean = false) {
+        if (menuItemIndex === null) {
+            menuItemIndex = this.getIndexOfMenuItem(menuItem);
+        }
         if (menuItem.active) {
             this.toggleActiveMenu(menuItem, false);
         }
         this.menuItems[menuItemIndex].open = false;
-        if (wasKeyboardEvent) {
+        if (returnFocusToMainMenuItem) {
             setTimeout(() => {
-                document.getElementById('main-menu-item-' + menuItemIndex).focus(); // FOCUS ON MAIN MENU ITEM
+                this.focusedIndex = menuItemIndex;
+                // document.getElementById('main-menu-item-' + menuItemIndex).focus(); // FOCUS ON MAIN MENU ITEM
                 // TODO: change IDs from 'Publications-menu-item' to 'main-menu-item-1'
             }, 10);
+        } else {
+            this.focusedIndex = -1;
         }
+
+        this.resetSubmenuLinks(menuItemIndex);
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
@@ -223,7 +233,7 @@ export default class TheMainMenu extends Vue {
         const index: number = this.getIndexOfMenuItem(item);
 
         this.menuItems[index].active = active;
-        this.menuItems[index].hidden = false;
+
 
         for (let i = 0; i < this.menuItems.length; i++) {
             if (i !== index) {
@@ -235,16 +245,20 @@ export default class TheMainMenu extends Vue {
                 }
             }
         }
+
+        this.menuItems[index].hidden = false;
     }
 
     // Resets all submenu links provided to be deactivated
     // parameter(s) needed:
     //      submenu = list of submenu links to be deactivated
-    private resetSubmenuLinks(index: number) {
-        for (const submenuItemKey: string in this.menuItems[index].subMenu) {
-            if (this.menuItems[index].subMenu.hasOwnProperty(submenuItemKey)) {
-                for (let j = 0; j < this.menuItems[index].subMenu[submenuItemKey].length; j++) {
-                    this.menuItems[index].subMenu[submenuItemKey][j].active = false;
+    private resetSubmenuLinks(mainMenuItemIndex: number) {
+        for (const submenuItemKey: string in this.menuItems[mainMenuItemIndex].subMenu) {
+            if (this.menuItems[mainMenuItemIndex].subMenu.hasOwnProperty(submenuItemKey)) {
+                for (let j = 0; j < this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey].length; j++) {
+                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].active = false;
+                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hovered = false;
+                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hidden = true;
                     // console.log(
                     //     this.menuItems[index].subMenu[submenuItemKey][j].title
                     //     + ' '

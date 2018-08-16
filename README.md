@@ -66,6 +66,10 @@ ___
 
 ## Design
 
+#### Navigation
+
+* Maintain article preview grid as solid black while image preview and table of contents blend together
+
 #### [Fetching after Navigation](https://router.vuejs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
 * Add loading filler
 

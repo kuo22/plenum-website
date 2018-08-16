@@ -2,7 +2,9 @@
     <ul role="menu"
         class="fly-out-menu"
         :class="{ 'submenu-active': menu.active }"
-        :style="{background: menu.color}">
+        :style="{background: menu.color}"
+        @mouseover="focusedIndex = -1"
+    >
         <li class="submenu-section-menu-item"
             v-for="(sectionLinks, menuTitle, index) in menu.subMenu"
             :key="index"
@@ -21,8 +23,8 @@
                @keydown.enter="enterSubmenu(menuTitle)"
                @keydown.space="enterSubmenu(menuTitle)"
                @keydown.right="enterSubmenu(menuTitle)"
-               @keydown.left.prevent="closeMainMenuFlyOut(menu, true)"
-               @keydown.esc.prevent="closeMainMenuFlyOut(menu, true)"
+               @keydown.left.prevent="closeMainMenuFlyOut(menu, null, true)"
+               @keydown.esc.prevent="closeMainMenuFlyOut(menu, null, true)"
                @keydown.up.prevent="moveUp"
                @keydown.down.prevent="moveDown"
                @keydown.home.prevent.native="focusedIndex = 0"

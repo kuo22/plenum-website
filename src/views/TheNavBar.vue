@@ -17,7 +17,9 @@
 
             <nav role="navigation"
                  aria-label="Plenum Main Navigation">
-                <the-main-menu :menuItems="menuItems"></the-main-menu>
+                <the-main-menu
+                    :menuItems="menuItems"
+                ></the-main-menu>
             </nav>
 
             <div

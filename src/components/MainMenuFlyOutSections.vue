@@ -3,6 +3,7 @@
         :aria-labelledby="menuTitle"
         class="submenu-section-menu"
         role="menu"
+        @mouseover="focusedIndex = -1"
     >
         <li
             v-for="(menuLink, index) in menuItems"
@@ -55,7 +56,7 @@
             <!-- TODO move to article preview component? -->
             <transition name="preview-fade">
                 <div
-                    v-show="menuLink.active || menuLink.hovered"
+                    v-show="menuLink.active || menuLink.hovered || focusedIndex === index"
 
                     role="presentation"
                     class="collection-preview"
@@ -157,7 +158,6 @@ export default class MainMenuFlyOutSections extends Vue {
     //      index: position of the menu item in the menu list
     private focusOnMenuItem(index: number) {
         this.focusedIndex = index;
-        this.menuItems[index].hovered = true;
     }
 
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
@@ -188,6 +188,20 @@ export default class MainMenuFlyOutSections extends Vue {
             if (parentMenuItems[i] === this.menuTitle) {
                 document.getElementById(this.parentMenu.name + '-fly-out-menu-item-' + i).focus();
             }
+        }
+        this.resetMenuItems();
+        this.resetFocus();
+    }
+
+    private resetFocus(): void {
+        this.focusedIndex = -1;
+    }
+
+    private resetMenuItems(): void {
+        for (let i = 0; i < this.menuItems.length; i++) {
+            this.menuItems[i].active = false;
+            this.menuItems[i].hovered = false;
+            this.menuItems[i].hidden = true;
         }
     }
 
@@ -356,26 +370,32 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     .preview-fade-enter {
-        opacity: 0;
+        opacity: 0.75;
+        /*z-index: 3 !important;*/
     }
 
     .preview-fade-enter-active {
-        transition: opacity 150ms ease-in;
+        transition: opacity 200ms ease-in;
+        /*z-index: 3 !important;*/
     }
 
     .preview-fade-enter-to {
         opacity: 1;
+        //z-index: 2 !important;
     }
 
     .preview-face-leave {
         opacity: 1;
+        //z-index: 2 !important;
     }
 
     .preview-fade-leave-active {
-        transition: opacity 150ms ease-out;
+        transition: opacity 200ms ease-out;
+        //z-index: 2 !important;
     }
 
     .preview-fade-leave-to {
         opacity: 0;
+        //z-index: 1 !important;
     }
 </style>
