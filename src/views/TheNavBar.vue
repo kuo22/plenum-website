@@ -1,10 +1,18 @@
 <template>
-    <div v-on:mouseover="playLogo = true"
-         v-on:mouseout="playLogo = false">
-        <div id="main" class="lefter">
+    <div
+        v-on:mouseover="playLogo = true"
+        v-on:mouseout="playLogo = false"
+    >
+        <div
+            id="main"
+            class="lefter"
+        >
 
-            <div id= "logo" class="grid-frame">
-                <logo-animated :playLogo="playLogo"></logo-animated>
+            <div
+                id= "logo"
+                class="grid-frame"
+            >
+                <the-logo :playLogo="playLogo"></the-logo>
                 <!--router-link to="/">
                     <span class="logo-helper"></span>
                     <img src="@/assets/plenum-logo-raster.png">
@@ -13,10 +21,13 @@
 
             <nav role="navigation"
                  aria-label="Plenum Main Navigation">
-                <main-menu v-bind:menuItems="menuItems"></main-menu>
+                <the-main-menu v-bind:menuItems="menuItems"></the-main-menu>
             </nav>
 
-            <div class="grid-frame" id="about-brief">
+            <div
+                class="grid-frame"
+                id="about-brief"
+            >
                 <p>
                     Plenum is an online journal devoted to showcasing the highest quality scholarship in undergraduate
                     geography. It is managed, produced, and reviewed by undergraduate students from the Department
@@ -40,26 +51,20 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import MainMenu from '@/components/MainMenu';
+import TheMainMenu from '@/components/TheMainMenu';
 import {MainMenuItem} from '../classes/MainMenuItem';
-import LogoAnimated from '@/components/LogoAnimated';
-import * as hsluv from '../../node_modules/hsluv/hsluv.js';
-import {error} from 'util';
-import {Action, Getter, State} from 'vuex-class';
-import {DrupalMenu} from '../types/types';
-import {MenuTreeState} from '../types/storeTypes';
-import {SubmenuLink} from '../classes/SubmenuLink';
+import TheLogo from '@/components/TheLogo';
 
 
 @Component({
     components: {
-        MainMenu,
-        LogoAnimated,
+        TheMainMenu,
+        TheLogo,
     },
 })
 
 // The main navigation bar for the app, each entry represents a page of wordpress content
-export default class NavBar extends Vue {
+export default class TheNavBar extends Vue {
     @Prop() private itemName: string;
     private playLogo: boolean = false;
     @Prop() private menuItems: MainMenuItem[]; // Main Menu Options

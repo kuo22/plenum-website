@@ -1,65 +1,85 @@
 <template>
-    <ul :aria-labelledby="menuTitle"
+    <ul
+        :aria-labelledby="menuTitle"
         class="submenu-section-menu"
-        role="menu">
-        <li class="menu-button"
+        role="menu"
+    >
+        <li
+            class="menu-button"
             role="none"
             v-for="(menuLink, index) in menuItems"
+            :key="index"
+        >
+            <router-link
+                :to="'/' + parentMenu.name.toLowerCase() +
+                     '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
+                     '/index'"
+                :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
+                :class="{ underlined: menuLink.active }"
+                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+
+                role="menuitem"
+                aria-haspopup="true"
+                :aria-expanded="menuLink.active ? 'true' : 'false'"
+
+                @mouseover.native="menuLink.hovered = true"
+                @mouseleave.native="menuLink.hovered = false"
+
+                @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
+                @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                @keydown.right.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                @keydown.space.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                @keydown.esc.prevent.native="exitMenu(menuTitle)"
+                @keydown.left.prevent.native="exitMenu(menuTitle)"
+                @keydown.down.prevent.native="moveDown"
+                @keydown.up.prevent.native="moveUp"
+                @keydown.home.prevent.native="focusedIndex = 0"
+                @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+
+                v-focus="index === focusedIndex"
+                @focus.prevent.native="focusOnMenuItem(index)"
             >
-            <router-link :to="'/' + parentMenu.name.toLowerCase() +
-                              '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                              '/index'"
-                         :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
-                         :class="{ underlined: menuLink.active }"
-                         :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
-
-                         role="menuitem"
-                         aria-haspopup="true"
-                         :aria-expanded="menuLink.active ? 'true' : 'false'"
-
-                         @mouseover.native="menuLink.hovered = true"
-                         @mouseleave.native="menuLink.hovered = false"
-
-                         @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
-                         @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                         @keydown.right.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                         @keydown.space.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                         @keydown.esc.prevent.native="exitMenu(menuTitle)"
-                         @keydown.left.prevent.native="exitMenu(menuTitle)"
-                         @keydown.down.prevent.native="moveDown"
-                         @keydown.up.prevent.native="moveUp"
-                         @keydown.home.prevent.native="focusedIndex = 0"
-                         @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
-
-                         v-focus="index === focusedIndex"
-                         @focus.prevent.native="focusOnMenuItem(index)">
-                <span class="menu-button-content" tabindex="-1">{{ menuLink.title }}&nbsp;</span>
+                <span
+                    class="menu-button-content"
+                    tabindex="-1"
+                >
+                    {{ menuLink.title }}&nbsp;
+                </span>
             </router-link>
 
             <!-- TODO: Add title bar that includes basic info about the issue (title, editors, published date, download all button?) -->
             <!-- div class="collection-title-bar">
 
             </div-->
+            <!-- TODO move to article preview component? -->
             <transition name="preview-fade">
-                <div class="collection-preview"
-                     :class="{'collection-active': menuLink.active }"
-                     v-show="menuLink.active || menuLink.hovered"
-                     @mouseleave="toggleOffAllArticleItemHovers(index)"
-                     role="presentation"> <!--, hovered: menuLink.hovered-->
+                <div
+                    class="collection-preview"
+                    :class="{'collection-active': menuLink.active }"
+                    v-show="menuLink.active || menuLink.hovered"
+                    @mouseleave="toggleOffAllArticleItemHovers(index)"
+                    role="presentation"
+                > <!--, hovered: menuLink.hovered-->
 
                     <div class="cover-image-preview preview-half">
                         <div class="preview-content-container">
-                            <img :alt="menuLink.title + ' Cover Image'"
+                            <img
+                                 :alt="menuLink.title + ' Cover Image'"
                                  :class="{ 'preview-active': menuLink.active }"
-                                 :src="menuLink.coverImageURL">
+                                 :src="menuLink.coverImageURL"
+                            >
                         </div>
                     </div>
 
-                    <div class="toc-preview-container"
-                         role="presentation">
-                        <article-previews class="preview-half"
-                                          v-bind:articles="menuLink.articles"
-                                          v-bind:parentCollection="menuLink"></article-previews>
+                    <div
+                        class="toc-preview-container"
+                        role="presentation"
+                    >
+                        <article-previews
+                            class="preview-half"
+                            v-bind:articles="menuLink.articles"
+                            v-bind:parentCollection="menuLink"
+                        ></article-previews>
                         <table-of-contents
                                 ref="tableOfContents"
                                 class="preview-half"
@@ -67,8 +87,8 @@
                                 v-bind:mainMenuAncestor="parentMenu"
                                 v-on:toggleOpen="toggleOpen"
                                 v-on:articleSelected="openArticle"
-                                v-on:exitMenu="focusOnSubmenusParentMenuItem">
-                        </table-of-contents>
+                                v-on:exitMenu="focusOnSubmenusParentMenuItem"
+                        ></table-of-contents>
                     </div>
 
                 </div>
@@ -96,7 +116,7 @@ import ArticlePreviews from './ArticlePreviews';
 })
 
 // Submenu associated with a unique main menu entry
-export default class FlyOutSectionMenu extends Vue {
+export default class MainMenuFlyOutSections extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
     @Prop() private menuTitle!: string;
     @Prop() private parentMenu!: MainMenuItem;

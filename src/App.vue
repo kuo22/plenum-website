@@ -1,12 +1,22 @@
 <template>
     <div id="app">
         <transition appear>
-            <nav-bar :menuItems="menuItems" id="menu-grid-section"></nav-bar>
+            <the-nav-bar
+                    :menuItems="menuItems"
+                    id="menu-grid-section"
+            >
+            </the-nav-bar>
         </transition>
-        <transition name="component-fade" mode="out-in">
-            <router-view class="view content-section"
-                         @click.native="closeFlyOut"
-                         @focus.native="closeFlyOut"></router-view>
+        <transition
+                name="component-fade"
+                mode="out-in"
+        >
+            <router-view
+                    class="view content-section"
+                    @click.native="closeFlyOut"
+                    @focus.native="closeFlyOut"
+            >
+            </router-view>
         </transition>
     </div>
 </template>
@@ -15,7 +25,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
-import NavBar from '@/views/NavBar';
+import TheNavBar from '@/views/TheNavBar';
 
 import { Collection } from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
@@ -29,7 +39,7 @@ const namespace: string = 'menuTree';
 
 @Component({
     components: {
-        NavBar,
+        TheNavBar,
         Home,
     },
 })
@@ -38,12 +48,10 @@ export default class App extends Vue {
     @Action('createMenuItems', { namespace }) private createMenuItems: any;
     @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
 
-    @Prop() private issues: Collection[] = [];
-    @Prop() private menuItems: MainMenuItem[] = [];
+    @Prop({ default: [] }) private issues: Collection[];
+    @Prop({ default: [] }) private menuItems: MainMenuItem[];
 
-    constructor() {
-        super();
-    }
+    constructor() { super(); }
 
     // When the app is created, tell the store to fetch menu data
     public async created(): void {

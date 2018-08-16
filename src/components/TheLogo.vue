@@ -1,8 +1,14 @@
 <template>
-    <router-link to="/" title="Return to Home"
-                 tabindex="0">
-        <div id="logo-animation-container"
-             tabindex="-1"></div>
+    <router-link
+            to="/"
+            title="Return to Home"
+            tabindex="0"
+    >
+        <div
+            id="logo-animation-container"
+            tabindex="-1"
+        >
+        </div>
     </router-link>
 </template>
 
@@ -18,7 +24,7 @@ import {error} from 'util';
 })
 
 // Submenu associated with a unique main menu entry
-export default class LogoAnimated extends Vue {
+export default class TheLogo extends Vue {
     private p5: p5;
     @Prop() private playLogo: boolean;
 

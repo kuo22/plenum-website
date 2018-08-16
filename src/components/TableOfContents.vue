@@ -1,36 +1,51 @@
 <template>
-    <div role="presentation" class="table-of-contents">
-        <ul class="preview-index index"
+    <div
+        role="presentation"
+        class="table-of-contents"
+    >
+        <ul
+            class="preview-index index"
             role="menu"
             :title="parentCollection.title + ' Content Menu'"
-            :aria-label="parentCollection.title + ' Content Menu'">
-            <li v-for="(article, index) in parentCollection.articles"
+            :aria-label="parentCollection.title + ' Content Menu'"
+        >
+            <li
+                v-for="(article, index) in parentCollection.articles"
+                :key="index"
                 class="preview-index-entry menu-button"
-                role="none">
-                <router-link :to="'/articles/' + article.nodeNumber"
-                             :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
-                             :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                role="none"
+            >
+                <router-link
+                    :to="'/articles/' + article.nodeNumber"
+                    :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
+                    :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
-                             role="menuitem"
+                    role="menuitem"
 
-                             @mouseover.native="toggleLingerHover(index)"
+                    @mouseover.native="toggleLingerHover(index)"
 
-                             @click.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                             @keydown.right.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                             @keydown.enter.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                             @keydown.space.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                             @keydown.esc.prevent.native="exitMenu(parentCollection)"
-                             @keydown.left.prevent.native="exitMenu(parentCollection)"
-                             @keydown.down.prevent.native="moveDown"
-                             @keydown.up.prevent.native="moveUp"
-                             @keydown.home.prevent.native="focusedIndex = 0"
-                             @keydown.end.prevent.native="focusedIndex = parentCollection.articles.length - 1"
-                             @keydown.alphabet.native="focusByLetter($event.key, index)"
+                    @click.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @keydown.right.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @keydown.enter.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @keydown.space.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @keydown.esc.prevent.native="exitMenu(parentCollection)"
+                    @keydown.left.prevent.native="exitMenu(parentCollection)"
+                    @keydown.down.prevent.native="moveDown"
+                    @keydown.up.prevent.native="moveUp"
+                    @keydown.home.prevent.native="focusedIndex = 0"
+                    @keydown.end.prevent.native="focusedIndex = parentCollection.articles.length - 1"
+                    @keydown.alphabet.native="focusByLetter($event.key, index)"
 
-                             v-focus="index === focusedIndex"
-                             @focus.native="focusedIndex = index; article.hovered = true;"
-                             @blur.native="article.hovered = false">
-                    <p class="title menu-button-content" tabindex="-1">{{ article.title }}</p>
+                    v-focus="index === focusedIndex"
+                    @focus.native="focusedIndex = index; article.hovered = true;"
+                    @blur.native="article.hovered = false"
+                >
+                    <p
+                        class="title menu-button-content"
+                        tabindex="-1"
+                    >
+                        {{ article.title }}
+                    </p>
                     <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
                 </router-link>
             </li>

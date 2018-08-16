@@ -1,18 +1,26 @@
 <template>
-    <div class="article-previews"
-         role="presentation"> <!-- TODO: is role necessary? -->
-        <div class="preview-content-container"
-             v-for="(article, index) in articles"
-             v-show="showPreviewManager(article, index)"> <!-- v-show="article.hovered"-->
+    <div
+        class="article-previews"
+        role="presentation"
+    > <!-- TODO: is role necessary? -->
+        <div
+            class="preview-content-container"
+            v-for="(article, index) in articles"
+            :key="index"
+            v-show="showPreviewManager(article, index)"
+        >
             <div class="abstract-card-container">
-                <article-title-card class="title-card"
-                                    v-bind:article="article"></article-title-card>
-
-                <!--hr-->
+                <article-title-card
+                    class="title-card"
+                    v-bind:article="article"
+                ></article-title-card>
 
                 <h3 class="abstract-title">ABSTRACT</h3>
-                <p class="abstract"
-                   :id="parentCollection.title.replace(' ', '') +'preview' + index">{{ article.abstract }}"
+                <p
+                    class="abstract"
+                    :id="parentCollection.title.replace(' ', '') +'preview' + index"
+                >
+                    {{ article.abstract }}
                 </p>
             </div>
         </div>

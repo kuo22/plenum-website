@@ -1,7 +1,12 @@
 <template>
     <div>
         <h1 class="title">{{article.title}}</h1>
-        <div v-if="article.subtitle" class="subtitle">{{article.subtitle}}</div>
+        <div
+            v-if="article.subtitle"
+            class="subtitle"
+        >
+            {{article.subtitle}}
+        </div>
         <!--<p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>-->
     </div>
 </template>

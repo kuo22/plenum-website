@@ -5,6 +5,7 @@
         :style="{background: menu.color}">
         <li class="submenu-section-menu-item"
             v-for="(sectionLinks, menuTitle, index) in menu.subMenu"
+            :key="index"
             :title="menuTitle + ' Content Menu-bar'"
             :aria-labelledby="menuTitle">
 
@@ -34,14 +35,14 @@
                     {{ menuTitle }}
                 </span>
             </a>
-            <fly-out-section-menu
+            <main-menu-fly-out-sections
                     :menuTitle="menuTitle"
                     :menuItems="sectionLinks"
                     :parentMenu="menu"
                     v-on:activateSubmenuLink="activateSubmenuLink"
                     v-on:toggleOpen="toggleOpen"
                     v-on:openArticle="openArticle">
-            </fly-out-section-menu>
+            </main-menu-fly-out-sections>
         </li>
     </ul>
 </template>
@@ -51,19 +52,19 @@ import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import ArticlePreview from '@/components/ArticlePreviews';
-import FlyOutSectionMenu from '@/components/FlyOutSectionMenu';
+import MainMenuFlyOutSections from '@/components/MainMenuFlyOutSections';
 import { mixin as focusMixin } from 'vue-focus';
 
 @Component({
     mixins: [focusMixin],
     components: {
         ArticlePreview,
-        FlyOutSectionMenu,
+        MainMenuFlyOutSections,
     },
 })
 
 // Flyout submenu associated with a unique main menu entry
-export default class FlyOutMenu extends Vue {
+export default class MainMenuFlyOut extends Vue {
     @Prop() private menu!: MainMenuItem; // Parent menu item
     @Prop() private menuItemHovered: boolean;
     @Prop() private previewImageURL: string = '';

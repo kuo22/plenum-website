@@ -1,71 +1,86 @@
 <template>
-    <ul id="main-menu"
+    <ul
+        id="main-menu"
         role="menubar"
-        aria-label="Plenum Main Navigation">
-        <li v-for="(menu, index) in menuItems"
+        aria-label="Plenum Main Navigation"
+    >
+        <li
+            v-for="(menu, index) in menuItems"
+            :key="index"
             :id="menu.name.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             @mouseenter="menu.hoverState = true"
             @mouseleave="menu.hoverState = false"
             :style="changeBackground(menu)"
-            class="menu-button">
+            class="menu-button"
+        >
 
-                <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
-                <a v-if="Object.getOwnPropertyNames(menu.subMenu).length > 1"
-                   :id="'main-menu-item-' + index"
+            <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
+            <a
+                v-if="Object.getOwnPropertyNames(menu.subMenu).length > 1"
+                :id="'main-menu-item-' + index"
 
-                   role="menuitem"
-                   aria-haspopup="true"
-                   :aria-expanded="menu.open ? 'true' : 'false'"
-                   :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                role="menuitem"
+                aria-haspopup="true"
+                :aria-expanded="menu.open ? 'true' : 'false'"
+                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
-                   @click="menu.open ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
-                   @keydown.enter.prevent="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
-                   @keydown.space="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
-                   @keydown.esc="menu.open ? closeMainMenuFlyOut(menu, index, true) : null"
-                   @keydown.right="menu.open ? focusToFlyOut(menu) : openMainMenuFlyOut(menu, true)"
-                   @keydown.left="menu.open ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
-                   @keydown.up.prevent="moveUp"
-                   @keydown.down.prevent="moveDown"
-                   @keydown.home.prevent.native="focusedIndex = 0"
-                   @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
-                   @keydown.alphabet="focusByLetter($event.key, index)"
+                @click="menu.open ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
+                @keydown.enter.prevent="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
+                @keydown.space="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
+                @keydown.esc="menu.open ? closeMainMenuFlyOut(menu, index, true) : null"
+                @keydown.right="menu.open ? focusToFlyOut(menu) : openMainMenuFlyOut(menu, true)"
+                @keydown.left="menu.open ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
+                @keydown.up.prevent="moveUp"
+                @keydown.down.prevent="moveDown"
+                @keydown.home.prevent.native="focusedIndex = 0"
+                @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+                @keydown.alphabet="focusByLetter($event.key, index)"
 
-                   v-focus="index === focusedIndex"
-                   @focus="focusedIndex = index">
-                    <span class="menu-button-content"
-                          tabindex="-1">
-                        {{ menu.name }}&nbsp;
-                    </span>
-                </a>
-                <router-link v-else :to="'/' + menu.name.toLowerCase()"
-                             :id="'main-menu-item-' + index"
+                v-focus="index === focusedIndex"
+                @focus="focusedIndex = index"
+            >
+                <span
+                    class="menu-button-content"
+                    tabindex="-1"
+                >
+                    {{ menu.name }}&nbsp;
+                </span>
+            </a>
+            <router-link
+                 v-else :to="'/' + menu.name.toLowerCase()"
+                 :id="'main-menu-item-' + index"
 
-                             role="link"
-                             aria-haspopup="false"
-                             :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
-                             @keydown.down.prevent.native="moveDown"
-                             @keydown.up.prevent.native="moveUp"
-                             @keydown.alphabet.native="focusByLetter($event.key, index)"
+                 role="link"
+                 aria-haspopup="false"
+                 :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                 @keydown.down.prevent.native="moveDown"
+                 @keydown.up.prevent.native="moveUp"
+                 @keydown.alphabet.native="focusByLetter($event.key, index)"
 
-                             v-focus="index === focusedIndex"
-                             @focus.native="focusedIndex = index">
-                    <span class="menu-button-content" tabindex="-1"> <!-- TODO: get ride of this hacky &nbsp; -->
-                        {{ menu.name }}&nbsp;
-                    </span>
-                </router-link>
+                 v-focus="index === focusedIndex"
+                 @focus.native="focusedIndex = index"
+            >
+                <span
+                    class="menu-button-content"
+                    tabindex="-1"
+                > <!-- TODO: get ride of this hacky &nbsp; -->
+                    {{ menu.name }}&nbsp;
+                </span>
+            </router-link>
 
-                <transition name="submenu-slide">
-                    <fly-out-menu
-                              class="submenu"
-                              :class="{ active: menu.active, open: menu.open, hidden: menu.hidden }"
-                              v-show="menu.open || menu.active"
-                              v-bind:menu="menu"
-                              v-on:activateMenu="toggleActiveMenu"
-                              v-on:toggleOpen="openMainMenuFlyOut"
-                              v-on:closeMainMenuFlyOut="closeMainMenuFlyOut"
-                              v-on:openArticle="openArticle">
-                    </fly-out-menu>
-                </transition>
+            <transition name="submenu-slide">
+                <main-menu-fly-out
+                          class="submenu"
+                          :class="{ active: menu.active, open: menu.open, hidden: menu.hidden }"
+                          v-show="menu.open || menu.active"
+                          v-bind:menu="menu"
+                          v-on:activateMenu="toggleActiveMenu"
+                          v-on:toggleOpen="openMainMenuFlyOut"
+                          v-on:closeMainMenuFlyOut="closeMainMenuFlyOut"
+                          v-on:openArticle="openArticle"
+                >
+                </main-menu-fly-out>
+            </transition>
         </li>
     </ul>
 </template>
@@ -73,19 +88,19 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { MainMenuItem } from '@/classes/MainMenuItem';
-import FlyOutMenu from '@/components/FlyOutMenu';
+import MainMenuFlyOut from '@/components/MainMenuFlyOut';
 import { mixin as focusMixin } from 'vue-focus';
 import { SubmenuLink } from '../classes/SubmenuLink';
 
 @Component({
     mixins: [focusMixin],
     components: {
-        FlyOutMenu,
+        MainMenuFlyOut,
     },
 })
 
 // Main navigation
-export default class MainMenu extends Vue {
+export default class TheMainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
     @Prop() private focusedIndex!: number; // Index of the focused menu item
 
