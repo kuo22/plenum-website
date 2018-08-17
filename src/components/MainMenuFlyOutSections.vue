@@ -56,7 +56,7 @@
             <!-- TODO move to article preview component? -->
             <transition name="preview-fade">
                 <div
-                    v-show="menuLink.active || menuLink.hovered || focusedIndex === index"
+                    v-show="isPreviewVisible(index)"
 
                     role="presentation"
                     class="collection-preview"
@@ -138,7 +138,15 @@ export default class MainMenuFlyOutSections extends Vue {
     public toggleOpen(menu: MainMenuItem): void { /* Filler */ }
 
     @Emit('openArticle')
-    public openArticle(menu: MainMenuItem, routerLinkLocation: string): void { /* Filler */ }
+    public openArticle(menu: MainMenuItem, routerLinkLocation: string): void {
+        this.resetFocus();
+    }
+
+    private isPreviewVisible(menuItemIndex: number): boolean {
+        return this.menuItems[menuItemIndex].active ||
+            this.menuItems[menuItemIndex].hovered ||
+            this.focusedIndex === menuItemIndex;
+    }
 
     // Turn off all toggled on hover attributes of the table of content entries in order to hide the article previews
     // and return the preview to the collection image

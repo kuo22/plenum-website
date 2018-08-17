@@ -29,7 +29,7 @@
 
                     @click.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
                     @keydown.right.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                    @keydown.enter.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @keydown.enter.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
                     @keydown.space.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
                     @keydown.esc.prevent.native="exitMenu(parentCollection)"
                     @keydown.left.prevent.native="exitMenu(parentCollection)"
@@ -86,7 +86,7 @@ export default class TableOfContents extends Vue {
 
     @Emit('articleSelected')
     public articleSelected(menu: MainMenuItem, routerLinkLocation: string) {
-        // Filler
+        this.resetFocus();
     }
 
     @Emit('exitMenu')
@@ -108,6 +108,10 @@ export default class TableOfContents extends Vue {
                 this.parentCollection.articles[index].hovered = true;
             }
         }
+    }
+
+    private resetFocus(): void {
+        this.focusedIndex = -1;
     }
 
     private focusArticle(article: Article, index: number): void {

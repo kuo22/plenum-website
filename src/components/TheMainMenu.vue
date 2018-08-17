@@ -19,7 +19,7 @@
 
             <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
             <a
-                v-if="Object.getOwnPropertyNames(menu.subMenu).length > 1"
+                v-if="menu.subMenu && Object.getOwnPropertyNames(menu.subMenu).length > 1"
                 :id="'main-menu-item-' + index"
                 :key="'link-to-' + menu.name.replace(' ', '-')"
 
@@ -76,13 +76,13 @@
 
             <transition name="submenu-slide">
                 <main-menu-fly-out
-                          v-show="menu.open || menu.active"
+                          v-show="menu.open"
 
                           class="submenu"
-                          :class="{ active: menu.active, open: menu.open, hidden: menu.hidden }"
+                          :class="{ open: menu.open, hidden: menu.hidden }"
                           :menu="menu"
 
-                          @activateMenu="toggleActiveMenu"
+                          @activateMenu="openMainMenuFlyOut"
                           @toggleOpen="openMainMenuFlyOut"
                           @closeMainMenuFlyOut="closeMainMenuFlyOut"
                           @openArticle="openArticle"
@@ -141,14 +141,14 @@ export default class TheMainMenu extends Vue {
     public changeBackground(menuItem: MainMenuItem): {} {
         let bg = {};
 
-        if (menuItem.hoverState || menuItem.open || menuItem.active) {
+        if (menuItem.hoverState || menuItem.open) {
             bg = { background: 'transparent' };
         } else {
             bg = { background: menuItem.color };
         }
 
         // If another menu item is open, while this item is active -> show background
-        if (menuItem.active) {
+        if (menuItem.open) {
             for (const otherItem: MainMenuItem of this.menuItems) {
                 if (otherItem.name !== menuItem.name && otherItem.open) {
                     bg = {background: menuItem.color};
@@ -159,6 +159,19 @@ export default class TheMainMenu extends Vue {
         return bg;
     }
 
+    public setFocusedIndex(newVal: number): void {
+        this.focusedIndex = newVal;
+    }
+
+    public closeAll(): void {
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (this.menuItems[i].open) {
+                this.toggleOpenMenu(this.menuItems[i], false);
+                this.menuItems[i].open = false;
+            }
+        }
+    }
+
     // Closes the flyout submenu for the provided main menu item and optionally moves focus to the parent menu item
     // parameter(s):
     //      menuItem         = parent menu item of the to-be closed flyout submenu
@@ -167,13 +180,17 @@ export default class TheMainMenu extends Vue {
     public closeMainMenuFlyOut(menuItem: MainMenuItem,
                                menuItemIndex: number,
                                returnFocusToMainMenuItem?: boolean = false) {
+        if (menuItem.open) {
+            this.toggleOpenMenu(menuItem, false);
+        } else {
+            this.resetSubmenuLinks(menuItemIndex);
+        }
+
         if (menuItemIndex === null) {
             menuItemIndex = this.getIndexOfMenuItem(menuItem);
         }
-        if (menuItem.active) {
-            this.toggleActiveMenu(menuItem, false);
-        }
         this.menuItems[menuItemIndex].open = false;
+
         if (returnFocusToMainMenuItem) {
             setTimeout(() => {
                 this.focusedIndex = menuItemIndex;
@@ -184,7 +201,7 @@ export default class TheMainMenu extends Vue {
             this.focusedIndex = -1;
         }
 
-        this.resetSubmenuLinks(menuItemIndex);
+
     }
 
     // Sets the open menu and if the menu to open is already open, it closes
@@ -205,7 +222,7 @@ export default class TheMainMenu extends Vue {
             this.menuItems[index].open = true;
             this.menuItems[index].hidden = false; // TODO: what is the purpose of hidden?
         } else {
-            this.toggleActiveMenu(menuItem);
+            this.toggleOpenMenu(menuItem);
         }
 
         if (isKeyboardEvent) {
@@ -228,19 +245,19 @@ export default class TheMainMenu extends Vue {
     // parameter(s):
     //      item    = main menu item
     //      active  = whether or not the main menu item is being actively used
-    private toggleActiveMenu(item: MainMenuItem, active?: boolean = !item.active): void {
+    private toggleOpenMenu(item: MainMenuItem, open?: boolean = !item.open): void {
         // Reset all submenus
         const index: number = this.getIndexOfMenuItem(item);
 
-        this.menuItems[index].active = active;
+        this.menuItems[index].open = open;
 
 
         for (let i = 0; i < this.menuItems.length; i++) {
             if (i !== index) {
-                this.menuItems[i].active = false;
+                this.menuItems[i].open = false;
                 this.menuItems[i].hidden = true;
             } else {
-                if (Object.keys(this.menuItems[index].subMenu).length > 0) {
+                if (this.menuItems[index].subMenu && Object.keys(this.menuItems[index].subMenu).length > 0) {
                     this.resetSubmenuLinks(index);
                 }
             }
@@ -256,13 +273,9 @@ export default class TheMainMenu extends Vue {
         for (const submenuItemKey: string in this.menuItems[mainMenuItemIndex].subMenu) {
             if (this.menuItems[mainMenuItemIndex].subMenu.hasOwnProperty(submenuItemKey)) {
                 for (let j = 0; j < this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey].length; j++) {
-                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].active = false;
                     this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hovered = false;
+                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].active = false;
                     this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hidden = true;
-                    // console.log(
-                    //     this.menuItems[index].subMenu[submenuItemKey][j].title
-                    //     + ' '
-                    //     + this.menuItems[index].subMenu[submenuItemKey][j].active);
                 }
             }
         }

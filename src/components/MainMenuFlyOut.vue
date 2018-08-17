@@ -41,9 +41,9 @@
                     :menuTitle="menuTitle"
                     :menuItems="sectionLinks"
                     :parentMenu="menu"
-                    v-on:activateSubmenuLink="activateSubmenuLink"
-                    v-on:toggleOpen="toggleOpen"
-                    v-on:openArticle="openArticle">
+                    @activateSubmenuLink="activateSubmenuLink"
+                    @toggleOpen="toggleOpen"
+                    @openArticle="openArticle">
             </main-menu-fly-out-sections>
         </li>
     </ul>

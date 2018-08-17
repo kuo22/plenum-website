@@ -2,6 +2,7 @@
     <div
         class="article-previews"
         role="presentation"
+        :class="{ 'article-previews--visible': isAnyArticlePreviewActive}"
     > <!-- TODO: is role necessary? -->
         <div
             v-for="(article, index) in articles"
@@ -43,12 +44,25 @@ import {SubmenuLink} from '../classes/SubmenuLink';
 export default class ArticlePreview extends Vue {
     @Prop({ type: Array < Article > [] }) private articles!: Article[];
     @Prop({ type: SubmenuLink }) private parentCollection!: SubmenuLink;
+    // rivate isAnyArticlePreviewActive: boolean = false;
 
     constructor() { super(); }
 
+    get isAnyArticlePreviewActive() {
+        let articleActiveFlag: boolean = false;
+        for (let i = 0; i < this.articles.length; i++) {
+            if (this.articles[i].hovered || (document.getElementById(
+                    this.parentCollection.title.replace(' ', '') + '-entry-' + i) === document.activeElement)) {
+                articleActiveFlag = true;
+            }
+        }
+
+        return articleActiveFlag;
+    }
+
     //
     private showPreviewManager(article: Article, index: number): boolean {
-        return article.hovered  || (document.getElementById(
+        return article.hovered || (document.getElementById(
             this.parentCollection.title.replace(' ', '') + '-entry-' + index) === document.activeElement
         );
     }
@@ -86,9 +100,14 @@ export default class ArticlePreview extends Vue {
         width: 0.5em;
     }
 
-    /*.article-previews {*/
-        /*background: white;*/
-    /*}*/
+    .article-previews {
+        background: white;
+        visibility: hidden;
+    }
+    
+    .article-previews--visible {
+        visibility: visible;
+    }
 
     .preview-container {
         width: 85%;

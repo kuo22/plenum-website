@@ -2,8 +2,7 @@
     <div id="app">
         <transition appear>
             <the-nav-bar
-                    :menuItems="menuTree"
-                    id="menu-grid-section"
+                    :menuItems="menuItems"
             ></the-nav-bar>
         </transition>
 
@@ -12,7 +11,7 @@
                 mode="out-in"
         >
             <router-view
-                    class="view content-section"
+                    class="content-section"
                     @click.native="closeFlyOut"
                     @focus.native="closeFlyOut"
             >
@@ -26,6 +25,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 import TheNavBar from '@/views/TheNavBar';
+import TheMainMenu from '@/components/TheMainMenu';
 
 import { Collection } from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
@@ -47,8 +47,7 @@ const namespace: string = 'menuTree';
 export default class App extends Vue {
     @Action('createMenuItems', { namespace }) private createMenuItems: any;
     @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
-    @Prop({ default() { return []; } }) private issues: Collection[];
-    // @Prop() private menuItems: MainMenuItem[];
+    @Prop() private menuItems: MainMenuItem[];
 
     constructor() { super(); }
 
@@ -56,17 +55,30 @@ export default class App extends Vue {
     public async created(): void {
         await this.createMenuItems()
             .then(() => {
-                // this.menuItems = this.menuTree;
+                this.menuItems = this.menuTree;
             })
             .catch();
     }
 
     // Closes the flyout menu
     private closeFlyOut(): void {
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (this.menuItems[i].open) {
+                for (const submenuItemKey: string in this.menuItems[i].subMenu) {
+                    if (this.menuItems[i].subMenu.hasOwnProperty(submenuItemKey)) {
+                        for (let j = 0; j < this.menuItems[i].subMenu[submenuItemKey].length; j++) {
+                            this.menuItems[i].subMenu[submenuItemKey][j].hovered = false;
+                            this.menuItems[i].subMenu[submenuItemKey][j].active = false;
+                            this.menuItems[i].subMenu[submenuItemKey][j].hidden = true;
+                        }
+                    }
+                }
+            }
+        }
+        // this.$refs.theMainMenu.closeMainMenuFlyOut();
         for (const menuItemIndex: number in this.menuItems) {
-            if (this.menuItems.hasOwnProperty(menuItemIndex)) {
+            if (this.menuItems.hasOwnProperty(menuItemIndex.toString())) {
                 this.menuItems[menuItemIndex].open = false;
-                this.menuItems[menuItemIndex].active = false;
                 setTimeout(() => {
                     this.menuItems[menuItemIndex].hidden = true;
                 }, 400);
@@ -139,6 +151,7 @@ export default class App extends Vue {
     $lefterWidth: 240px;
     $activeSubmenuWidth: 20px;
     $borderWidth: 3px;
+    $border: 3px solid black;
 
     * {
         margin: 0;
@@ -147,53 +160,48 @@ export default class App extends Vue {
         list-style-type: none;
     }
 
-  #app {
-    font-family: $menuFont;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-      width: 100%;
-      height: 100vh;
-  }
+    #app {
+        font-family: $menuFont;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        width: 100vw;
+        height: 100vh;
+    }
 
-  h1 {
-      font-size: 1.75em;
-  }
+    .lefter {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        outline: $border;
+        width: $lefterWidth;
+        z-index: 4;
+    }
 
-  h2 {
-      font-size: 1.4em;
-  }
-  
-  #menu-grid-section {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: $lefterWidth;
-      z-index: 4;
-      background: white;
-  }
 
-  .before-appear {
-      opacity: 0;
-  }
 
-  .appear {
-      transition: opacity 0.3s ease-in;
-  }
+    .before-appear {
+        opacity: 0;
+    }
 
-  .after-appear {
-      opacity: 1;
-  }
+    .appear {
+        transition: opacity 0.3s ease-in;
+    }
 
-  .content-section {
-      width: calc(100% - #{$lefterWidth});
-      height: 100vh;
-      position: absolute;
-      right: 0;
-      bottom: 0;
-  }
+    .after-appear {
+        opacity: 1;
+    }
+
+    .content-section {
+        overflow-x: hidden;
+        width: calc(100% - #{$lefterWidth});
+        height: 100vh;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
 
     .component-fade-enter-active, .component-fade-leave-active {
         transition: opacity .3s ease;

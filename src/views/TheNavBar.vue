@@ -1,38 +1,26 @@
 <template>
     <div
+        class="navbar main lefter"
         @mouseover="playLogo = true"
         @mouseout="playLogo = false"
     >
-        <div
-            id="main"
-            class="lefter"
+        <div class="logo grid-frame">
+            <the-logo :playLogo="playLogo"></the-logo>
+        </div>
+
+        <nav
+            role="navigation"
+            aria-label="Plenum Main Navigation"
         >
+            <the-main-menu :menuItems="menuItems"></the-main-menu>
+        </nav>
 
-            <div
-                id= "logo"
-                class="grid-frame"
-            >
-                <the-logo :playLogo="playLogo"></the-logo>
-            </div>
-
-            <nav role="navigation"
-                 aria-label="Plenum Main Navigation">
-                <the-main-menu
-                    :menuItems="menuItems"
-                ></the-main-menu>
-            </nav>
-
-            <div
-                class="grid-frame"
-                id="about-brief"
-            >
-                <p>
-                    Plenum is an online journal devoted to showcasing the highest quality scholarship in undergraduate
-                    geography. It is managed, produced, and reviewed by undergraduate students from the Department
-                    of Geography at the University of Washington.
-                </p>
-            </div>
-
+        <div class="about-brief grid-frame">
+            <p>
+                Plenum is an online journal devoted to showcasing the highest quality scholarship in undergraduate
+                geography. It is managed, produced, and reviewed by undergraduate students from the Department
+                of Geography at the University of Washington.
+            </p>
         </div>
     </div>
 </template>
@@ -67,18 +55,6 @@ export default class TheNavBar extends Vue {
 </script>
 
 <style lang="scss">
-    $lefterWidth: 240px;
-    $border: 3px solid black;
-
-    .lefter {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        outline: $border;
-        width: $lefterWidth;
-        z-index: 4;
-    }
 </style>
 
 <style lang="scss" scoped>
@@ -88,12 +64,22 @@ export default class TheNavBar extends Vue {
     $readFont: 'Crimson Text', serif;
 
     nav[role=navigation] {
-        height: calc(100% - (#{$lefterWidth} * 2) - 15px - 3px); // subtracting padding and border width
+        height: calc(100% - (#{$lefterWidth} * 2) - 30px - 3px); // subtracting padding and border width
         background: white;
         padding: 15px 15px 0 15px;
     }
 
-    #main {
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: $lefterWidth;
+        z-index: 4;
+        background: white;
+    }
+
+    .main {
         z-index: 5;
         background: white;
     }
@@ -105,7 +91,7 @@ export default class TheNavBar extends Vue {
         background: white;
     }
 
-    #logo {
+    .logo {
         border-bottom: $border;
     }
 
@@ -121,15 +107,16 @@ export default class TheNavBar extends Vue {
         max-height: 80%;
     }
 
-    #about-brief {
+    .about-brief {
         position: absolute;
         bottom: 0;
         left: 0;
         border-top: $border;
+        padding: 15px 15px 0 15px;
+        width: calc(#{$lefterWidth} - 30px);
     }
 
-    #about-brief p {
-        padding: 15px;
+    .about-brief p {
         vertical-align: middle;
         font-family: $menuFont;
         font-size: 15.41px;

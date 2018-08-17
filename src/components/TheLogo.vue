@@ -25,8 +25,8 @@ import {error} from 'util';
 
 // Submenu associated with a unique main menu entry
 export default class TheLogo extends Vue {
-    private p5: p5;
     @Prop() private playLogo: boolean;
+    private p5: p5;
 
     constructor() { super(); }
 
