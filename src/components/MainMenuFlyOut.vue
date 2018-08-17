@@ -38,12 +38,14 @@
                 </span>
             </a>
             <main-menu-fly-out-sections
-                    :menuTitle="menuTitle"
-                    :menuItems="sectionLinks"
-                    :parentMenu="menu"
-                    @activateSubmenuLink="activateSubmenuLink"
-                    @toggleOpen="toggleOpen"
-                    @openArticle="openArticle">
+                :menuTitle="menuTitle"
+                :menuItems="sectionLinks"
+                :parentMenu="menu"
+                @activateSubmenuLink="activateSubmenuLink"
+                @toggleOpen="toggleOpen"
+                @openArticle="openArticle"
+                @collectionActivated="collectionActivated"
+            >
             </main-menu-fly-out-sections>
         </li>
     </ul>
@@ -70,13 +72,14 @@ export default class MainMenuFlyOut extends Vue {
     @Prop() private menu!: MainMenuItem; // Parent menu item
     @Prop() private menuItemHovered: boolean;
     private focusedIndex: number = -1;
+    private collectionsClicked: number = 0;
 
     constructor() { super(); }
 
     // Emits an open event to the parent
     @Emit('activateMenu')
     public activateMenu(item: MainMenuItem): void {
-        /* TODO: tslint fix - 'no-empty blocks' */
+        // Filler
     }
 
     @Emit('toggleOpen')
@@ -90,8 +93,13 @@ export default class MainMenuFlyOut extends Vue {
     }
 
     @Emit('closeMainMenuFlyOut')
-    public closeMainMenuFlyOut(menu: MainMenuItem, wasKeyboardEvent: boolean): void {
-        // Filler
+    public closeMainMenuFlyOut(menu: MainMenuItem, wasKeyboardEvent: boolean) {
+        // filler
+    }
+
+    @Emit('collectionActivated')
+    public collectionActivated(submenuLink: SubmenuLink) {
+        this.resetAllSubmenuLinksExcept(submenuLink);
     }
 
     // Moves focus to first submenu item of the menu matching the provided menu title
@@ -99,6 +107,24 @@ export default class MainMenuFlyOut extends Vue {
     //      menuTitle = title of the menu to be entered
     private enterSubmenu(menuTitle: string) {
         document.getElementById(menuTitle.replace(' ', '') + '-section-menu-item-0').focus();
+    }
+
+    private resetAllSubmenuLinksExcept(exception: SubmenuLink): void {
+        const sectionTitles = Object.keys(this.menu.subMenu);
+        for (let i = 0; i < sectionTitles.length; i++) {
+            const submenuLinks: SubmenuLink[] = this.menu.subMenu[sectionTitles[i]];
+            for (let j = 0; j < submenuLinks.length; j++) {
+                if (exception.title !== this.menu.subMenu[sectionTitles[i]][j].title) {
+                    this.menu.subMenu[sectionTitles[i]][j].active = false;
+                    this.menu.subMenu[sectionTitles[i]][j].hovered = false;
+                    this.menu.subMenu[sectionTitles[i]][j].hidden = true;
+                }
+            }
+        }
+    }
+
+    private resetAllSubmenuLinks(): void {
+        // Filler
     }
 
     // TODO: import these functions as mixin? to use in all menu components
@@ -149,6 +175,7 @@ export default class MainMenuFlyOut extends Vue {
 
         if (activatedFlag) {
             this.activateMenu(item);
+            this.resetAllSubmenuLinksExcept(submenuLink);
             submenuLink.active = true;
             if (isKeyboardEvent) {
                 // Barely delay to give time for the menu to enter the DOM

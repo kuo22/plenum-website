@@ -28,7 +28,7 @@ export default new Router({
         },
         {
 
-            path: '/publications/:publication/index',
+            path: '/publications/:publication',
             name: 'publication-table-of-contents',
             component: TableOfContents,
         },

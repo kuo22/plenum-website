@@ -22,10 +22,9 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import TheNavBar from '@/components/TheNavBar';
 import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
-import TheNavBar from '@/views/TheNavBar';
-import TheMainMenu from '@/components/TheMainMenu';
 
 import { Collection } from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
@@ -58,10 +57,12 @@ export default class App extends Vue {
                 this.menuItems = this.menuTree;
             })
             .catch();
+
     }
 
     // Closes the flyout menu
     private closeFlyOut(): void {
+
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].open) {
                 for (const submenuItemKey: string in this.menuItems[i].subMenu) {

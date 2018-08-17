@@ -14,11 +14,9 @@
         >
             <router-link
                 :to="'/' + parentMenu.name.toLowerCase() +
-                     '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase() +
-                     '/index'"
+                     '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
                 :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
-                :class="{ underlined: menuLink.active }"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -42,11 +40,13 @@
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
-                    class="menu-button-content"
+                    class="flyout-section-menu-item-content menu-button-content"
+                    :class="{ 'flyout-section-menu-item-content__active': menuLink.active }"
                     tabindex="-1"
                 >
                     {{ menuLink.title }}&nbsp;
                 </span>
+
             </router-link>
 
             <!-- TODO: Add title bar that includes basic info about the issue (title, editors, published date, download all button?) -->
@@ -132,7 +132,9 @@ export default class MainMenuFlyOutSections extends Vue {
     @Emit('activateSubmenuLink')
     public activateSubmenuLink(item: MainMenuItem,
                                menuTitle: string,
-                               menuLink: SubmenuLink): void { /* Filler */ }
+                               menuLink: SubmenuLink): void {
+        this.collectionActivated(menuLink);
+    }
 
     @Emit('toggleOpen')
     public toggleOpen(menu: MainMenuItem): void { /* Filler */ }
@@ -140,6 +142,11 @@ export default class MainMenuFlyOutSections extends Vue {
     @Emit('openArticle')
     public openArticle(menu: MainMenuItem, routerLinkLocation: string): void {
         this.resetFocus();
+    }
+
+    @Emit('collectionActivated')
+    public collectionActivated(submenuLink: SubmenuLink) {
+        // Filler
     }
 
     private isPreviewVisible(menuItemIndex: number): boolean {
@@ -372,9 +379,19 @@ export default class MainMenuFlyOutSections extends Vue {
     .section-container li a:focus {
         outline: none;
     }
+    
+    .flyout-section-menu-item-content:hover {
+        /*text-decoration: underline;*/
+        border-right: 2px solid black;
+        /*border-bottom: 2px solid black;*/
+    }
 
-    .underlined {
-        text-decoration: underline;
+    .flyout-section-menu-item-content__active {
+        border-right: 2px solid black;
+    }
+
+    .flyout-section-menu-item-content:active {
+        border-right: 0 solid black;
     }
 
     .preview-fade-enter {

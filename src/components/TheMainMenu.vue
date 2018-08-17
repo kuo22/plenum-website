@@ -86,6 +86,7 @@
                           @toggleOpen="openMainMenuFlyOut"
                           @closeMainMenuFlyOut="closeMainMenuFlyOut"
                           @openArticle="openArticle"
+                          @collectionActivated="collectionActivated"
                 >
                 </main-menu-fly-out>
             </transition>
@@ -110,6 +111,8 @@ import { SubmenuLink } from '../classes/SubmenuLink';
 // Main navigation
 export default class TheMainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
+    // Number of times a submenu link has been clicked, and therefore a new page was loaded
+    private collectionsClicked: number = 0;
     private focusedIndex: number = -1; // Index of the focused menu item; Initialize to non-existant index value
 
     constructor() { super(); }
@@ -120,6 +123,7 @@ export default class TheMainMenu extends Vue {
     }
 
     public openArticle(menu: MainMenuItem, routerLinkLocation: string) {
+        this.collectionsClicked = 0;
         this.closeMainMenuFlyOut(menu, null, false); // TODO: get 'true' via parameters
         this.$router.push(routerLinkLocation);
     }
@@ -164,6 +168,8 @@ export default class TheMainMenu extends Vue {
     }
 
     public closeAll(): void {
+        this.routerBackToPreviousPage();
+
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].open) {
                 this.toggleOpenMenu(this.menuItems[i], false);
@@ -177,6 +183,7 @@ export default class TheMainMenu extends Vue {
     //      menuItem         = parent menu item of the to-be closed flyout submenu
     //      menuItemIndex    = index of the main menu item in the main menu list
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
+
     public closeMainMenuFlyOut(menuItem: MainMenuItem,
                                menuItemIndex: number,
                                returnFocusToMainMenuItem?: boolean = false) {
@@ -201,14 +208,14 @@ export default class TheMainMenu extends Vue {
             this.focusedIndex = -1;
         }
 
-
+        this.routerBackToPreviousPage();
     }
-
     // Sets the open menu and if the menu to open is already open, it closes
     // parameter(s):
     //      menuItem        = main menu item to be opened or closed
     //      isKeyBoardEvent = whether or not the native DOM event was from a key press or not
     //      toLastMenuItem  = whether or not focus goes to the last menu item; defaults to first menu item
+
     public openMainMenuFlyOut(menuItem: MainMenuItem,
                               isKeyboardEvent: boolean,
                               toLastMenuItem?: boolean = false): void {
@@ -228,6 +235,17 @@ export default class TheMainMenu extends Vue {
         if (isKeyboardEvent) {
             this.focusToFlyOut(menuItem, toLastMenuItem);
         }
+
+    }
+    private routerBackToPreviousPage(): void {
+        if (this.collectionsClicked !== 0) {
+            this.$router.go(this.collectionsClicked * -1);
+            this.collectionsClicked = 0;
+        }
+    }
+
+    private collectionActivated(submenuLink: SubmenuLink): void {
+        this.collectionsClicked++;
     }
 
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
