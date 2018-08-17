@@ -1,5 +1,6 @@
 # To-do
 
+# Branch To-do's
 ## Organize CSS
 
  [Implement Vue CSS Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
@@ -12,7 +13,7 @@
 ##### Files Todo
 * [] components/*
 * [] views/*
-* [] App.vue
+* [x] App.vue
 
 ######Organize CSS Resources
 * [Get BEM](http://getbem.com/introduction/)
@@ -32,6 +33,8 @@ ___
 ###### Restructuring Resources
 
 ___
+
+# Etc. To-dos
 
 ## Accessibility
 * [] Add alt attribute to all images (in Drupal too)
@@ -68,10 +71,10 @@ ___
 
 #### Navigation
 
-* Maintain article preview grid as solid black while image preview and table of contents blend together
+* [x] Maintain article preview grid as solid black while image preview and table of contents blend together
 
 #### [Fetching after Navigation](https://router.vuejs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
-* Add loading filler
+* [] Add loading filler
 
 #### Logo
 * [] Embed 'PLENUM', same typeface as mock-up covers
@@ -93,6 +96,9 @@ ___
 
 ## Bugs
 
+#### Navigation
+* [] Order of articles is wrong
+
 #### Fix 'Vue Warnings'
 Address all Vue warnings that appear in console during runtime; otherwise, justify why it must remain.
 
@@ -100,7 +106,7 @@ Address all Vue warnings that appear in console during runtime; otherwise, justi
 * [] Article menu styling conflicts with text article view
 
 ### Navigation
-* [] 'Publication' menu-item receives focus after article is opened with mouse click,
+* [x] 'Publication' menu-item receives focus after article is opened with mouse click,
 [according to WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html), focus 
 doesn't move anywhere after link activation (article selection). Maybe send focus to the 'main' landmark?
 * [] Test efficacy of submenu slide via CSS transitions rather than Vue transitions
