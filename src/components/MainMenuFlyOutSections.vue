@@ -128,11 +128,11 @@ export default class MainMenuFlyOutSections extends Vue {
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].active) {
                 for (let j = 0; j < this.menuItems[i].articles.length; j++) {
-                    this.menuItems[i].articles[j].hovered = false;
+                    this.menuItems[i].articles[j].previewVisible = false;
                 }
             }
         }
-        this.menuItems[index].hovered = false;
+        this.menuItems[index].previewVisible = false;
     }
 
     // Send focus to a specific collection menu item depending on the provided index number of the menu item
@@ -182,7 +182,7 @@ export default class MainMenuFlyOutSections extends Vue {
     private resetMenuItems(): void {
         for (let i = 0; i < this.menuItems.length; i++) {
             this.menuItems[i].active = false;
-            this.menuItems[i].hovered = false;
+            this.menuItems[i].previewVisible = false;
             this.menuItems[i].hidden = true;
         }
     }

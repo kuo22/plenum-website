@@ -69,7 +69,7 @@ export default class App extends Vue {
                 for (const submenuItemKey: string in this.menuItems[i].subMenu) {
                     if (this.menuItems[i].subMenu.hasOwnProperty(submenuItemKey)) {
                         for (let j = 0; j < this.menuItems[i].subMenu[submenuItemKey].length; j++) {
-                            this.menuItems[i].subMenu[submenuItemKey][j].hovered = false;
+                            this.menuItems[i].subMenu[submenuItemKey][j].previewVisible = false;
                             this.menuItems[i].subMenu[submenuItemKey][j].active = false;
                             this.menuItems[i].subMenu[submenuItemKey][j].hidden = true;
                         }
@@ -160,6 +160,10 @@ export default class App extends Vue {
         padding: 0;
         color: black;
         list-style-type: none;
+    }
+
+    a {
+        text-decoration: none;
     }
 
     #app {

@@ -19,18 +19,22 @@
                 role="presentation"
         >
             <article-previews
-                class="preview-half"
+                class="preview-half preview-half--previews"
                 :articles="menuLink.articles"
                 :parentCollection="menuLink"
             ></article-previews>
-            <table-of-contents
-                class="preview-half"
-                :parentCollection="menuLink"
-                :mainMenuAncestor="parentMenu"
-                @toggleOpen="toggleOpen"
-                @articleSelected="openArticle"
-                @exitMenu="exitMenu"
-            ></table-of-contents>
+            <div
+                role="presentation"
+                class="preview-half preview-half--right-half"
+            >
+                <table-of-contents
+                    :parentCollection="menuLink"
+                    :mainMenuAncestor="parentMenu"
+                    @toggleOpen="toggleOpen"
+                    @articleSelected="openArticle"
+                    @exitMenu="exitMenu"
+                ></table-of-contents>
+            </div>
         </div>
 
     </div>
@@ -38,13 +42,13 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {SubmenuLink} from '../classes/SubmenuLink';
-    import {MainMenuItem} from '../classes/MainMenuItem';
-    import TableOfContents from '@/components/TableOfContents';
-    import ArticleTitleCard from './ArticleTitleCard';
-    import ArticlePreviews from './ArticlePreviews';
+import {SubmenuLink} from '../classes/SubmenuLink';
+import {MainMenuItem} from '../classes/MainMenuItem';
+import TableOfContents from '@/components/TableOfContents';
+import ArticleTitleCard from './ArticleTitleCard';
+import ArticlePreviews from './ArticlePreviews';
 
-    @Component({
+@Component({
         components: {
             ArticlePreviews,
             ArticleTitleCard,
@@ -87,6 +91,15 @@ import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
         float: left;
         background: transparent;
         // border-right: 3px solid black;
+    }
+
+    .preview-half--right-half {
+        outline: 3px solid black;
+    }
+
+    .preview-half--previews {
+        background: white;
+        visibility: hidden;
     }
 
     .toc-preview-container {

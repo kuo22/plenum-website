@@ -1,10 +1,6 @@
 <template>
-    <div
-        role="presentation"
-        class="table-of-contents"
-    >
         <ul
-            class="preview-index index"
+            class="table-of-contents"
             role="menu"
             :title="parentCollection.title + ' Content Menu'"
             :aria-label="parentCollection.title + ' Content Menu'"
@@ -13,54 +9,57 @@
             <li
                 v-for="(article, index) in parentCollection.articles"
                 :key="index"
-                class="preview-index-entry menu-button"
+                class="menu-button"
                 role="none"
             >
                 <router-link
                     :to="'/articles/' + article.nodeNumber"
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
+                    class="table-of-contents__menu-item"
+                    :class="{
+                                'table-of-contents__menu-item--hovered': article.previewVisible,
+                                'table-of-contents__menu-item--focused': focusedIndex !== -1
+                            }"
 
                     role="menuitem"
                     :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
                     v-focus="index === focusedIndex"
 
-                    @mouseover.native="toggleLingerHover(index)"
+                    @mouseover.native="radioTogglePreviewVisibleState(index)"
 
-                    @click.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                    @keydown.right.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                    @keydown.enter.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
-                    @keydown.space.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.hovered = false;"
+                    @click.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
+                    @keydown.rightprevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
+                    @keydown.enter.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
+                    @keydown.space.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
                     @keydown.esc.prevent.native="exitMenu(parentCollection)"
                     @keydown.left.prevent.native="exitMenu(parentCollection)"
-                    @keydown.down.prevent.native="moveDown"
-                    @keydown.up.prevent.native="moveUp"
+                    @keydown.down.prevent.native="moveFocusDownMenu"
+                    @keydown.up.prevent.native="moveFocusUpMenu"
                     @keydown.home.prevent.native="focusedIndex = 0"
                     @keydown.end.prevent.native="focusedIndex = parentCollection.articles.length - 1"
                     @keydown.alphabet.native="focusByLetter($event.key, index)"
 
-                    @focus.native="focusedIndex = index; article.hovered = true;"
-                    @blur.native="article.hovered = false"
+                    @focus.native="focusedIndex = index; article.previewVisible = true;"
+                    @blur.native="article.previewVisible = false"
                 >
                     <p
-                        class="title menu-button-content"
+                        class="table-of-contents__title menu-button-content"
                         tabindex="-1"
                     >
                         {{ article.title }}
                     </p>
-                    <p class="author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
+                    <p class="table-of-contents__author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
                 </router-link>
             </li>
         </ul>
-    </div>
 </template>
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-import {MainMenuItem} from '../classes/MainMenuItem';
 import { mixin as focusMixin } from 'vue-focus';
+import {MainMenuItem} from '../classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
-import {Article} from '../types/types';
 
 @Component({
     mixins: [focusMixin],
@@ -71,17 +70,14 @@ import {Article} from '../types/types';
 export default class TableOfContents extends Vue {
     @Prop() private parentCollection!: SubmenuLink;
     @Prop() private mainMenuAncestor!: MainMenuItem;
-    private focusedIndex: number = -1;
+    private focusedIndex: number;
     private scrollPosition: number;
 
+    // Construct the Table of Contents Vue component and initialize component data
     constructor() {
         super();
         this.scrollPosition = 0;
-    }
-
-    @Emit('toggleOpen')
-    public toggleOpen(menu: MainMenuItem): void {
-        // Filler
+        this.focusedIndex = -1;
     }
 
     @Emit('articleSelected')
@@ -94,36 +90,29 @@ export default class TableOfContents extends Vue {
         // Filler
     }
 
-    private deactivateAllHovers(): void {
+    // Radio toggles the visibility of the article preview amongst all articles of a collection
+    // except for the article menu item with the provided index
+    private radioTogglePreviewVisibleState(visibleMenuItemIndex: number): void {
         for (let i = 0; i < this.parentCollection.articles.length; i++) {
-            this.parentCollection.articles[i].hovered = false;
-        }
-    }
-
-    private toggleLingerHover(index: number): void {
-        for (let i = 0; i < this.parentCollection.articles.length; i++) {
-            if (i !== index) {
-                this.parentCollection.articles[i].hovered = false;
+            if (i !== visibleMenuItemIndex) {
+                this.parentCollection.articles[i].previewVisible = false;
             } else {
-                this.parentCollection.articles[index].hovered = true;
+                this.parentCollection.articles[visibleMenuItemIndex].previewVisible = true;
             }
         }
     }
 
+    // Resets the focus so no menu item is in focus
+    // TODO: make this global for menu components?
     private resetFocus(): void {
         this.focusedIndex = -1;
-    }
-
-    private focusArticle(article: Article, index: number): void {
-        this.focusedIndex = index;
-        article.hovered = true;
     }
 
     // Searches through the menu items and moves focus to the next menu item label that starts with the queried letter
     // parameter(s):
     //      queryLetter           = single letter to be queried across menu item labels
     //      currentlyFocusedIndex = index of the menu item that is currently focused
-    private focusByLetter(queryLetter: string, currentlyFocusedIndex: number) {
+    private focusByLetter(queryLetter: string, currentlyFocusedIndex: number): void {
         // If not at the end of the menu...
         const lengthOfMenu: number = this.parentCollection.articles.length;
         if (currentlyFocusedIndex !== lengthOfMenu - 1) {
@@ -137,88 +126,59 @@ export default class TableOfContents extends Vue {
         }
     }
 
-    // TODO: import these functions as mixin? to use in all menu components
-    private moveDown() {
+    // Move focus down one menu item, or return to first menu item if at the end
+    private moveFocusDownMenu(): void {
         this.focusedIndex = this.focusedIndex === this.parentCollection.articles.length - 1 ? 0 : this.focusedIndex + 1;
     }
 
-    private moveUp() {
+    // Move focus up one menu item, or return to last menu item if at the first
+    private moveFocusUpMenu(): void {
         this.focusedIndex = this.focusedIndex === 0 ? this.parentCollection.articles.length - 1 : this.focusedIndex - 1;
     }
 }
 </script>
 
 <style lang="scss" scoped>
-    $viewAllSubMenus: false;
-    $lefterWidth: 240px;
-    $preview-container: calc(100vw - #{$lefterWidth});
-
-    a {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
     .table-of-contents {
-        outline: 3px solid black;
-    }
-
-    /* index-card-component */
-    .preview-index {
         position: relative;
-        text-align: left;
         top: 8%;
         width: 92%;
         height: 84%;
         margin: auto;
+
+        text-align: left;
     }
 
-    .preview-index-entry {
+    .table-of-contents__menu-item {
         width: 100%;
         height: auto;
-        margin-bottom: 1em;
-    }
+        padding-bottom: 1em;
 
-    .title, .author {
+        border-left: 3px solid transparent;
+
         font-family: 'Amiri', serif;
         font-weight: lighter;
     }
 
-    .title {
-        font-size: 2.1em;
-        line-height: 1em;
-        padding: 10px;
+    .table-of-contents__menu-item--hovered {
+        border-left: 3px solid black;
     }
 
-    .author {
+    .table-of-contents__menu-item--focused {
+        border-left: 3px solid transparent;
+    }
+
+    .table-of-contents__title {
+        padding: 10px;
+
+        font-size: 2.1em;
+        line-height: 1em;
+    }
+
+    .table-of-contents__author {
+        text-align: right;
         font-style: italic;
         font-size: 1.4em;
         line-height: 1.4em;
-        text-align: right;
-    }
-    /* index-card-component */
-
-    .visible {
-        opacity: 1;
-    }
-
-    .abstract .cover-content-container {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        background: rgba(255, 255, 255, 0.9);
-    }
-
-    .abstract .cover-content-container.visible {
-        opacity: 1;
-    }
-
-    .component-fade-enter-active {
-        transition: opacity 0.1s ease;
-    }
-
-    .component-fade-leave-active {
-        transition: opacity 0.3s ease;
     }
 </style>

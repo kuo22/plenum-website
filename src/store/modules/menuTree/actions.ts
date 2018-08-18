@@ -159,7 +159,7 @@ async function createArticle(articleData: any): Promise<Article | void> {
                 downloadURL,
                 nodeNumber: articleData.attributes.nid,
                 uuid: articleData.attributes.uuid,
-                hovered: false,
+                previewVisible: false,
             };
 
             return article;

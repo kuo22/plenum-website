@@ -166,7 +166,7 @@ class API extends Vue {
             subtitle, // Subtitle
             nodeNumber: 0,
             uuid: '0',
-            hovered: false,
+            previewVisible: false,
     };
 
         return article;
@@ -195,7 +195,7 @@ class API extends Vue {
             subtitle, // Subtitle
             nodeNumber: articleData.uid[0].target_id,
             uuid: articleData.uuid[0].value,
-            hovered: false,
+            previewVisible: false,
         };
 
         return article;

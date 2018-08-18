@@ -277,7 +277,7 @@ export default class TheMainMenu extends Vue {
         for (const submenuItemKey: string in this.menuItems[mainMenuItemIndex].subMenu) {
             if (this.menuItems[mainMenuItemIndex].subMenu.hasOwnProperty(submenuItemKey)) {
                 for (let j = 0; j < this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey].length; j++) {
-                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hovered = false;
+                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].previewVisible = false;
                     this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].active = false;
                     this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hidden = true;
                 }

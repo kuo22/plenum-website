@@ -116,7 +116,7 @@ export default class MainMenuFlyOut extends Vue {
             for (let j = 0; j < submenuLinks.length; j++) {
                 if (exception.title !== this.menu.subMenu[sectionTitles[i]][j].title) {
                     this.menu.subMenu[sectionTitles[i]][j].active = false;
-                    this.menu.subMenu[sectionTitles[i]][j].hovered = false;
+                    this.menu.subMenu[sectionTitles[i]][j].previewVisible = false;
                     this.menu.subMenu[sectionTitles[i]][j].hidden = true;
                 }
             }

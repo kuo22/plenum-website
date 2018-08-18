@@ -11,7 +11,9 @@
 5. Other
 
 ##### Files Todo
-* [] components/*
+* [] components/
+  * [x] TableOfContents.vue
+  * [x] ArticlePreviews.vue
 * [] views/*
 * [x] App.vue
 
@@ -95,9 +97,6 @@ Design drafts for portable devices before implementing
 ___
 
 ## Bugs
-
-#### Navigation
-* [] Order of articles is wrong
 
 #### Fix 'Vue Warnings'
 Address all Vue warnings that appear in console during runtime; otherwise, justify why it must remain.

@@ -39,7 +39,7 @@ export interface Article extends DrupalNode {
     refs: string;
     copyright: boolean;
     downloadURL: string;
-    hovered?: boolean;
+    previewVisible?: boolean;
 }
 
 // A Plenum Issue, a collection of articles
