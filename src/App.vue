@@ -54,10 +54,11 @@ export default class App extends Vue {
     public async created(): void {
         await this.createMenuItems()
             .then(() => {
+                // TODO: don't change the prop, figure out how to initialize prop with 'menuTree' or convert all changes
+                // to menuItems via the store
                 this.menuItems = this.menuTree;
             })
             .catch();
-
     }
 
     // Closes the flyout menu

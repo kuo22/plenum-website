@@ -111,6 +111,7 @@ import { SubmenuLink } from '../classes/SubmenuLink';
 // Main navigation
 export default class TheMainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
+
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
     private collectionsClicked: number = 0;
     private focusedIndex: number = -1; // Index of the focused menu item; Initialize to non-existant index value
@@ -122,27 +123,27 @@ export default class TheMainMenu extends Vue {
         /* TODO: tslint fix - 'no-empty blocks' */
     }
 
-    public openArticle(menu: MainMenuItem, routerLinkLocation: string) {
+    public closeAll(): void {
+        this.routerBackToPreviousPage();
+
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (this.menuItems[i].open) {
+                this.toggleOpenMenu(this.menuItems[i], false);
+                this.menuItems[i].open = false;
+            }
+        }
+    }
+
+    private openArticle(menu: MainMenuItem, routerLinkLocation: string) {
         this.collectionsClicked = 0;
         this.closeMainMenuFlyOut(menu, null, false); // TODO: get 'true' via parameters
         this.$router.push(routerLinkLocation);
     }
 
-    public getIndexOfMenuItem(menu: MainMenuItem): number {
-        let index = -1;
-        for (let i = 0; i < this.menuItems.length - 1; i++) {
-            if (this.menuItems[i].name === menu.name) {
-                index = i;
-            }
-        }
-
-        return index;
-    }
-
     // Changes the background color of a menu item based on its hover state
     // parameter(s) needed:
     //      menuitem = menu item to be changed
-    public changeBackground(menuItem: MainMenuItem): {} {
+    private changeBackground(menuItem: MainMenuItem): {} {
         let bg = {};
 
         if (menuItem.hoverState || menuItem.open) {
@@ -163,30 +164,14 @@ export default class TheMainMenu extends Vue {
         return bg;
     }
 
-    public setFocusedIndex(newVal: number): void {
-        this.focusedIndex = newVal;
-    }
-
-    public closeAll(): void {
-        this.routerBackToPreviousPage();
-
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (this.menuItems[i].open) {
-                this.toggleOpenMenu(this.menuItems[i], false);
-                this.menuItems[i].open = false;
-            }
-        }
-    }
-
     // Closes the flyout submenu for the provided main menu item and optionally moves focus to the parent menu item
     // parameter(s):
     //      menuItem         = parent menu item of the to-be closed flyout submenu
     //      menuItemIndex    = index of the main menu item in the main menu list
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
-
-    public closeMainMenuFlyOut(menuItem: MainMenuItem,
-                               menuItemIndex: number,
-                               returnFocusToMainMenuItem?: boolean = false) {
+    private closeMainMenuFlyOut(menuItem: MainMenuItem,
+                                menuItemIndex: number,
+                                returnFocusToMainMenuItem?: boolean = false) {
         if (menuItem.open) {
             this.toggleOpenMenu(menuItem, false);
         } else {
@@ -210,15 +195,15 @@ export default class TheMainMenu extends Vue {
 
         this.routerBackToPreviousPage();
     }
+
     // Sets the open menu and if the menu to open is already open, it closes
     // parameter(s):
     //      menuItem        = main menu item to be opened or closed
     //      isKeyBoardEvent = whether or not the native DOM event was from a key press or not
     //      toLastMenuItem  = whether or not focus goes to the last menu item; defaults to first menu item
-
-    public openMainMenuFlyOut(menuItem: MainMenuItem,
-                              isKeyboardEvent: boolean,
-                              toLastMenuItem?: boolean = false): void {
+    private openMainMenuFlyOut(menuItem: MainMenuItem,
+                               isKeyboardEvent: boolean,
+                               toLastMenuItem?: boolean = false): void {
         const index: number = this.getIndexOfMenuItem(menuItem);
         // Close all flyouts
         for (const menuItem of this.menuItems) {
@@ -237,6 +222,7 @@ export default class TheMainMenu extends Vue {
         }
 
     }
+
     private routerBackToPreviousPage(): void {
         if (this.collectionsClicked !== 0) {
             this.$router.go(this.collectionsClicked * -1);
@@ -297,6 +283,21 @@ export default class TheMainMenu extends Vue {
                 }
             }
         }
+    }
+
+    private getIndexOfMenuItem(menu: MainMenuItem): number {
+        let index = -1;
+        for (let i = 0; i < this.menuItems.length - 1; i++) {
+            if (this.menuItems[i].name === menu.name) {
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    private setFocusedIndex(newVal: number): void {
+        this.focusedIndex = newVal;
     }
 
     // Move focus down one menu item, or return to first menu item if at the end

@@ -55,47 +55,18 @@
             </div-->
             <!-- TODO move to article preview component? -->
             <transition name="preview-fade">
-                <div
+                <main-menu-fly-out-sections-previews
                     v-show="isPreviewVisible(index)"
 
-                    role="presentation"
-                    class="collection-preview"
-                    :class="{'collection-active': menuLink.active }"
+                    :menuLink="menuLink"
+                    :parentMenu="parentMenu"
 
-                    @mouseleave="toggleOffAllArticleItemHovers(index)"
-                > <!--, hovered: menuLink.hovered-->
+                    @mouseleave.native="toggleOffAllArticleItemHovers(index)"
 
-                    <div class="cover-image-preview preview-half">
-                        <div class="preview-content-container">
-                            <img
-                                 :alt="menuLink.title + ' Cover Image'"
-                                 :class="{ 'preview-active': menuLink.active }"
-                                 :src="menuLink.coverImageURL"
-                            >
-                        </div>
-                    </div>
-
-                    <div
-                        class="toc-preview-container"
-                        role="presentation"
-                    >
-                        <article-previews
-                            class="preview-half"
-                            :articles="menuLink.articles"
-                            :parentCollection="menuLink"
-                        ></article-previews>
-                        <table-of-contents
-                                ref="tableOfContents"
-                                class="preview-half"
-                                :parentCollection="menuLink"
-                                :mainMenuAncestor="parentMenu"
-                                @toggleOpen="toggleOpen"
-                                @articleSelected="openArticle"
-                                @exitMenu="focusOnSubmenusParentMenuItem"
-                        ></table-of-contents>
-                    </div>
-
-                </div>
+                    @toggleOpen="toggleOpen"
+                    @openArticle="openArticle"
+                    @exitMenu="focusOnSubmenusParentMenuItem"
+                ></main-menu-fly-out-sections-previews>
             </transition>
         </li>
     </ul>
@@ -106,16 +77,12 @@ import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import { mixin as focusMixin } from 'vue-focus';
-import TableOfContents from '@/components/TableOfContents';
-import ArticleTitleCard from './ArticleTitleCard';
-import ArticlePreviews from './ArticlePreviews';
+import MainMenuFlyOutSectionsPreviews from './MainMenuFlyOutSectionsPreviews';
 
 @Component({
     mixins: [focusMixin],
     components: {
-        ArticlePreviews,
-        ArticleTitleCard,
-        TableOfContents,
+        MainMenuFlyOutSectionsPreviews,
     },
 })
 
@@ -282,13 +249,6 @@ export default class MainMenuFlyOutSections extends Vue {
         height: calc(100vh - #{$preview-height});
     }
 
-    .toc-preview-container {
-        width: $preview-width;
-        height: $preview-height;
-        position: absolute;
-        // background: rgba(255, 255, 255, 0.5);
-    }
-
     .collection-preview {
         display: inline-block;
         position: absolute;
@@ -302,48 +262,10 @@ export default class MainMenuFlyOutSections extends Vue {
         outline: 3px solid black;
     }
 
-    .collection-preview.collection-active {
-        z-index: 1;
-    }
 
-    .collection-preview.hovered {
-        z-index: 3;
-    }
 
     /* COLLECTION IMAGE AND ARTICLE ABSTRACT PREVIEW START */
 
-    .preview-content-container {
-        position: absolute;
-        top: 8%;
-        left: 4%;
-        width: 92%;
-        height: 84%;
-        transform: translateY(0vh);
-        text-align: center;
-    }
-
-    .preview-content-container .article-preview {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    .preview-content-container img {
-        position: relative;
-        max-width: 100%;
-        max-height: 100%;
-        top: 0;
-        height: auto;
-        box-shadow: -5px 5px 15px 2px rgba(0, 0, 0, 0.14);
-        transition: all 0.4s ease;
-    }
-
-    .preview-content-container img.preview-active {
-        max-width: 98%;
-        max-height: 98%;
-        top: 1%; // Half of max-height border
-        box-shadow: -2px 2px 10px -2px rgba(0, 0, 0, 0.41);
-    }
 
     .preview-half {
         position: relative;

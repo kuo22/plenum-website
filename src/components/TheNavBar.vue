@@ -5,6 +5,7 @@
         @mouseout="playLogo = false"
     >
         <div class="logo grid-frame">
+            <!-- TODO: close menu when logo is activated -->
             <the-logo :playLogo="playLogo"></the-logo>
         </div>
 
@@ -42,7 +43,7 @@ import TheLogo from '@/components/TheLogo';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class TheNavBar extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
-    private playLogo: boolean = false;
+    private playLogo: boolean = false; // Initializer for the logo animation switch
 
     constructor() { super(); }
 
@@ -53,9 +54,6 @@ export default class TheNavBar extends Vue {
 
 }
 </script>
-
-<style lang="scss">
-</style>
 
 <style lang="scss" scoped>
     $lefterWidth: 240px;
