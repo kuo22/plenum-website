@@ -26,7 +26,7 @@
                 role="menuitem"
                 aria-haspopup="true"
                 :aria-expanded="menu.open ? 'true' : 'false'"
-                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                :tabindex="index === focusedIndex || (allFlyOutsAreClosed && index === 0) ? '0' : '-1'"
 
                 v-focus="index === focusedIndex"
 
@@ -38,8 +38,9 @@
                 @keydown.left="menu.open ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
                 @keydown.up.prevent="moveUp"
                 @keydown.down.prevent="moveDown"
-                @keydown.home.prevent.native="focusedIndex = 0"
-                @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+                @keydown.home.prevent="focusedIndex = 0"
+                @keydown.end.prevent="focusedIndex = menuItems.length - 1"
+                @keydown.tab="focusedIndex = 0"
                 @keydown.alphabet="focusByLetter($event.key, index)"
                 @focus="focusedIndex = index"
             >
@@ -61,6 +62,9 @@
                  aria-haspopup="false"
                  :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
+                 @click.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
+                 @keydown.right.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
+                 @keydown.enter.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
@@ -76,17 +80,15 @@
 
             <transition name="submenu-slide">
                 <main-menu-fly-out
-                          v-show="menu.open"
+                      class="submenu"
+                      :class="{ open: menu.open, hidden: menu.hidden }"
+                      :menu="menu"
 
-                          class="submenu"
-                          :class="{ open: menu.open, hidden: menu.hidden }"
-                          :menu="menu"
-
-                          @activateMenu="openMainMenuFlyOut"
-                          @toggleOpen="openMainMenuFlyOut"
-                          @closeMainMenuFlyOut="closeMainMenuFlyOut"
-                          @openArticle="openArticle"
-                          @collectionActivated="collectionActivated"
+                      @activateMenu="openMainMenuFlyOut"
+                      @toggleOpen="openMainMenuFlyOut"
+                      @closeMainMenuFlyOut="closeMainMenuFlyOut"
+                      @openArticle="openArticle"
+                      @collectionActivated="collectionActivated"
                 >
                 </main-menu-fly-out>
             </transition>
@@ -113,13 +115,28 @@ export default class TheMainMenu extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
 
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
-    private collectionsClicked: number = 0;
-    private focusedIndex: number = -1; // Index of the focused menu item; Initialize to non-existant index value
+    private focusedIndex: number; // Index of the focused menu item; Initialize to non-existent index value
+    private collectionsClicked: number;
 
-    constructor() { super(); }
+    constructor() {
+        super();
+        this.focusedIndex = -1;
+        this.collectionsClicked = 0;
+    }
+
+    get allFlyOutsAreClosed() {
+        let openFlag: boolean = true;
+        for (let i = 0; i < this.menuItems.length; i++) {
+            if (this.menuItems[i].open) {
+                openFlag = false;
+            }
+        }
+        return openFlag;
+    }
 
     // Emits an open event to the parent
-    @Emit('open') public open(item: MainMenuItem, keyboardEvent: boolean): void {
+    @Emit('open')
+    public open(item: MainMenuItem, keyboardEvent: boolean): void {
         /* TODO: tslint fix - 'no-empty blocks' */
     }
 
@@ -132,6 +149,10 @@ export default class TheMainMenu extends Vue {
                 this.menuItems[i].open = false;
             }
         }
+    }
+
+    private activateRouterLink(routerURL: string): void {
+        this.$router.push(routerURL);
     }
 
     private openArticle(menu: MainMenuItem, routerLinkLocation: string) {

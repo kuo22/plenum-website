@@ -43,15 +43,12 @@ import TheLogo from '@/components/TheLogo';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class TheNavBar extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
-    private playLogo: boolean = false; // Initializer for the logo animation switch
+    private playLogo: boolean; // Initializer for the logo animation switch
 
-    constructor() { super(); }
-
-    @Emit('update:playLogo')
-    private logoHovered(isHovered: boolean) {
-        // Filler
+    constructor() {
+        super();
+        this.playLogo = false;
     }
-
 }
 </script>
 

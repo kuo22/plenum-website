@@ -15,6 +15,10 @@
   * [x] MainMenuFlyOutSectionsPreviews.vue
   * [x] TableOfContents.vue
   * [x] ArticlePreviews.vue
+  * [x] MainMenuFlyOutSections.vue
+  * [x] MainMenuFlyOut.vue
+  * [] TheMainMenu.vue
+  * [] TheNavBar.vue
 * [] views/*
 * [x] App.vue
 
@@ -54,6 +58,9 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
 * [x] Fix focus container size for main menu items
 * [x] Fix focusability on main menu elements
 * [x] Focusability on logo
+
+* [] [Parent menus should control the focus of submenus](http://accessibility.athena-ict.com/aria/tests/menus.shtml)
+  * Find a way to check if focus is being managed? Idk why, for testing?
 
 #### Accessibility Manual Testing
 * [] [VoiceOver Testing Tutorial](https://webaim.org/articles/voiceover/)

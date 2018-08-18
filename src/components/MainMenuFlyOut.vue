@@ -1,24 +1,31 @@
 <template>
-    <ul role="menu"
+    <ul
+        v-show="menu.open"
+
+        role="menu"
+
         class="fly-out-menu"
-        :class="{ 'submenu-active': menu.active }"
+        :class="{ 'fly-out-menu--active': menu.active }"
         :style="{background: menu.color}"
+
         @mouseover="focusedIndex = -1"
     >
-        <li class="submenu-section-menu-item"
+        <li
             v-for="(sectionLinks, menuTitle, index) in menu.subMenu"
             :key="index"
             :title="menuTitle + ' Content Menu-bar'"
-            :aria-labelledby="menuTitle">
 
-            <a :v-if="menu.subMenu"
-               class="section-label"
+            class="fly-out-menu__menu-item"
+            :aria-labelledby="menuTitle"
+        >
+            <a
+                :v-if="menu.subMenu"
                :id="menu.name + '-fly-out-menu-item-' + index"
 
                role="menuitem"
                aria-haspopup="true"
                aria-expanded="true"
-               :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+               :tabindex="index === focusedIndex ? '0' : '-1'"
 
                @keydown.enter="enterSubmenu(menuTitle)"
                @keydown.space="enterSubmenu(menuTitle)"
@@ -32,8 +39,12 @@
                @keydown.alphabet="focusByLetter($event.key, index)"
 
                v-focus="index === focusedIndex"
-               @focus="focusedIndex = index">
-                <span class="menu-button-content" tabindex="-1">
+               @focus="focusedIndex = index"
+            >
+                <span
+                    class="fly-out-menu__section-title menu-button-content"
+                    tabindex="-1"
+                >
                     {{ menuTitle }}
                 </span>
             </a>
@@ -70,11 +81,14 @@ import { mixin as focusMixin } from 'vue-focus';
 // Flyout submenu associated with a unique main menu entry
 export default class MainMenuFlyOut extends Vue {
     @Prop() private menu!: MainMenuItem; // Parent menu item
-    @Prop() private menuItemHovered: boolean;
-    private focusedIndex: number = -1;
-    private collectionsClicked: number = 0;
+    private focusedIndex: number; //
+    private collectionsClicked: number; //
 
-    constructor() { super(); }
+    constructor() {
+        super();
+        this.focusedIndex = -1;
+        this.collectionsClicked = 0;
+    }
 
     // Emits an open event to the parent
     @Emit('activateMenu')
@@ -109,6 +123,9 @@ export default class MainMenuFlyOut extends Vue {
         document.getElementById(menuTitle.replace(' ', '') + '-section-menu-item-0').focus();
     }
 
+    // Reset submenu links to their initialized state except for the provided submenu link
+    // parameter(s) needed:
+    //      exception = the submenu link that is NOT reset
     private resetAllSubmenuLinksExcept(exception: SubmenuLink): void {
         const sectionTitles = Object.keys(this.menu.subMenu);
         for (let i = 0; i < sectionTitles.length; i++) {
@@ -123,6 +140,7 @@ export default class MainMenuFlyOut extends Vue {
         }
     }
 
+    //
     private resetAllSubmenuLinks(): void {
         // Filler
     }
@@ -190,79 +208,35 @@ export default class MainMenuFlyOut extends Vue {
 
 <style lang="scss" scoped>
     $viewAllSubMenus: true;
-    $border: 3px solid black;
     $lefterWidth: 240px;
-    $preview-container: calc(100vw - #{$lefterWidth});
     $focusPadding: 10px;
 
-    .menu-button-content {
-        padding: 0 0 0 $focusPadding;
-        width: calc(100% - #{$focusPadding});
+    .fly-out-menu {
+        width: 100%;
+
+        font-weight: bold;
+        text-align: right;
     }
 
-    .submenu-section-menu-item {
-        padding: 15px 15px 0 15px;
-    }
-
-    a {
-        text-decoration: none;
-        outline: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    .submenu-active {
+    .fly-out-menu--active {
         // left: 20px;
         z-index: 4;
     }
 
-    .fly-out-menu {
-        font-weight: bold;
-        text-align: right;
-        width: 100%;
+    .fly-out-menu__menu-item {
+        padding: 15px 15px 0 15px;
     }
 
-    .fly-out-menu a:hover {
-        cursor: default;
-        text-decoration: underline;
-    }
+    .fly-out-menu__menu-item a {
+        display: block;
 
-    .preview-half {
-        position: relative;
-        display: inline-block;
-        height: 100vh;
-        width: calc((#{$preview-container} - #{$lefterWidth}) / 2);
-        float: left;
-        background: white;
-    }
-
-    .section-label {
         text-align: left;
         font-size: 1.6em;
-        display: block;
     }
 
-    .section-container li {
-        height: 40px;
-    }
-
-    .section-container li:focus {
-        outline: none;
-    }
-
-    .section-container li a {
-        text-align: right;
-        display: block;
-    }
-
-    .section-container li a:focus {
-        outline: none;
-    }
-
-    .underlined {
-        text-decoration: underline;
+    .fly-out-menu__section-title {
+        width: calc(100% - #{$focusPadding});
+        padding: 0 0 0 $focusPadding;
     }
 
     @if $viewAllSubMenus {

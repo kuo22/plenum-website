@@ -71,7 +71,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
     }
 
     @Emit('exitMenu')
-    public exitMenu(parentMenu: SubmenuLink): void {
+    public exitMenu(parentMenu: SubmenuLink) {
         // Filler
     }
 
@@ -82,6 +82,19 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
     $lefterWidth: 240px;
     $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
     $preview-height: 90vh;
+
+    .collection-preview {
+        display: inline-block;
+        position: absolute;
+        left: calc(#{$lefterWidth} + 3px); // + outline width
+        top: calc(100vh - #{$preview-height});
+        width: $preview-width;
+        height: $preview-height;
+        float: right;
+        background: white;
+        z-index: 2;
+        outline: 3px solid black;
+    }
 
     .preview-grid-half {
         position: relative;

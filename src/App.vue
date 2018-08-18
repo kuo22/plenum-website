@@ -1,5 +1,8 @@
 <template>
-    <div id="app">
+    <div
+        id="app"
+        @keydown.tab="closeFlyOut"
+    >
         <transition appear>
             <the-nav-bar
                     :menuItems="menuItems"
@@ -26,10 +29,11 @@ import TheNavBar from '@/components/TheNavBar';
 import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
 
-import { Collection } from './types/types';
+import {Article, Collection} from './types/types';
 import { MainMenuItem } from './classes/MainMenuItem';
 
 import API from '@/API';
+import {SubmenuLink} from './classes/SubmenuLink';
 
 // TODO: move Menus out of view folder, it's a component!
 
@@ -69,9 +73,9 @@ export default class App extends Vue {
                 for (const submenuItemKey: string in this.menuItems[i].subMenu) {
                     if (this.menuItems[i].subMenu.hasOwnProperty(submenuItemKey)) {
                         for (let j = 0; j < this.menuItems[i].subMenu[submenuItemKey].length; j++) {
-                            this.menuItems[i].subMenu[submenuItemKey][j].previewVisible = false;
-                            this.menuItems[i].subMenu[submenuItemKey][j].active = false;
-                            this.menuItems[i].subMenu[submenuItemKey][j].hidden = true;
+                            // (this.menuItems[i].subMenu[submenuItemKey][j] as Article).previewVisible = false;
+                            (this.menuItems[i].subMenu[submenuItemKey][j] as SubmenuLink).active = false;
+                            (this.menuItems[i].subMenu[submenuItemKey][j] as SubmenuLink).hidden = true;
                         }
                     }
                 }

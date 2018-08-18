@@ -1,7 +1,7 @@
 <template>
     <ul
         :aria-labelledby="menuTitle"
-        class="submenu-section-menu"
+        class="collection-group-menu"
         role="menu"
         @mouseover="focusedIndex = -1"
     >
@@ -9,19 +9,19 @@
             v-for="(menuLink, index) in menuItems"
             :key="index"
 
-            class="menu-button"
+            class="collection-group-menu__menu-item menu-button"
             role="none"
         >
             <router-link
                 :to="'/' + parentMenu.name.toLowerCase() +
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
-                :id="menuTitle.replace(' ','') + '-section-menu-item-' + index"
+                :id="menuTitle.replace(' ', '') + '-section-menu-item-' + index"
 
                 role="menuitem"
                 aria-haspopup="true"
                 :aria-expanded="menuLink.active ? 'true' : 'false'"
-                :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                :tabindex="index === focusedIndex ? '0' : '-1'"
 
                 v-focus="index === focusedIndex"
 
@@ -40,8 +40,8 @@
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
-                    class="flyout-section-menu-item-content menu-button-content"
-                    :class="{ 'flyout-section-menu-item-content__active': menuLink.active }"
+                    class="collection-group-menu__menu-item-content menu-button-content"
+                    :class="{ 'collection-group-menu__menu-item-content--active': menuLink.active }"
                     tabindex="-1"
                 >
                     {{ menuLink.title }}&nbsp;
@@ -65,7 +65,7 @@
 
                     @toggleOpen="toggleOpen"
                     @openArticle="openArticle"
-                    @exitMenu="focusOnSubmenusParentMenuItem"
+                    @exitMenu="setFocusOnMenuItem"
                 ></main-menu-fly-out-sections-previews>
             </transition>
         </li>
@@ -74,10 +74,10 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-import {MainMenuItem} from '@/classes/MainMenuItem';
-import {SubmenuLink} from '../classes/SubmenuLink';
 import { mixin as focusMixin } from 'vue-focus';
 import MainMenuFlyOutSectionsPreviews from './MainMenuFlyOutSectionsPreviews';
+import {MainMenuItem} from '@/classes/MainMenuItem';
+import {SubmenuLink} from '@/classes/SubmenuLink';
 
 @Component({
     mixins: [focusMixin],
@@ -89,12 +89,14 @@ import MainMenuFlyOutSectionsPreviews from './MainMenuFlyOutSectionsPreviews';
 // Submenu associated with a unique main menu entry
 export default class MainMenuFlyOutSections extends Vue {
     @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
-    @Prop() private menuTitle!: string;
-    @Prop() private parentMenu!: MainMenuItem;
-    @Prop() private menuItemHovered!: boolean;
-    private focusedIndex: number = -1;
+    @Prop() private menuTitle!: string; // Title of the fly out's menu parent
+    @Prop() private parentMenu!: MainMenuItem; // Parent menu of theses fly out sections
+    private focusedIndex: number;
 
-    constructor() { super(); }
+    constructor() {
+        super();
+        this.focusedIndex = -1;
+    }
 
     @Emit('activateSubmenuLink')
     public activateSubmenuLink(item: MainMenuItem,
@@ -104,7 +106,9 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     @Emit('toggleOpen')
-    public toggleOpen(menu: MainMenuItem): void { /* Filler */ }
+    public toggleOpen(menu: MainMenuItem): void {
+        /* Filler */
+    }
 
     @Emit('openArticle')
     public openArticle(menu: MainMenuItem, routerLinkLocation: string): void {
@@ -112,10 +116,13 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     @Emit('collectionActivated')
-    public collectionActivated(submenuLink: SubmenuLink) {
+    public collectionActivated(submenuLink: SubmenuLink): void {
         // Filler
     }
 
+    // Returns whether or not the collection preview should be visible
+    // parameter(s) needed:
+    //      menuItemIndex = the index location of the menu item in the menu list
     private isPreviewVisible(menuItemIndex: number): boolean {
         return this.menuItems[menuItemIndex].active ||
             this.menuItems[menuItemIndex].hovered ||
@@ -124,6 +131,7 @@ export default class MainMenuFlyOutSections extends Vue {
 
     // Turn off all toggled on hover attributes of the table of content entries in order to hide the article previews
     // and return the preview to the collection image
+    //      index = the index location of the menu item in the menu list
     private toggleOffAllArticleItemHovers(index: number): void {
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].active) {
@@ -137,7 +145,7 @@ export default class MainMenuFlyOutSections extends Vue {
 
     // Send focus to a specific collection menu item depending on the provided index number of the menu item
     // parameter:
-    //      index: position of the menu item in the menu list
+    //      index = the index location of the menu item in the menu list
     private focusOnMenuItem(index: number) {
         this.focusedIndex = index;
     }
@@ -145,20 +153,21 @@ export default class MainMenuFlyOutSections extends Vue {
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
     // parameter(s) needed:
     //      menu           = parent menu of the flyout to be focused on
-    //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
     private focusToTOC(menu: SubmenuLink) {
         setTimeout(() => {
             document.getElementById(menu.title.replace(' ', '') + '-entry-0').focus();
         }, 5);
     }
 
-    // Focus on the provided parental menu item
-        // TODO: Rename method
-    private focusOnSubmenusParentMenuItem(providedMenuItem: SubmenuLink)  {
-        // TODO: make more efficient, all of this jsut to figure out the index of the provided menu item?
+    // Focus on the provided submenu link
+    private setFocusOnMenuItem(parentMenu: SubmenuLink) {
         for (let index = 0; index <= this.menuItems.length - 1; index++) {
-            if (this.menuItems[index].title === providedMenuItem.title) {
-                document.getElementById(this.menuTitle.replace(' ', '') + '-section-menu-item-' + index).focus();
+            if (this.menuItems[index] === parentMenu) {
+                const focusedIndex = this.focusedIndex === -1 ? 0 : this.focusedIndex;
+                const elementID: string = this.menuTitle.replace(' ', '') +
+                    '-section-menu-item-' +
+                    focusedIndex.toString();
+                document.getElementById(elementID).focus();
             }
         }
     }
@@ -206,42 +215,35 @@ export default class MainMenuFlyOutSections extends Vue {
     $preview-height: 90vh;
     $focusPadding: 8px;
 
-    // TODO: clean up unnecessary css leftover from SubMenu component as template
-    a {
+    .collection-group-menu__menu-item {
+        height: 2.5em;
+        line-height: 45px; // TODO: use responsive unit
+    }
+
+    .collection-group-menu__menu-item a {
         text-decoration: none;
         outline: none;
     }
 
-    a:hover {
+    .collection-group-menu__menu-item a:hover {
         text-decoration: underline;
     }
 
-    a[role=menuitem] {
-        // width: calc(100% - #{$focusPadding});
-    }
-
-    a[role=menuitem] * {
-        // padding-right: #{$focusPadding};
+    .collection-group-menu__menu-item[role=menuitem] * {
         width: 100%;
         height: 100%;
     }
 
-    .submenu-section-menu .menu-button {
-        height: 2.5em;
+    .collection-group-menu__menu-item-content:hover {
+        border-right: 2px solid black;
     }
 
-    .submenu a:hover {
-        cursor: pointer;
-        text-decoration: underline;
+    .collection-group-menu__menu-item-content--active {
+        border-right: 2px solid black;
     }
 
-    .submenu-section-menu li {
-        line-height: 45px;
-    }
-
-    .submenu-active {
-        // left: 20px;
-        z-index: 4;
+    .collection-group-menu__menu-item-content:active {
+        border-right: 0 solid black;
     }
 
     .collection-title-bar {
@@ -249,73 +251,7 @@ export default class MainMenuFlyOutSections extends Vue {
         height: calc(100vh - #{$preview-height});
     }
 
-    .collection-preview {
-        display: inline-block;
-        position: absolute;
-        left: calc(#{$lefterWidth} + 3px); // + outline width
-        top: calc(100vh - #{$preview-height});
-        width: $preview-width;
-        height: $preview-height;
-        float: right;
-        background: white;
-        z-index: 2;
-        outline: 3px solid black;
-    }
-
-
-
-    /* COLLECTION IMAGE AND ARTICLE ABSTRACT PREVIEW START */
-
-
-    .preview-half {
-        position: relative;
-        height: $preview-height;
-        width: calc((#{$preview-width}) / 2);
-        float: left;
-        background: transparent;
-        // border-right: 3px solid black;
-    }
-
-    /*.preview-container {*/
-        /*position: absolute;*/
-        /*top: 0;*/
-        /*left: 0;*/
-    /*}*/
-    
-    /* COLLECTION IMAGE AND ARTICLE ABSTRACT PREVIEW END */
-
-    .section-container li {
-        height: 40px;
-    }
-
-    .section-container li:focus {
-        outline: none;
-    }
-
-    .section-container li a {
-        text-align: right;
-        font-size: 1.3em;
-        display: block;
-    }
-
-    .section-container li a:focus {
-        outline: none;
-    }
-    
-    .flyout-section-menu-item-content:hover {
-        /*text-decoration: underline;*/
-        border-right: 2px solid black;
-        /*border-bottom: 2px solid black;*/
-    }
-
-    .flyout-section-menu-item-content__active {
-        border-right: 2px solid black;
-    }
-
-    .flyout-section-menu-item-content:active {
-        border-right: 0 solid black;
-    }
-
+    /* APPEAR TRANSITION */
     .preview-fade-enter {
         opacity: 0.75;
         /*z-index: 3 !important;*/

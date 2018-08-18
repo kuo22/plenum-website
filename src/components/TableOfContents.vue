@@ -15,6 +15,7 @@
                 <router-link
                     :to="'/articles/' + article.nodeNumber"
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
+
                     class="table-of-contents__menu-item"
                     :class="{
                                 'table-of-contents__menu-item--hovered': article.previewVisible,
@@ -22,7 +23,7 @@
                             }"
 
                     role="menuitem"
-                    :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
+                    :tabindex="index === focusedIndex ? '0' : '-1'"
 
                     v-focus="index === focusedIndex"
 
@@ -68,10 +69,10 @@ import {SubmenuLink} from '../classes/SubmenuLink';
 
 // Submenu associated with a unique main menu entry
 export default class TableOfContents extends Vue {
-    @Prop() private parentCollection!: SubmenuLink;
-    @Prop() private mainMenuAncestor!: MainMenuItem;
-    private focusedIndex: number;
-    private scrollPosition: number;
+    @Prop() private parentCollection!: SubmenuLink; //
+    @Prop() private mainMenuAncestor!: MainMenuItem; //
+    private focusedIndex: number; //
+    private scrollPosition: number; //
 
     // Construct the Table of Contents Vue component and initialize component data
     constructor() {
@@ -81,7 +82,7 @@ export default class TableOfContents extends Vue {
     }
 
     @Emit('articleSelected')
-    public articleSelected(menu: MainMenuItem, routerLinkLocation: string) {
+    public articleSelected(menu: MainMenuItem, routerLinkLocation: string): void {
         this.resetFocus();
     }
 
