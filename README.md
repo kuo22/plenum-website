@@ -12,6 +12,7 @@
 
 ##### Files Todo
 * [] components/
+  * [x] MainMenuFlyOutSectionsPreviews.vue
   * [x] TableOfContents.vue
   * [x] ArticlePreviews.vue
 * [] views/*
