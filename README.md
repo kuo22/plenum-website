@@ -17,7 +17,7 @@
   * [x] ArticlePreviews.vue
   * [x] MainMenuFlyOutSections.vue
   * [x] MainMenuFlyOut.vue
-  * [] TheMainMenu.vue
+  * [x] TheMainMenu.vue
   * [] TheNavBar.vue
 * [] views/*
 * [x] App.vue
@@ -118,6 +118,7 @@ Address all Vue warnings that appear in console during runtime; otherwise, justi
 doesn't move anywhere after link activation (article selection). Maybe send focus to the 'main' landmark?
 * [] Test efficacy of submenu slide via CSS transitions rather than Vue transitions
 * [] Change transition of issue preview box shadow to improve jumpiness
+* [] Clicking between main menu items doesn't toggle the open menu - should they be toggle radio menu somehow?
 
 ___
 

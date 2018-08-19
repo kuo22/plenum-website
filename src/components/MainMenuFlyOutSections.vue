@@ -209,11 +209,9 @@ export default class MainMenuFlyOutSections extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $viewAllSubMenus: false;
     $lefterWidth: 240px;
     $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
     $preview-height: 90vh;
-    $focusPadding: 8px;
 
     .collection-group-menu__menu-item {
         height: 2.5em;

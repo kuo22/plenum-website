@@ -1,8 +1,9 @@
 <template>
     <ul
-        id="main-menu"
+        class="main-menu"
         role="menubar"
         aria-label="Plenum Main Navigation"
+
         @mouseover="focusedIndex = -1"
     >
         <li
@@ -10,7 +11,7 @@
             :id="menu.name.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             :key="index"
 
-            class="menu-button"
+            class="main-menu__menu-item menu-button"
             :style="changeBackground(menu)"
 
             @mouseenter="menu.hoverState = true"
@@ -45,7 +46,7 @@
                 @focus="focusedIndex = index"
             >
                 <span
-                    class="menu-button-content"
+                    class="main-menu__menu-item-content menu-button-content"
                     tabindex="-1"
                 >
                     {{ menu.name }}&nbsp;
@@ -71,24 +72,25 @@
                  @focus.native="focusedIndex = index"
             >
                 <span
-                    class="menu-button-content"
+                    class="main-menu__menu-item-content menu-button-content"
                     tabindex="-1"
                 > <!-- TODO: get ride of this hacky &nbsp; -->
                     {{ menu.name }}&nbsp;
                 </span>
             </router-link>
 
-            <transition name="submenu-slide">
+            <transition name="fly-out-slide">
                 <main-menu-fly-out
-                      class="submenu"
-                      :class="{ open: menu.open, hidden: menu.hidden }"
-                      :menu="menu"
+                    v-show="menu.open"
+                    class="fly-out"
+                    :class="{ 'fly-out--open': menu.open, 'fly-out--hidden': menu.hidden }"
+                    :menu="menu"
 
-                      @activateMenu="openMainMenuFlyOut"
-                      @toggleOpen="openMainMenuFlyOut"
-                      @closeMainMenuFlyOut="closeMainMenuFlyOut"
-                      @openArticle="openArticle"
-                      @collectionActivated="collectionActivated"
+                    @activateMenu="openMainMenuFlyOut"
+                    @toggleOpen="openMainMenuFlyOut"
+                    @closeMainMenuFlyOut="closeMainMenuFlyOut"
+                    @openArticle="openArticle"
+                    @collectionActivated="incrementPagesVisited"
                 >
                 </main-menu-fly-out>
             </transition>
@@ -116,15 +118,23 @@ export default class TheMainMenu extends Vue {
 
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
     private focusedIndex: number; // Index of the focused menu item; Initialize to non-existent index value
-    private collectionsClicked: number;
+    private pagesVisited: number; // The number of pages visited in one menu session
+    // TODO: create a 'endMenuSession' method that runs a reset and proceed procedure
 
     constructor() {
         super();
         this.focusedIndex = -1;
-        this.collectionsClicked = 0;
+        this.pagesVisited = 0;
     }
 
-    get allFlyOutsAreClosed() {
+    // Emits an open event to the parent
+    @Emit('open')
+    public open(item: MainMenuItem, keyboardEvent: boolean): void {
+        /* TODO: tslint fix - 'no-empty blocks' */
+    }
+
+    // Returns whether or not all of the fly out submenus are closed
+    private get allFlyOutsAreClosed() {
         let openFlag: boolean = true;
         for (let i = 0; i < this.menuItems.length; i++) {
             if (this.menuItems[i].open) {
@@ -134,13 +144,8 @@ export default class TheMainMenu extends Vue {
         return openFlag;
     }
 
-    // Emits an open event to the parent
-    @Emit('open')
-    public open(item: MainMenuItem, keyboardEvent: boolean): void {
-        /* TODO: tslint fix - 'no-empty blocks' */
-    }
-
-    public closeAll(): void {
+    // Closes all of the fly out menus
+    public closeAllFlyOuts(): void {
         this.routerBackToPreviousPage();
 
         for (let i = 0; i < this.menuItems.length; i++) {
@@ -151,12 +156,18 @@ export default class TheMainMenu extends Vue {
         }
     }
 
+    // Opens the provided URL
     private activateRouterLink(routerURL: string): void {
         this.$router.push(routerURL);
     }
 
+    // TODO: DOES NOT BELONG IN MAIN MENU
+    // The procedure to open an article
+    // parameter(s) needed:
+    //      menu                = a main menu item
+    //      routerLinkLocation  = a url endpoint
     private openArticle(menu: MainMenuItem, routerLinkLocation: string) {
-        this.collectionsClicked = 0;
+        this.pagesVisited = 0;
         this.closeMainMenuFlyOut(menu, null, false); // TODO: get 'true' via parameters
         this.$router.push(routerLinkLocation);
     }
@@ -244,15 +255,17 @@ export default class TheMainMenu extends Vue {
 
     }
 
+    // Calls the router to go back in history to the page that was loaded before a menu session
     private routerBackToPreviousPage(): void {
-        if (this.collectionsClicked !== 0) {
-            this.$router.go(this.collectionsClicked * -1);
-            this.collectionsClicked = 0;
+        if (this.pagesVisited > 0) {
+            this.$router.go(this.pagesVisited * -1);
+            this.pagesVisited = 0;
         }
     }
 
-    private collectionActivated(submenuLink: SubmenuLink): void {
-        this.collectionsClicked++;
+    // Increments the number of pages visited during a menu session
+    private incrementPagesVisited(submenuLink: SubmenuLink): void {
+        this.pagesVisited++;
     }
 
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
@@ -269,7 +282,7 @@ export default class TheMainMenu extends Vue {
     // Toggles the active state of main menu item or optionally declares the active state
     // parameter(s):
     //      item    = main menu item
-    //      active  = whether or not the main menu item is being actively used
+    //      open  = whether or not the main menu item's fly out is open
     private toggleOpenMenu(item: MainMenuItem, open?: boolean = !item.open): void {
         // Reset all submenus
         const index: number = this.getIndexOfMenuItem(item);
@@ -293,7 +306,7 @@ export default class TheMainMenu extends Vue {
 
     // Resets all submenu links provided to be deactivated
     // parameter(s) needed:
-    //      submenu = list of submenu links to be deactivated
+    //      mainMenuItemIndex = the locational index of a main menu item
     private resetSubmenuLinks(mainMenuItemIndex: number) {
         for (const submenuItemKey: string in this.menuItems[mainMenuItemIndex].subMenu) {
             if (this.menuItems[mainMenuItemIndex].subMenu.hasOwnProperty(submenuItemKey)) {
@@ -306,10 +319,13 @@ export default class TheMainMenu extends Vue {
         }
     }
 
-    private getIndexOfMenuItem(menu: MainMenuItem): number {
+    // Returns the locational index of the provided menu item
+    // parameter(s) needed:
+    //      menuItem = a main menu item
+    private getIndexOfMenuItem(menuItem: MainMenuItem): number {
         let index = -1;
         for (let i = 0; i < this.menuItems.length - 1; i++) {
-            if (this.menuItems[i].name === menu.name) {
+            if (this.menuItems[i].name === menuItem.name) {
                 index = i;
             }
         }
@@ -317,6 +333,9 @@ export default class TheMainMenu extends Vue {
         return index;
     }
 
+    // Setter for the data of the index of the focused menu item
+    // parameter(s) needed:
+    //      newVal = the new value from which to set
     private setFocusedIndex(newVal: number): void {
         this.focusedIndex = newVal;
     }
@@ -354,38 +373,40 @@ export default class TheMainMenu extends Vue {
     $lefterWidth: 240px;
     $buttonTextCenterAdjustment: 3px;
 
-    li {
+    .main-menu__menu-item {
         height: $menuItemHeight;
-        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
         margin: 15px 0;
+
+        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
     }
 
-    li:hover {
+    .main-menu__menu-item:hover {
         background: transparent;
     }
 
-    a[role=menuitem],
-    a[role=link] {
+    .main-menu__menu-item a[role=menuitem],
+    .main-menu__menu-item a[role=link] {
+        height: $menuItemHeight;
+
         font-size: 1.75em;
         font-weight: bold;
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
         text-align: right;
-        height: $menuItemHeight;
     }
 
-    a[role=menuitem]:focus,
-    a[role=link]:focus {
+    .main-menu__menu-item a[role=menuitem]:focus,
+    .main-menu__menu-item a[role=link]:focus {
         outline: none;
     }
 
-    a[role=menuitem] span,
-    a[role=link] span {
+    .main-menu__menu-item-content,
+    .main-menu__menu-item-content {
+        width: 100%;
         height: calc(#{$menuItemHeight} - #{$buttonTextCenterAdjustment});
         line-height: $menuItemHeight;
-        width: 100%;
     }
 
-    .submenu {
+    .fly-out {
         position: absolute;
         top: 0;
         height: 100%;
@@ -396,43 +417,43 @@ export default class TheMainMenu extends Vue {
         z-index: -1 !important;
     }
 
-    .open {
+    .fly-out--open {
         z-index: 4;
     }
 
-    .hidden {
+    .fly-out--hidden {
         display: none;
     }
 
     /* Submenu Transition Animation */
-    .submenu-slide-enter {
+    .fly-out-slide-enter {
         z-index: 4;
     }
 
-    .submenu-slide-enter-active {
+    .fly-out-slide-enter-active {
         transition: all .4s ease;
         z-index: 4;
     }
 
-    .submenu-slide-enter-to {
+    .fly-out-slide-enter-to {
         z-index: 4;
     }
 
-    .submenu-slide-leave {
+    .fly-out-slide-leave {
         z-index: 4;
     }
 
-    .submenu-slide-leave-active {
+    .fly-out-slide-leave-active {
         transition: all .4s ease;
         z-index: 4;
     }
 
-    .submenu-slide-leave-to {
+    .fly-out-slide-leave-to {
         z-index: 4;
         transform: translateX(-$lefterWidth);
     }
 
-    .submenu-slide-enter {
+    .fly-out-slide-enter {
         transform: translateX(-$lefterWidth);
     }
 </style>

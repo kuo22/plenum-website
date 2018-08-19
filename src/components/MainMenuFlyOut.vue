@@ -1,9 +1,6 @@
 <template>
     <ul
-        v-show="menu.open"
-
         role="menu"
-
         class="fly-out-menu"
         :class="{ 'fly-out-menu--active': menu.active }"
         :style="{background: menu.color}"
