@@ -232,6 +232,10 @@ export default class MainMenuFlyOutSections extends Vue {
         height: 100%;
     }
 
+    .collection-group-menu__menu-item-content {
+        border-right: 2px solid transparent;
+    }
+
     .collection-group-menu__menu-item-content:hover {
         border-right: 2px solid black;
     }
@@ -241,7 +245,7 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     .collection-group-menu__menu-item-content:active {
-        border-right: 0 solid black;
+        border-right: 2px solid transparent;
     }
 
     .collection-title-bar {
