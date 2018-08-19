@@ -18,7 +18,10 @@
                 </em>
             </h3>
         </header>
-        <div class="article__frame">
+        <div
+            id="article-frame"
+            class="article__frame"
+        >
             <div class="article__page">
                 <div class="article__abstract">
                     <h4 id="article__abstract-title">ABSTRACT</h4>
@@ -41,31 +44,36 @@
                     <p v-html="article.refs"></p>
                 </div>
             </div>
-
-            <footer>
-
-                <div
-                    v-if="article.copyright"
-                    class="article__copyright"
-                >
-                    <p>
-                        Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
-                        <br>
-                        All rights reserved.
-                    </p>
-                </div>
-
-                <a
-                    class="article__download-button"
-                    :title="'Download the Article: ' + article.title"
-                    :href="article.downloadURL"
-                    target="_blank"
-                >
-                    Download Article
-                </a>
-
-            </footer>
         </div>
+        <footer
+            class="footer"
+            :class="{ 'footer--all-visible': footerComplete }"
+            @mouseover="footerHovered = true"
+            @mouseleave="footerHovered = false"
+        >
+            <div
+                v-if="article.copyright"
+                class="footer__copyright"
+            >
+                <p>
+                    Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
+                    <br>
+                    All rights reserved.
+                </p>
+            </div>
+
+            <a
+                class="footer__download-button"
+                :title="'Download the Article: ' + article.title"
+                :href="article.downloadURL"
+                target="_blank"
+
+                tabindex="0"
+            >
+                <span tabindex="-1">Download Article</span>
+            </a>
+
+        </footer>
     </main>
 </template>
 
@@ -84,21 +92,32 @@ import APIService from '@/API';
 export default class TextArticle extends Vue {
     @Prop() private mainTitleOffScreen: boolean;
 
-    private articleLoading: boolean = false;
-    private article: Article = null;
-    private articleError: boolean = null;
+    private articleLoading: boolean;
+    private article: Article;
+    private articleError: boolean;
+
+    private footerHovered: boolean;
 
     private $route: Route;
-    // private issueTitle: string = this.$route.params.publication;
-
 
     constructor() {
         super();
+        this.articleLoading = false;
+        this.article = null;
+        this.articleError = null;
+
+        this.footerHovered = false;
     }
 
     // When view is mounted, retrieve article
     public created() {
         this.fetchArticle();
+    }
+
+    get footerComplete(): boolean {
+        const el = document.getElementById('article-frame');
+        // console.log(el.scrollHeight);
+        return this.footerHovered || el.scrollTop !== 1;
     }
 
     @Watch('$route')
@@ -159,7 +178,7 @@ export default class TextArticle extends Vue {
     .article__info {
         position: fixed;
         width: calc(100% - #{$lefterWidth});
-        padding: 30px 0px 30px 20px;
+        padding: 30px 0 30px 20px;
 
         z-index: 2;
 
@@ -210,21 +229,35 @@ export default class TextArticle extends Vue {
         text-align: left;
     }
 
-    footer {
+    .footer {
         position: fixed;
         bottom: 0;
-        width: calc(100% - calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth}));
+        width: calc(100% - calc(#{$lefterWidth}));
+        height: 6vh;
         z-index: 2;
+
+        background: transparent;
+        outline: 3px solid transparent;
+        transition: all 100ms ease-in;
     }
 
-    .article__copyright {
+    .footer--all-visible {
+        transition: all 100ms ease-out;
+        background: white;
+        outline: 3px solid black;
+    }
+
+    .footer__copyright {
         position: absolute;
+        top: 0;
         bottom: 0;
         left: 0;
-        margin: 0 0 3px calc(#{$borderWidth} + 3px);
+        height: 5vh;
+        margin: auto;
+        margin-left: calc(3px + 3px);
     }
 
-    .article__copyright p {
+    .footer__copyright p {
         margin: 0;
 
         font-size: 12px;
@@ -232,17 +265,14 @@ export default class TextArticle extends Vue {
         text-indent: 0;
     }
 
-    // Good if the menu is active and pushed out 20 px
-    .article__info:not(#in-page-article__info), .article__copyright {
-        left: calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth});
-    }
-
-    .article__download-button {
+    .footer__download-button {
         position: absolute;
         right: 0;
+        top: 0;
         bottom: 0;
-        margin: 0 15px 10px 0;
-        padding: 3px 5px;
+        height: 5vh;
+        //margin: auto 15px 10px auto;
+        padding: 5px 8px;
 
         color: #1b4eff;
 
