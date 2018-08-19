@@ -5,7 +5,10 @@
     >
         <transition appear>
             <the-nav-bar
+                    class="lefter"
                     :menuItems="menuItems"
+
+                    @logoClicked="closeFlyOut"
             ></the-nav-bar>
         </transition>
 
@@ -190,7 +193,12 @@ export default class App extends Vue {
         z-index: 4;
     }
 
-
+    .grid-frame {
+        width: $lefterWidth;
+        height: $lefterWidth;
+        text-align: center;
+        background: white;
+    }
 
     .before-appear {
         opacity: 0;

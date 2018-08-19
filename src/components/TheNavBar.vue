@@ -1,22 +1,26 @@
 <template>
     <div
-        class="navbar main lefter"
+        class="navbar"
         @mouseover="playLogo = true"
         @mouseout="playLogo = false"
     >
-        <div class="logo grid-frame">
+        <div class="navbar__logo-frame grid-frame">
             <!-- TODO: close menu when logo is activated -->
-            <the-logo :playLogo="playLogo"></the-logo>
+            <the-logo
+                :playLogo="playLogo"
+                @logoClicked="logoClicked"
+            ></the-logo>
         </div>
 
         <nav
+            class="navbar__main-menu"
             role="navigation"
             aria-label="Plenum Main Navigation"
         >
             <the-main-menu :menuItems="menuItems"></the-main-menu>
         </nav>
 
-        <div class="about-brief grid-frame">
+        <div class="navbar__about grid-frame">
             <p>
                 Plenum is an online journal devoted to showcasing the highest quality scholarship in undergraduate
                 geography. It is managed, produced, and reviewed by undergraduate students from the Department
@@ -43,11 +47,16 @@ import TheLogo from '@/components/TheLogo';
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class TheNavBar extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
-    private playLogo: boolean; // Initializer for the logo animation switch
+    private animateLogo: boolean; // Whether or not the logo is animating
 
     constructor() {
         super();
-        this.playLogo = false;
+        this.animateLogo = false;
+    }
+
+    @Emit('logoClicked')
+    private logoClicked(): void {
+        // Filler
     }
 }
 </script>
@@ -56,13 +65,6 @@ export default class TheNavBar extends Vue {
     $lefterWidth: 240px;
     $border: 3px solid black;
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
-    $readFont: 'Crimson Text', serif;
-
-    nav[role=navigation] {
-        height: calc(100% - (#{$lefterWidth} * 2) - 30px - 3px); // subtracting padding and border width
-        background: white;
-        padding: 15px 15px 0 15px;
-    }
 
     .navbar {
         position: fixed;
@@ -70,54 +72,40 @@ export default class TheNavBar extends Vue {
         left: 0;
         height: 100vh;
         width: $lefterWidth;
-        z-index: 4;
-        background: white;
-    }
-
-    .main {
         z-index: 5;
+
         background: white;
     }
 
-    .grid-frame {
-        width: $lefterWidth;
-        height: $lefterWidth;
-        text-align: center;
-        background: white;
-    }
-
-    .logo {
+    .navbar__logo-frame {
         border-bottom: $border;
     }
 
-    .logo-helper { /* Adds an empty span block to displace the logo to the center*/
-        display: inline-block;
-        height: 100%;
-        vertical-align: middle;
+    .navbar__main-menu {
+        height: calc(100% - (#{$lefterWidth} * 2) - 30px - 3px); // subtracting padding and border width
+        padding: 15px 15px 0 15px;
+
+        background: white;
     }
 
-    #logo img {
-        vertical-align: middle;
-        max-width: 80%;
-        max-height: 80%;
-    }
-
-    .about-brief {
+    .navbar__about {
         position: absolute;
         bottom: 0;
         left: 0;
-        border-top: $border;
-        padding: 15px 15px 0 15px;
         width: calc(#{$lefterWidth} - 30px);
+        padding: 15px 15px 0 15px;
+
+        border-top: $border;
+
+        font-family: $menuFont;
+        font-weight: bold;
     }
 
-    .about-brief p {
+    .navbar__about p {
         vertical-align: middle;
-        font-family: $menuFont;
-        font-size: 15.41px;
+        font-size: 15.41px; // TODO: make responsive?
         text-align: left;
         line-height: 20px;
-        font-weight: bold;
         text-indent: unset;
     }
 

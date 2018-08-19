@@ -11,14 +11,15 @@
 5. Other
 
 ##### Files Todo
-* [] components/
+* [x] components/
   * [x] MainMenuFlyOutSectionsPreviews.vue
   * [x] TableOfContents.vue
   * [x] ArticlePreviews.vue
   * [x] MainMenuFlyOutSections.vue
   * [x] MainMenuFlyOut.vue
   * [x] TheMainMenu.vue
-  * [] TheNavBar.vue
+  * [x] TheNavBar.vue
+  * [x] TheLogo.vue
 * [] views/*
 * [x] App.vue
 

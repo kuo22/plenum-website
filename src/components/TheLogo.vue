@@ -1,11 +1,16 @@
 <template>
     <router-link
-            to="/"
-            title="Return to Home"
-            tabindex="0"
+        to="/"
+        title="Return to Home"
+        tabindex="0"
+
+        class="logo-frame"
+
+        @click.native="logoClicked"
     >
         <div
-            id="logo-animation-container"
+            id="logo"
+            class="logo"
             tabindex="-1"
         >
         </div>
@@ -30,12 +35,17 @@ export default class TheLogo extends Vue {
 
     constructor() { super(); }
 
-    // When this component is loaded, draw a canvas with an animatable Plenum logo
-    public created() {
-        this.p5 = new p5(this.logoSketch(1.0, 2.0), 'logo-animation-container');
+    @Emit('logoClicked')
+    private logoClicked(): void {
+        // Filler
     }
 
-    public logoSketch(animationSpeed: number, transitionSpeed: number): any {
+    // When this component is loaded, draw a canvas with an animatable Plenum logo
+    private created() {
+        this.p5 = new p5(this.logoSketch(1.0, 2.0), 'logo');
+    }
+
+    private logoSketch(animationSpeed: number, transitionSpeed: number): any {
         let sketch;
         if (180 % transitionSpeed === 0) {
             sketch = (p) => {
@@ -133,34 +143,27 @@ export default class TheLogo extends Vue {
 
         return sketch;
     }
-
-
-    // Emits an open event to the parent
-    // @Emit('activateMenu') public activateMenu(item: MenuItem): void {
-        /* tslint fix - 'no-empty blocks' */
-    // }
-
 }
 </script>
 
 <style lang="scss" scoped>
-    #logo-animation-container {
+    .logo {
         width: 240px;
         height: 240px;
     }
 
-    a {
+    .logo-frame {
         position: relative;
         width: 100%;
         height: 100%;
     }
 
-    a:focus > div {
+    .logo-frame:focus > .logo {
         outline: 3px dashed white;
     }
 
-    a:focus,
-    a div:focus {
+    .logo-frame:focus,
+    .logo:focus {
         outline: none;
     }
 </style>
