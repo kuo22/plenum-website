@@ -1,6 +1,6 @@
 <template>
-    <main id="table-of-contents">
-        <h1>Hello</h1>
+    <main class="table-of-contents">
+        <h1>table of contents?</h1>
     </main>
 </template>
 

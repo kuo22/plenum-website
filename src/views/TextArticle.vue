@@ -1,69 +1,52 @@
 <template>
-    <main :v-if="article"
-          id="text-article-view">
-        <span id="active-submenu-spacer"></span>
-        <header>
-            <div class="article-info">
-                <div class="titles">
-                    <h1 class="title">
-                        {{ article.title }}
-                    </h1>
-                    <h2 class="subtitle">
-                        {{  article.subtitle }}
-                    </h2>
-                </div>
-                <!-- make author card a component -->
-                <h3 class="author">
-                    <em>{{ article.author.firstName }} {{ article.author.lastName }}</em>
-                </h3>
+    <main
+        :v-if="article"
+        class="article"
+    >
+        <header class="article__info">
+            <div>
+                <h1 class="article__title">
+                    {{ article.title }}
+                </h1>
+                <h2 class="article__subtitle">
+                    {{  article.subtitle }}
+                </h2>
             </div>
+            <h3 class="article__author">
+                <em>
+                    {{ article.author.firstName }} {{ article.author.lastName }}
+                </em>
+            </h3>
         </header>
-        <div id="text-article">
-            <div id="article-page">
-                <div id="article">
-                    <div id="abstract">
-                        <h4 id="abstract-title">ABSTRACT</h4>
-                        <!--span class="tab"></span-->
-                        <p>
-                            {{ article.abstract }}
-                        </p>
-                    </div>
+        <div class="article__frame">
+            <div class="article__page">
+                <div class="article__abstract">
+                    <h4 id="article__abstract-title">ABSTRACT</h4>
+                    <p>
+                        {{ article.abstract }}
+                    </p>
+                </div>
 
-                    <hr>
+                <hr>
 
-                    <!--<div id="in-page-article-info" class="article-info">-->
-                        <!--<div class="titles">-->
-                            <!--<h1 class="title">-->
-                                <!--{{this.article.title}}-->
-                            <!--</h1>-->
-                            <!--<h2 class="subtitle">-->
-                                <!--{{this.article.subtitle}}-->
-                            <!--</h2>-->
-                        <!--</div>-->
-                        <!--<h3 class="author">-->
-                            <!--<i>{{this.article.author.firstName}} {{this.article.author.lastName}}</i>-->
-                        <!--</h3>-->
-                    <!--</div>-->
+                <div class="article__body">
+                    <p v-html="article.body"></p>
+                </div>
 
-                    <div id="article-body">
-                        <p v-html="article.body"></p>
-                    </div>
+                <hr>
 
-                    <hr>
+                <div class="article__biblio">
+                    <h4>BIBLIOGRAPHY</h4>
 
-                    <div id="bibliography">
-                        <h4>BIBLIOGRAPHY</h4>
-
-                        <p v-html="article.refs"></p>
-                    </div>
+                    <p v-html="article.refs"></p>
                 </div>
             </div>
 
             <footer>
 
                 <div
-                    id="copyright"
                     v-if="article.copyright"
+                    class="article__copyright"
                 >
                     <p>
                         Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
@@ -73,7 +56,7 @@
                 </div>
 
                 <a
-                    id="download"
+                    class="article__download-button"
                     :title="'Download the Article: ' + article.title"
                     :href="article.downloadURL"
                     target="_blank"
@@ -168,31 +151,105 @@ export default class TextArticle extends Vue {
     $activeMenuWidth: 20px;
     $fontSize: 17px;
 
-    header {
-        position: fixed;
-        z-index: 2;
-        width: calc(100% - #{$lefterWidth});
-    }
-
-    #text-article-view {
+    .article {
+        overflow-x: initial;
         font-family: 'Amiri', serif;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    .article__info {
+        position: fixed;
+        width: calc(100% - #{$lefterWidth});
+        padding: 30px 0px 30px 20px;
+
+        z-index: 2;
+
+        text-align: left;
         font-weight: normal;
     }
 
-    h1 {
+    .article__subtitle {
+        margin-left: 30px;
+    }
+
+    .article__author {
+        margin-top: 15px;
+    }
+
+    .article__title,
+    .article__subtitle,
+    .article__author {
         font-weight: normal;
     }
 
-    h2 {
-        font-weight: normal;
+    /* ARTICLE CONTENT BELOW TITLES */
+    .article__frame {
+        margin-top: 15%;
+        padding: $margin;
+
+        text-align: left;
     }
 
-    h3 {
-        font-weight: normal;
+    .article__page {
+        width: $pageWidth;
+        margin: 0 auto $margin auto;
+
+        box-shadow: 3px 3px 8px 1px #d5d5d5;
+
+        background: #fafafa;
     }
+
+    .article__biblio {
+        margin: $margin 0 0 0;
+    }
+
+    .article__biblio p p {
+        padding: 0 0 0 50px;
+
+        text-indent: -50px;
+        font-size: calc(#{$fontSize} - 3px);
+        text-align: left;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: calc(100% - calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth}));
+        z-index: 2;
+    }
+
+    .article__copyright {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        margin: 0 0 3px calc(#{$borderWidth} + 3px);
+    }
+
+    .article__copyright p {
+        margin: 0;
+
+        font-size: 12px;
+        text-align: left;
+        text-indent: 0;
+    }
+
+    // Good if the menu is active and pushed out 20 px
+    .article__info:not(#in-page-article__info), .article__copyright {
+        left: calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth});
+    }
+
+    .article__download-button {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        margin: 0 15px 10px 0;
+        padding: 3px 5px;
+
+        color: #1b4eff;
+
+        text-decoration: underline;
+    }
+
+    /* STYLING FOR INSERTED HTML FROM DRUPAL */
 
     h4 {
         font-size: 19px;
@@ -200,29 +257,32 @@ export default class TextArticle extends Vue {
     }
 
     h5 {
+        margin: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
+
         font-weight: bold;
         text-transform: uppercase;
         font-size: calc(#{$fontSize} + 5px);
         text-indent: 0;
-        margin: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
         text-align: center;
-
     }
 
     h6 {
         width: calc(#{$pageWidth} / 2);
-        font-size: 25px;
         margin: 25px auto;
+
+        outline: 4px #000;
+
+        font-size: 25px;
         text-indent: 0;
         line-height: 125%;
-        outline: 4px #000;
     }
 
     p {
+        margin-bottom: 6px;
+
         text-align: justify;
         font-size: 17px;
         line-height: 150%;
-        margin-bottom: 6px;
         text-indent: 50px;
     }
 
@@ -242,108 +302,5 @@ export default class TextArticle extends Vue {
     blockquote strong {
         font-weight: normal;
         font-size: calc(#{$fontSize} - 2px);
-    }
-
-    .tab {
-        display:inline-block;
-        width: 20px;
-    }
-
-    #active-submenu-spacer {
-        width: calc(#{$activeMenuWidth} + #{$borderWidth});
-        height: 100vh;
-        display: inline-block;
-        position: absolute;
-        left: 0;
-        top: 0;
-    }
-
-    #text-article {
-        position: absolute;
-        left: calc(#{$activeMenuWidth} + #{$borderWidth});
-        top: 0;
-        width: calc(100% - #{$activeMenuWidth} - #{$borderWidth});
-        z-index: -1;
-        margin-top: 15%;
-    }
-
-    .article-info {
-        text-align: left;
-        padding: 30px 0px 30px 20px;
-    }
-
-    #in-page-article-info {
-        margin: 0 0 calc(#{$margin} / 1.5) 0;
-    }
-
-    .subtitle {
-        margin-left: 30px;
-    }
-
-    .author {
-        margin-top: 15px;
-    }
-
-    #article-page {
-        width: $pageWidth;
-        margin: 0 auto $margin auto;
-        background: #fafafa;
-        box-shadow: 3px 3px 8px 1px #d5d5d5;
-    }
-
-    #article {
-        padding: $margin;
-        text-align: left;
-    }
-
-    #abstract-title {
-        // margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
-    }
-
-    #bibliography {
-        margin: $margin 0 0 0;
-    }
-
-    #bibliography p p {
-        padding: 0 0 0 50px;
-        text-indent: -50px;
-        font-size: calc(#{$fontSize} - 3px);
-        text-align: left;
-    }
-
-    footer {
-        position: fixed;
-        //left: $lefterWidth;
-        bottom: 0;
-        z-index: 2;
-        width: calc(100% - calc(#{$lefterWidth} + #{$activeMenuWidth} + #{$borderWidth}));
-    }
-
-    footer #copyright {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        margin: 0 0 3px calc(#{$borderWidth} + 3px);
-    }
-
-    #copyright p {
-        font-size: 12px;
-        text-align: left;
-        text-indent: 0;
-        margin: 0;
-    }
-
-    .article-info:not(#in-page-article-info), footer #copyright {
-        left: calc(#{$lefterWidth}+ #{$activeMenuWidth} + #{$borderWidth});
-    }
-
-    footer #download {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        padding: 3px 5px;
-        margin: 0 15px 10px 0;
-        text-decoration: underline;
-        color: #1b4eff;
     }
 </style>

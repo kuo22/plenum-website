@@ -20,7 +20,8 @@
   * [x] TheMainMenu.vue
   * [x] TheNavBar.vue
   * [x] TheLogo.vue
-* [] views/*
+* [x] views/*
+  * [x] TextArticle.vue
 * [x] App.vue
 
 ######Organize CSS Resources

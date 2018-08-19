@@ -174,30 +174,35 @@ export default class App extends Vue {
     }
 
     #app {
-        font-family: $menuFont;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-align: center;
-        color: #2c3e50;
         width: 100vw;
         height: 100vh;
+
+        color: #2c3e50;
+
+        text-align: center;
+        font-family: $menuFont;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
     }
 
     .lefter {
         position: absolute;
         top: 0;
         left: 0;
-        height: 100%;
-        outline: $border;
         width: $lefterWidth;
+        height: 100%;
         z-index: 4;
+
+        outline: $border;
     }
 
     .grid-frame {
         width: $lefterWidth;
         height: $lefterWidth;
-        text-align: center;
+
         background: white;
+
+        text-align: center;
     }
 
     .before-appear {
@@ -213,12 +218,13 @@ export default class App extends Vue {
     }
 
     .content-section {
-        overflow-x: hidden;
+        position: absolute;
         width: calc(100% - #{$lefterWidth});
         height: 100vh;
-        position: absolute;
         right: 0;
         bottom: 0;
+
+        overflow-x: hidden;
     }
 
     .component-fade-enter-active, .component-fade-leave-active {

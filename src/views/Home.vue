@@ -1,5 +1,5 @@
 <template>
-    <main id="home">
+    <main>
         <h1>Home Page w/ Highlight News</h1>
     </main>
 </template>
@@ -23,7 +23,4 @@
 </script>
 
 <style>
-    #home {
-
-    }
 </style>
