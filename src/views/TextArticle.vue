@@ -3,26 +3,42 @@
         :v-if="article"
         class="article"
     >
-        <header class="article__info">
-            <div>
-                <h1 class="article__title">
-                    {{ article.title }}
-                </h1>
-                <h2 class="article__subtitle">
-                    {{  article.subtitle }}
-                </h2>
-            </div>
-            <h3 class="article__author">
-                <em>
-                    {{ article.author.firstName }} {{ article.author.lastName }}
-                </em>
-            </h3>
+        <header
+            class="article__info"
+
+            @mouseover="headerHovered = true"
+            @mouseleave="headerHovered = false"
+        >
+            <transition name="header-slide">
+                <div
+                    v-show="headerHovered || startOfArticleFlag"
+                    class="article__info-container"
+                    :class="{ 'article__info-container--outlined': outlinedHeader }"
+                >
+                    <div>
+                        <h1 class="article__title">
+                            {{ article.title }}
+                        </h1>
+                        <h2 class="article__subtitle">
+                            {{  article.subtitle }}
+                        </h2>
+                    </div>
+                    <h3 class="article__author">
+                        <em>
+                            {{ article.author.firstName }} {{ article.author.lastName }}
+                        </em>
+                    </h3>
+                </div>
+            </transition>
         </header>
         <div
             id="article-frame"
             class="article__frame"
         >
-            <div class="article__page">
+            <div
+                v-view="startOfArticle"
+                class="article__page"
+            >
                 <div class="article__abstract">
                     <h4 id="article__abstract-title">ABSTRACT</h4>
                     <p>
@@ -36,9 +52,11 @@
                     <p v-html="article.body"></p>
                 </div>
 
-                <hr>
+                <hr v-view="endOfArticleReached">
 
-                <div class="article__biblio">
+                <div
+                    class="article__biblio"
+                >
                     <h4>BIBLIOGRAPHY</h4>
 
                     <p v-html="article.refs"></p>
@@ -47,10 +65,20 @@
         </div>
         <footer
             class="footer"
-            :class="{ 'footer--all-visible': footerComplete }"
             @mouseover="footerHovered = true"
             @mouseleave="footerHovered = false"
         >
+            <transition name="footer-slide">
+                <ul
+                    v-show="footerHovered || endOfArticleFlag || startOfArticleFlag"
+                    role="menubar"
+                    class="footer__menu"
+                >
+                    <li>
+                        <a>Test</a>
+                    </li>
+                </ul>
+            </transition>
             <div
                 v-if="article.copyright"
                 class="footer__copyright"
@@ -96,7 +124,15 @@ export default class TextArticle extends Vue {
     private article: Article;
     private articleError: boolean;
 
+    private headerHovered: boolean;
     private footerHovered: boolean;
+
+    private startOfArticleFlag: boolean;
+    private endOfArticleFlag: boolean;
+
+    private bodyScrollPosition: number;
+
+    private outlinedHeader: boolean;
 
     private $route: Route;
 
@@ -106,7 +142,15 @@ export default class TextArticle extends Vue {
         this.article = null;
         this.articleError = null;
 
+        this.headerHovered = false;
         this.footerHovered = false;
+
+        this.startOfArticleFlag = true;
+        this.endOfArticleFlag = false;
+
+        this.bodyScrollPosition = 0;
+
+        this.outlinedHeader = false;
     }
 
     // When view is mounted, retrieve article
@@ -114,10 +158,27 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
-    get footerComplete(): boolean {
-        const el = document.getElementById('article-frame');
-        // console.log(el.scrollHeight);
-        return this.footerHovered || el.scrollTop !== 1;
+    private startOfArticle(e): void {
+        if (e.scrollPercent < 0.008) {
+            this.startOfArticleFlag = true;
+        } else {
+            this.startOfArticleFlag = false;
+        }
+        if (e.type === 'exit') {
+            this.outlinedHeader = true;
+        } else {
+            this.outlinedHeader = false;
+        }
+    }
+
+    private endOfArticleReached(e): void {
+        if (e.percentTop > 0.5) {
+            if (e.type === 'enter') {
+                this.endOfArticleFlag = true;
+            } else if (e.type === 'exit') {
+                this.endOfArticleFlag = false;
+            }
+        }
     }
 
     @Watch('$route')
@@ -177,13 +238,31 @@ export default class TextArticle extends Vue {
 
     .article__info {
         position: fixed;
-        width: calc(100% - #{$lefterWidth});
+        width: calc(100% - #{$lefterWidth} - 20px);
+        height: 15vh;
         padding: 30px 0 30px 20px;
 
         z-index: 2;
 
         text-align: left;
         font-weight: normal;
+    }
+
+    .article__info-container {
+        position: absolute;
+        top: 0 !important;
+        left: 0;
+        width: calc(100% - 40px);
+        height: calc(100% - 40px);
+        padding: 20px;
+        z-index: -1;
+
+        background: transparent;
+    }
+
+    .article__info-container--outlined {
+        outline: 3px solid black;
+        background: white;
     }
 
     .article__subtitle {
@@ -235,16 +314,20 @@ export default class TextArticle extends Vue {
         width: calc(100% - calc(#{$lefterWidth}));
         height: 6vh;
         z-index: 2;
-
-        background: transparent;
-        outline: 3px solid transparent;
-        transition: all 100ms ease-in;
     }
 
-    .footer--all-visible {
-        transition: all 100ms ease-out;
-        background: white;
+    .footer__menu {
+        position: absolute;
+        bottom: 0 !important;
+        left: 0;
+        width: calc(100% - 2 * 10vw);
+        height: 100%;
+        padding: 0 10vw;
+        z-index: -1;
+
         outline: 3px solid black;
+
+        background: white;
     }
 
     .footer__copyright {
@@ -278,6 +361,35 @@ export default class TextArticle extends Vue {
 
         text-decoration: underline;
     }
+
+    /* TRANSITIONS */
+
+    .header-slide-enter {
+        transform: translateY(calc(-1 * 100%));
+    }
+    .header-slide-enter-active {
+        transition: all 0.2s ease;
+    }
+    .header-slide-leave-active {
+        transition: all 0.3s ease;
+    }
+    .header-slide-leave-to {
+        transform: translateY(calc(-1 * 100%));
+    }
+
+    .footer-slide-enter {
+        transform: translateY(calc(6vh + 3px));
+    }
+    .footer-slide-enter-active {
+        transition: all 0.2s ease;
+    }
+    .footer-slide-leave-active {
+        transition: all 0.3s ease;
+    }
+    .footer-slide-leave-to {
+        transform: translateY(calc(6vh + 3px));
+    }
+
 
     /* STYLING FOR INSERTED HTML FROM DRUPAL */
 

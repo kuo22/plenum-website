@@ -12,8 +12,9 @@
     "axios": "^0.18.0",
     "fullpage.js": "^2.9.7",
     "hsluv": "0.0.3",
-    "p5": "^0.6.1",
-    "vue": "^2.5.16",
+    "p5": "^0.7.1",
+    "vue": "^2.5.17",
+    "vue-check-view": "^0.2.3",
     "vue-class-component": "^6.0.0",
     "vue-focus": "^2.1.0",
     "vue-property-decorator": "^6.0.0",
@@ -34,7 +35,7 @@
     "node-sass": "^4.9.2",
     "sass-loader": "^6.0.6",
     "ts-jest": "^22.4.6",
-    "vue-template-compiler": "^2.5.13"
+    "vue-template-compiler": "^2.5.17"
   },
   "browserslist": [
     "> 1%",

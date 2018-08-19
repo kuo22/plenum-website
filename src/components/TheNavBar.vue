@@ -1,13 +1,13 @@
 <template>
     <div
         class="navbar"
-        @mouseover="playLogo = true"
-        @mouseout="playLogo = false"
+        @mouseover="animateLogo = true"
+        @mouseout="animateLogo = false"
     >
         <div class="navbar__logo-frame grid-frame">
             <!-- TODO: close menu when logo is activated -->
             <the-logo
-                :playLogo="playLogo"
+                :playLogo="animateLogo"
                 @logoClicked="logoClicked"
             ></the-logo>
         </div>
