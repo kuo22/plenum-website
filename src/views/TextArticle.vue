@@ -1,22 +1,27 @@
 <template>
     <main
-        :v-if="article"
+        :v-show="article !== null"
         class="article"
     >
         <vue-headroom
             :z-index="3"
             :upTolerance="15"
+
+            :class="{ 'headroom--hidden': hideHeadroom }"
+
+            @onTop="atPageTop = true"
+            @onNotTop="atPageTop = false"
         >
             <header
-                class="article__info"
+                class="article__info article__info--headroom"
 
                 @mouseover="headerHovered = true"
                 @mouseleave="headerHovered = false"
             >
-                <transition name="header-slide">
+                <!--transition name="header-slide" -->
                     <div
-                        class="article__info-container"
-                        :class="{ 'article__info-container--outlined': outlinedHeader }"
+                        class="article__info-container article__info-container--headroom"
+                        :class="{ 'article__info-container--hidden': atPageTop }"
                     >
                         <div>
                             <h1 class="article__title">
@@ -31,10 +36,29 @@
                                 {{ article.author.firstName }} {{ article.author.lastName }}
                             </em>
                         </h3>
-                    </div>
-                </transition>
+                    </div >
+                <!-- /transition -->
             </header>
         </vue-headroom>
+        <div class="article__info article__info--embedded">
+            <div
+                class="article__info-container article__info-container--embedded"
+            >
+                <div>
+                    <h1 class="article__title">
+                        {{ article.title }}
+                    </h1>
+                    <h2 class="article__subtitle">
+                        {{  article.subtitle }}
+                    </h2>
+                </div>
+                <h3 class="article__author">
+                    <em>
+                        {{ article.author.firstName }} {{ article.author.lastName }}
+                    </em>
+                </h3>
+            </div>
+        </div>
         <div
             id="article-frame"
             class="article__frame"
@@ -56,7 +80,7 @@
                     <p v-html="article.body"></p>
                 </div>
 
-                <hr v-view="endOfArticleReached">
+                <hr v-view="endOfArticle">
 
                 <div
                     class="article__biblio"
@@ -135,9 +159,14 @@ export default class TextArticle extends Vue {
     private startOfArticleFlag: boolean;
     private endOfArticleFlag: boolean;
 
-    private bodyScrollPosition: number;
+    private atPageTop: boolean;
+    private articlePageAtTop: boolean;
 
-    private outlinedHeader: boolean;
+    private lastPercentCenter: number = -1;
+    private maxPercentCenter: number = -1;
+
+    private hideHeadroom: boolean;
+    private scrollSessionFromTop: boolean;
 
     private $route: Route;
 
@@ -153,9 +182,11 @@ export default class TextArticle extends Vue {
         this.startOfArticleFlag = true;
         this.endOfArticleFlag = false;
 
-        this.bodyScrollPosition = 0;
+        this.atPageTop = true;
+        this.articlePageAtTop = false;
 
-        this.outlinedHeader = false;
+        this.hideHeadroom = true;
+        this.scrollSessionFromTop = true;
     }
 
     // When view is mounted, retrieve article
@@ -163,20 +194,36 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
+    // TODO: clean this method up...
     private startOfArticle(e): void {
         if (e.scrollPercent < 0.008) {
             this.startOfArticleFlag = true;
         } else {
             this.startOfArticleFlag = false;
         }
-        if (e.type === 'exit') {
-            this.outlinedHeader = true;
+
+        if (e.scrollPercent === 0) {
+            this.atPageTop = true;
+            this.scrollSessionFromTop = true;
         } else {
-            this.outlinedHeader = false;
+            this.atPageTop = false;
         }
+
+        if (e.type === 'exit') {
+            this.hideHeadroom = false;
+            this.scrollSessionFromTop = false;
+        } else if (e.percentCenter < this.lastPercentCenter) { // Scrolling down
+            this.hideHeadroom = this.scrollSessionFromTop;
+        } else if (e.percentCenter > this.lastPercentCenter) { // Scrolling up
+            // Filler
+        } else {
+            this.scrollSessionFromTop = true;
+        }
+
+        this.lastPercentCenter = e.percentCenter;
     }
 
-    private endOfArticleReached(e): void {
+    private endOfArticle(e): void {
         if (e.percentTop > 0.5) {
             if (e.type === 'enter') {
                 this.endOfArticleFlag = true;
@@ -245,7 +292,10 @@ export default class TextArticle extends Vue {
         position: fixed;
         width: calc(100% - #{$lefterWidth} - 20px);
         height: 16vh;
+        top: 0;
         left: calc(#{$lefterWidth} + 3px) !important;
+        //margin-top: 30px;
+        //margin-left: 30px;
         padding: 30px 0 30px 20px;
 
         z-index: 2;
@@ -254,20 +304,41 @@ export default class TextArticle extends Vue {
         font-weight: normal;
     }
 
+    .article__info--embedded {
+        position: static;
+        z-index: 1;
+        outline: 3px solid transparent;
+        margin-left: 3px;
+
+    }
+
+    .article__info-container--headroom {
+        outline: 3px solid black;
+    }
+
     .article__info-container {
         position: absolute;
         top: 0 !important;
         left: 0;
-        width: calc(100% - 40px);
-        height: calc(100% - 40px);
+        //width: calc(100% - 40px);
+        //height: calc(100% - 40px);
         padding: 20px;
         z-index: -1;
 
         background: white;
     }
 
+    .article__info-container--embedded {
+        margin-left: 3px;
+    }
+
     .article__info-container--outlined {
         outline: 3px solid black;
+    }
+
+    .article__info-container--hidden {
+        transition: opacity 150ms ease;
+        opacity: 0;
     }
 
     .article__subtitle {
@@ -286,8 +357,7 @@ export default class TextArticle extends Vue {
 
     /* ARTICLE CONTENT BELOW TITLES */
     .article__frame {
-        margin-top: 15%;
-        padding: $margin;
+        margin-top: calc(16vh + 90px);
 
         text-align: left;
     }
@@ -370,7 +440,7 @@ export default class TextArticle extends Vue {
     /* HEADROOM */
 
     .headroom {
-        height: calc(16vh + 60px + 3px);
+        height: calc(16vh + 90px + 3px);
     }
     .headroom--pinned {
     }
@@ -383,6 +453,10 @@ export default class TextArticle extends Vue {
     .headroom--bottom {
     }
     .headroom--not-bottom {
+    }
+
+    .headroom--hidden {
+        display: none;
     }
 
     /* TRANSITIONS */
