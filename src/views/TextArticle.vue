@@ -3,34 +3,38 @@
         :v-if="article"
         class="article"
     >
-        <header
-            class="article__info"
-
-            @mouseover="headerHovered = true"
-            @mouseleave="headerHovered = false"
+        <vue-headroom
+            :z-index="3"
+            :upTolerance="15"
         >
-            <transition name="header-slide">
-                <div
-                    v-show="headerHovered || startOfArticleFlag"
-                    class="article__info-container"
-                    :class="{ 'article__info-container--outlined': outlinedHeader }"
-                >
-                    <div>
-                        <h1 class="article__title">
-                            {{ article.title }}
-                        </h1>
-                        <h2 class="article__subtitle">
-                            {{  article.subtitle }}
-                        </h2>
+            <header
+                class="article__info"
+
+                @mouseover="headerHovered = true"
+                @mouseleave="headerHovered = false"
+            >
+                <transition name="header-slide">
+                    <div
+                        class="article__info-container"
+                        :class="{ 'article__info-container--outlined': outlinedHeader }"
+                    >
+                        <div>
+                            <h1 class="article__title">
+                                {{ article.title }}
+                            </h1>
+                            <h2 class="article__subtitle">
+                                {{  article.subtitle }}
+                            </h2>
+                        </div>
+                        <h3 class="article__author">
+                            <em>
+                                {{ article.author.firstName }} {{ article.author.lastName }}
+                            </em>
+                        </h3>
                     </div>
-                    <h3 class="article__author">
-                        <em>
-                            {{ article.author.firstName }} {{ article.author.lastName }}
-                        </em>
-                    </h3>
-                </div>
-            </transition>
-        </header>
+                </transition>
+            </header>
+        </vue-headroom>
         <div
             id="article-frame"
             class="article__frame"
@@ -107,13 +111,14 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import APIService from '@/API';
 
 @Component({
     components: {
-
+        headroom,
     },
 })
 
@@ -239,7 +244,8 @@ export default class TextArticle extends Vue {
     .article__info {
         position: fixed;
         width: calc(100% - #{$lefterWidth} - 20px);
-        height: 15vh;
+        height: 16vh;
+        left: calc(#{$lefterWidth} + 3px) !important;
         padding: 30px 0 30px 20px;
 
         z-index: 2;
@@ -257,12 +263,11 @@ export default class TextArticle extends Vue {
         padding: 20px;
         z-index: -1;
 
-        background: transparent;
+        background: white;
     }
 
     .article__info-container--outlined {
         outline: 3px solid black;
-        background: white;
     }
 
     .article__subtitle {
@@ -362,6 +367,24 @@ export default class TextArticle extends Vue {
         text-decoration: underline;
     }
 
+    /* HEADROOM */
+
+    .headroom {
+        height: calc(16vh + 60px + 3px);
+    }
+    .headroom--pinned {
+    }
+    .headroom--unpinned {
+    }
+    .headroom--top {
+    }
+    .headroom--not-top {
+    }
+    .headroom--bottom {
+    }
+    .headroom--not-bottom {
+    }
+
     /* TRANSITIONS */
 
     .header-slide-enter {
@@ -378,16 +401,20 @@ export default class TextArticle extends Vue {
     }
 
     .footer-slide-enter {
-        transform: translateY(calc(6vh + 3px));
+        transform: translate3d(0px, calc(100% + 3px), 0px);
+        //transform: translateY(calc(6vh + 3px));
     }
     .footer-slide-enter-active {
-        transition: all 0.2s ease;
+        transition: all 250ms;
+        //transition: all 0.2s ease;
     }
     .footer-slide-leave-active {
-        transition: all 0.3s ease;
+        transition: all 250ms;
+        //transition: all 0.3s ease;
     }
     .footer-slide-leave-to {
-        transform: translateY(calc(6vh + 3px));
+        transform: translate3d(0px, calc(100% + 3px), 0px);
+        //transform: translateY(calc(6vh + 3px));
     }
 
 

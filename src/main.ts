@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import store from '@/store/index';
 import checkView from 'vue-check-view';
+import headroom from 'vue-headroom';
 import {StoreOptions} from 'vuex';
 import Vuex from 'vuex';
 import {RootState} from '@/types/storeTypes';
@@ -22,6 +23,7 @@ Vue.config.keyCodes = {
 };
 
 Vue.use(checkView);
+Vue.use(headroom);
 
 new Vue({
     router,
