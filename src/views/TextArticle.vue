@@ -5,7 +5,7 @@
     >
         <vue-headroom
             :z-index="3"
-            :upTolerance="15"
+            :upTolerance="8"
 
             :class="{ 'headroom--hidden': hideHeadroom }"
 
@@ -40,7 +40,10 @@
                 <!-- /transition -->
             </header>
         </vue-headroom>
-        <div class="article__info article__info--embedded">
+        <div
+            class="article__info article__info--embedded"
+            :class="{ 'article__info--embedded--hidden': isArticleInfoHidden }"
+        >
             <div
                 class="article__info-container article__info-container--embedded"
             >
@@ -97,26 +100,29 @@
             @mouseleave="footerHovered = false"
         >
             <transition name="footer-slide">
-                <ul
+                <div
                     v-show="footerHovered || endOfArticleFlag || startOfArticleFlag"
-                    role="menubar"
                     class="footer__menu"
                 >
-                    <li>
-                        <a>Test</a>
-                    </li>
-                </ul>
+                    <div
+                            v-if="article.copyright"
+                            class="footer__copyright"
+                    >
+                        <p>
+                            Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
+                            <br>
+                            All rights reserved.
+                        </p>
+                    </div>
+                    <ul
+                        role="menubar"
+                    >
+                        <li>
+                            <a>Test</a>
+                        </li>
+                    </ul>
+                </div>
             </transition>
-            <div
-                v-if="article.copyright"
-                class="footer__copyright"
-            >
-                <p>
-                    Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
-                    <br>
-                    All rights reserved.
-                </p>
-            </div>
 
             <a
                 class="footer__download-button"
@@ -147,6 +153,10 @@ import APIService from '@/API';
 })
 
 export default class TextArticle extends Vue {
+    // TODO: clean up headroom visibility
+    // TODO: clean up footer and header css
+    // TODO: consider creating a footer (and maybe header) component?
+
     @Prop() private mainTitleOffScreen: boolean;
 
     private articleLoading: boolean;
@@ -194,6 +204,14 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
+    get isArticleInfoHidden() {
+        if (this.atPageTop || this.hideHeadroom) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     // TODO: clean this method up...
     private startOfArticle(e): void {
         if (e.scrollPercent < 0.008) {
@@ -202,7 +220,7 @@ export default class TextArticle extends Vue {
             this.startOfArticleFlag = false;
         }
 
-        if (e.scrollPercent === 0) {
+        if (e.percentCenter === this.maxPercentCenter) {
             this.atPageTop = true;
             this.scrollSessionFromTop = true;
         } else {
@@ -221,6 +239,9 @@ export default class TextArticle extends Vue {
         }
 
         this.lastPercentCenter = e.percentCenter;
+        if (this.lastPercentCenter > this.maxPercentCenter) {
+            this.maxPercentCenter = this.lastPercentCenter;
+        }
     }
 
     private endOfArticle(e): void {
@@ -290,13 +311,13 @@ export default class TextArticle extends Vue {
 
     .article__info {
         position: fixed;
-        width: calc(100% - #{$lefterWidth} - 20px);
-        height: 16vh;
+        //width: calc(100% - #{$lefterWidth} - 20px);
+        height: $lefterWidth;
         top: 0;
         left: calc(#{$lefterWidth} + 3px) !important;
         //margin-top: 30px;
-        //margin-left: 30px;
-        padding: 30px 0 30px 20px;
+        margin-left: 30px;
+        //padding: 30px 0 30px 20px;
 
         z-index: 2;
 
@@ -308,24 +329,30 @@ export default class TextArticle extends Vue {
         position: static;
         z-index: 1;
         outline: 3px solid transparent;
-        margin-left: 3px;
-
     }
 
-    .article__info-container--headroom {
-        outline: 3px solid black;
+    .article__info--embedded--hidden {
+        visibility: hidden;
     }
 
     .article__info-container {
-        position: absolute;
-        top: 0 !important;
-        left: 0;
+        //position: absolute;
+        //top: 0 !important;
         //width: calc(100% - 40px);
         //height: calc(100% - 40px);
+        top: 50%;
+        position: relative;
+        transform: translateY(-50%);
+        left: 0;
         padding: 20px;
         z-index: -1;
 
         background: white;
+    }
+
+    .article__info-container--headroom {
+        //outline: 3px solid black;
+        box-shadow: 8px 8px 10px 2px #00000029;
     }
 
     .article__info-container--embedded {
@@ -339,6 +366,7 @@ export default class TextArticle extends Vue {
     .article__info-container--hidden {
         transition: opacity 150ms ease;
         opacity: 0;
+        background: transparent;
     }
 
     .article__subtitle {
@@ -357,7 +385,7 @@ export default class TextArticle extends Vue {
 
     /* ARTICLE CONTENT BELOW TITLES */
     .article__frame {
-        margin-top: calc(16vh + 90px);
+        margin-top: calc(240px * 0.5);
 
         text-align: left;
     }
@@ -416,6 +444,9 @@ export default class TextArticle extends Vue {
     }
 
     .footer__copyright p {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
         margin: 0;
 
         font-size: 12px;
@@ -429,12 +460,18 @@ export default class TextArticle extends Vue {
         top: 0;
         bottom: 0;
         height: 5vh;
+        margin: auto;
         //margin: auto 15px 10px auto;
-        padding: 5px 8px;
+        padding: 0.5em 0.8em;
 
         color: #1b4eff;
 
+        font-size: 1.2em;
         text-decoration: underline;
+    }
+
+    .footer__download-button * {
+        line-height: 5vh; // Same as parent
     }
 
     /* HEADROOM */
