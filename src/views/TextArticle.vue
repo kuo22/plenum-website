@@ -40,6 +40,9 @@
                 <!-- /transition -->
             </header>
         </vue-headroom>
+        <article-navigation
+            :allVisible="articleNavigationVisible"
+        ></article-navigation>
         <div class="article__header">
             <div
                 class="article__info article__info--embedded"
@@ -101,30 +104,16 @@
             @mouseover="footerHovered = true"
             @mouseleave="footerHovered = false"
         >
-            <transition name="footer-slide">
-                <div
-                    v-show="footerHovered || endOfArticleFlag || startOfArticleFlag"
-                    class="footer__menu"
-                >
-                    <div
-                            v-if="article.copyright"
-                            class="footer__copyright"
-                    >
-                        <p>
-                            Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
-                            <br>
-                            All rights reserved.
-                        </p>
-                    </div>
-                    <ul
-                        role="menubar"
-                    >
-                        <li>
-                            <a>Test</a>
-                        </li>
-                    </ul>
-                </div>
-            </transition>
+            <div
+                    v-if="article.copyright"
+                    class="footer__copyright"
+            >
+                <p>
+                    Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
+                    <br>
+                    All rights reserved.
+                </p>
+            </div>
 
             <a
                 class="footer__download-button"
@@ -147,10 +136,12 @@ import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import APIService from '@/API';
+import ArticleNavigation from '@/components/ArticleNavigation';
 
 @Component({
     components: {
         headroom,
+        ArticleNavigation,
     },
 })
 
@@ -161,6 +152,10 @@ export default class TextArticle extends Vue {
 
     @Prop() private mainTitleOffScreen: boolean;
 
+    // Children props
+    private articleNavigationVisible: boolean = false;
+
+    // Internal data
     private articleLoading: boolean;
     private article: Article;
     private articleError: boolean;
@@ -432,7 +427,7 @@ export default class TextArticle extends Vue {
         bottom: 0;
         width: calc(100% - calc(#{$lefterWidth}));
         height: 6vh;
-        z-index: 2;
+        z-index: 3;
     }
 
     .footer__menu {
