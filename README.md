@@ -11,7 +11,7 @@
 5. Other
 
 ##### Files Todo
-* [x] components/
+* [] components/
   * [x] MainMenuFlyOutSectionsPreviews.vue
   * [x] TableOfContents.vue
   * [x] ArticlePreviews.vue
@@ -20,8 +20,9 @@
   * [x] TheMainMenu.vue
   * [x] TheNavBar.vue
   * [x] TheLogo.vue
-* [x] views/*
-  * [x] TextArticle.vue
+  * [] ArticleNavigation.vue
+* [] views/*
+  * [] TextArticle.vue
 * [x] App.vue
 
 ######Organize CSS Resources
@@ -36,7 +37,9 @@ ___
 
 ##### Files Todo
 * [] components/*
+    * [] ArticleNavigation
 * [] views/*
+    * [] TextArticle
 * [] App.vue
 
 ###### Restructuring Resources
@@ -93,6 +96,7 @@ ___
 
 #### Responsiveness
 Design drafts for portable devices before implementing
+* [] Text article headroom breaks on some window resizes
 * [] Add min-height to main menu and navbar
 * [] Add width-change points
 * [] [Implement this method to scale fonts?](https://forum.vuejs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
