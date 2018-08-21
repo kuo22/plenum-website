@@ -299,7 +299,7 @@ export default class TextArticle extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $pageWidth: calc(50vw);
+    $pageWidth: 50vw;
     $margin: calc(#{$pageWidth} / 8.5);
     $lefterWidth: 240px;
     $borderWidth: 3px;
@@ -406,7 +406,8 @@ export default class TextArticle extends Vue {
     }
 
     .article__page {
-        width: $pageWidth;
+        width: calc(#{$pageWidth} - 10vw);
+        padding: 5vw;
         margin: 0 auto $margin auto;
 
         box-shadow: 3px 3px 8px 1px #d5d5d5;
