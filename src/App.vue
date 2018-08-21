@@ -174,7 +174,7 @@ export default class App extends Vue {
     }
 
     #app {
-        width: 100vw;
+        width: 99vw; // 100vw adds a scroll bar to the bottom of page
         height: 100vh;
 
         color: #2c3e50;
