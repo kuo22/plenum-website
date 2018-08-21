@@ -222,7 +222,7 @@ export default class App extends Vue {
         width: calc(100% - #{$lefterWidth});
         height: 100vh;
         right: 0;
-        bottom: 0;
+        top: 0;
 
         overflow-x: hidden;
     }

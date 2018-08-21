@@ -103,6 +103,7 @@ export default class TheNavBar extends Vue {
 
     .navbar__about p {
         vertical-align: middle;
+        margin: 1em 0;
         font-size: 15.41px; // TODO: make responsive?
         text-align: left;
         line-height: 20px;
