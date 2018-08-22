@@ -3,24 +3,20 @@
         class="title-card__container"
         :class="{ 'title-card__container--hidden': hideTitleCard }"
     >
-        <div>
-            <h1 class="title-card__title">
-                {{ article.title }}
-            </h1>
-            <h2 class="title-card__subtitle">
-                {{  article.subtitle }}
-            </h2>
-        </div>
+        <h1 class="title-card__title">
+            {{ article.title }}
+        </h1>
+        <h2 class="title-card__subtitle">
+            {{  article.subtitle }}
+        </h2>
         <h3 class="title-card__author">
-            <em>
-                {{ article.author.firstName }} {{ article.author.lastName }}
-            </em>
+            {{ article.author.firstName }} {{ article.author.lastName }}
         </h3>
     </div >
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
     import { Route } from 'vue-router';
     import { Article } from '@/types/types';
 
@@ -52,12 +48,13 @@
         left: 0;
         //top: 50%;
         //transform: translateY(-50%);
+        max-width: 50vw;
         padding: 20px;
         z-index: -1;
 
-        background: white;
-
         box-shadow: 8px 8px 10px 2px #00000029;
+
+        background: white;
 
         text-align: left;
     }
@@ -77,12 +74,15 @@
     }
 
     .title-card__subtitle {
-        text-align: left;
         margin-left: 30px;
+        \
+        text-align: left;
     }
 
     .title-card__author {
-        text-align: left;
         margin-top: 15px;
+
+        font-style: italic;
+        text-align: left;
     }
 </style>

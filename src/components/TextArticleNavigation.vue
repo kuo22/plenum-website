@@ -5,21 +5,23 @@
     >
         <li
             class="nav__menu-item nav__menu-item--back"
-            :class="{ 'nav__menu-item--hovered': backHovered || allVisible }"
+            :class="{ 'nav__menu-item--visible': backHovered || focusedIndex === 0 || allVisible }"
             @mouseover="backHovered = true"
             @mouseleave="backHovered = false"
         >
             <a
-
+                tabindex="0"
+                @focus="focusedIndex = 0"
+                @blur="focusedIndex = -1"
             >
                 <img
                     src="../assets/nav/left-arrow.svg"
-                    @mouseover="backArrowHovered = true"
-                    @mouseleave="backArrowHovered = false"
+                    @mouseover="navArrowHovered('back')"
+                    @mouseleave="navArrowUnhovered('back')"
                 />
                 <transition name="title-card-fade">
                     <text-article-title-card
-                            v-show="backArrowHovered"
+                            v-show="backArrowHovered || focusedIndex === 0"
                             role="presentation"
                             :hideTitleCard="false"
                             :article="previousArticle"
@@ -29,16 +31,17 @@
         </li>
         <li
             class="nav__menu-item nav__menu-item--forward"
-            :class="{ 'nav__menu-item--hovered': forwardHovered || allVisible }"
+            :class="{ 'nav__menu-item--visible': forwardHovered || focusedIndex === 1 || allVisible }"
             @mouseover="forwardHovered = true"
             @mouseleave="forwardHovered = false"
         >
             <a
-
+                @focus="focusedIndex = 1"
+                @blur="focusedIndex = -1"
             >
                 <transition name="title-card-fade">
                     <text-article-title-card
-                            v-show="forwardArrowHovered"
+                            v-show="forwardArrowHovered || focusedIndex === 1"
                             class="nav__title-card--forward"
                             role="presentation"
                             :hideTitleCard="false"
@@ -47,8 +50,8 @@
                 </transition>
                 <img
                     src="../assets/nav/right-arrow.svg"
-                    @mouseover="forwardArrowHovered = true"
-                    @mouseleave="forwardArrowHovered = false"
+                    @mouseover="navArrowHovered('forward')"
+                    @mouseleave="navArrowUnhovered('forward')"
                 />
             </a>
         </li>
@@ -57,11 +60,11 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
-    import { Route } from 'vue-router';
-    import { Article } from '@/types/types';
-    import TextArticleTitleCard from '@/components/TextArticleTitleCard';
+import { Route } from 'vue-router';
+import { Article } from '@/types/types';
+import TextArticleTitleCard from '@/components/TextArticleTitleCard';
 
-    @Component({
+@Component({
     components: {
         TextArticleTitleCard,
     },
@@ -71,6 +74,8 @@ export default class TextArticleNavigation extends Vue {
     @Prop() private allVisible!: boolean;
     @Prop() private previousArticle!: Article;
     @Prop() private nextArticle!: Article;
+
+    private focusedIndex: number;
 
     private backHovered: boolean;
     private forwardHovered: boolean;
@@ -83,6 +88,8 @@ export default class TextArticleNavigation extends Vue {
     constructor() {
         super();
 
+        this.focusedIndex = -1;
+
         this.backHovered = false;
         this.forwardHovered = false;
 
@@ -93,6 +100,25 @@ export default class TextArticleNavigation extends Vue {
     // When view is mounted, retrieve article
     public created() {
         // Filler
+    }
+
+    @Emit('navArrowHovered')
+    private navArrowHovered(direction: string): void {
+        if (direction === 'back') {
+            this.backArrowHovered = true;
+        } else if (direction === 'forward') {
+            this.forwardArrowHovered = true;
+        }
+        // Filler
+    }
+
+    @Emit('navArrowUnhovered')
+    private navArrowUnhovered(direction: string): void {
+        if (direction === 'back') {
+            this.backArrowHovered = false;
+        } else if (direction === 'forward') {
+            this.forwardArrowHovered = false;
+        }
     }
 
     // @Emit('navArrowHovered')
@@ -153,7 +179,7 @@ export default class TextArticleNavigation extends Vue {
         cursor: pointer;
     }
 
-    .nav__menu-item--hovered a {
+    .nav__menu-item--visible a {
         opacity: 1;
         transition: opacity 250ms ease;
 
@@ -161,10 +187,12 @@ export default class TextArticleNavigation extends Vue {
 
     .nav__menu-item--back {
         left: calc(240px + 3px);
+        padding-right: calc((100vw - 243px - 50vw) / 4);
     }
 
     .nav__menu-item--forward {
         right: 0;
+        padding-left: calc((100vw - 243px - 50vw) / 4);
     }
 
     .nav__title-card--forward {

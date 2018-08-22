@@ -3,45 +3,50 @@
         :v-show="article !== null"
         class="article"
     >
-        <vue-headroom
-            :z-index="3"
-            :upTolerance="8"
+        <transition name="header-title-fade">
+            <vue-headroom
+                v-show="!navArrowHovered"
+                :z-index="3"
+                :upTolerance="8"
 
-            :class="{ 'headroom--hidden': hideHeadroom }"
+                :class="{ 'headroom--hidden': hideHeadroom }"
 
-            @onTop="isAtPageTop = true"
-        >
-            <header
-                class="article__info article__info--headroom"
-
-                @mouseover="headerHovered = true"
-                @mouseleave="headerHovered = false"
+                @onTop="isAtPageTop = true"
             >
-                <div
-                    class="article__info-container article__info-container--headroom"
-                    :class="{ 'article__info-container--hidden': isAtPageTop || scrollSessionFromTop }"
+                <header
+                    class="article__info article__info--headroom"
+
+                    @mouseover="headerHovered = true"
+                    @mouseleave="headerHovered = false"
                 >
-                    <div>
-                        <h1 class="article__title">
-                            {{ article.title }}
-                        </h1>
-                        <h2 class="article__subtitle">
-                            {{  article.subtitle }}
-                        </h2>
-                    </div>
-                    <h3 class="article__author">
-                        <em>
-                            {{ article.author.firstName }} {{ article.author.lastName }}
-                        </em>
-                    </h3>
-                </div >
-            </header>
-        </vue-headroom>
+                    <div
+                        class="article__info-container article__info-container--headroom"
+                        :class="{ 'article__info-container--hidden': isAtPageTop || scrollSessionFromTop }"
+                    >
+                        <div>
+                            <h1 class="article__title">
+                                {{ article.title }}
+                            </h1>
+                            <h2 class="article__subtitle">
+                                {{  article.subtitle }}
+                            </h2>
+                        </div>
+                        <h3 class="article__author">
+                            <em>
+                                {{ article.author.firstName }} {{ article.author.lastName }}
+                            </em>
+                        </h3>
+                    </div >
+                </header>
+            </vue-headroom>
+        </transition>
 
         <text-article-navigation
             :allVisible="isNavExposed"
             :previousArticle="article"
             :nextArticle="article"
+            @navArrowHovered="navArrowHovered = true"
+            @navArrowUnhovered="navArrowHovered = false"
         ></text-article-navigation>
 
         <div class="article__header">
@@ -49,23 +54,26 @@
                 class="article__info article__info--embedded"
                 :class="{ 'article__info--embedded--hidden': hideArticleContents }"
             >
-                <div
-                    class="article__info-container article__info-container--embedded"
-                >
-                    <div>
-                        <h1 class="article__title">
-                            {{ article.title }}
-                        </h1>
-                        <h2 class="article__subtitle">
-                            {{  article.subtitle }}
-                        </h2>
+                <transition name="header-title-fade">
+                    <div
+                        v-show="!navArrowHovered"
+                        class="article__info-container article__info-container--embedded"
+                    >
+                        <div>
+                            <h1 class="article__title">
+                                {{ article.title }}
+                            </h1>
+                            <h2 class="article__subtitle">
+                                {{  article.subtitle }}
+                            </h2>
+                        </div>
+                        <h3 class="article__author">
+                            <em>
+                                {{ article.author.firstName }} {{ article.author.lastName }}
+                            </em>
+                        </h3>
                     </div>
-                    <h3 class="article__author">
-                        <em>
-                            {{ article.author.firstName }} {{ article.author.lastName }}
-                        </em>
-                    </h3>
-                </div>
+                </transition>
             </div>
         </div>
         <div
@@ -154,6 +162,7 @@ export default class TextArticle extends Vue {
     @Prop() private mainTitleOffScreen: boolean;
 
     // Children props
+    private navArrowHovered: boolean;
 
     // Internal data
     private articleLoading: boolean;
@@ -177,6 +186,9 @@ export default class TextArticle extends Vue {
 
     constructor() {
         super();
+
+        this.navArrowHovered = false;
+
         this.articleLoading = false;
         this.article = null;
         this.articleError = null;
@@ -340,6 +352,7 @@ export default class TextArticle extends Vue {
         left: 0;
         top: 50%;
         transform: translateY(-50%);
+        max-width: 50vw;
         padding: 20px;
         z-index: -1;
 
@@ -521,6 +534,25 @@ export default class TextArticle extends Vue {
     }
     .footer-slide-leave-to {
         transform: translate3d(0px, calc(100% + 3px), 0px);
+    }
+
+    .header-title-fade-enter {
+        opacity: 0;
+    }
+    .header-title-fade-enter-active {
+        transition: opacity 150ms ease;
+    }
+    .header-title-fade-enter-to {
+        opacity: 1;
+    }
+    .header-title-fade-leave {
+        opacity: 1;
+    }
+    .header-title-fade-leave-active {
+        transition: opacity 250ms ease;
+    }
+    .header-title-fade-leave-to {
+        opacity: 0;
     }
 
 

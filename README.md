@@ -60,9 +60,7 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
 * [] Decide if it is necessary to remove tabindex in vue structure
         https://www.w3.org/TR/WCAG20-TECHS/F44.html
 * [] Add arrow key controls [example](https://forum.vuejs.org/t/navigate-through-list-using-arrowkeys/30689)
-* [x] Fix focus container size for main menu items
-* [x] Fix focusability on main menu elements
-* [x] Focusability on logo
+* [] [Add breadcrumbs navigation for content pages?](https://www.w3.org/TR/wai-aria-practices/examples/breadcrumb/index.html)
 
 * [] [Parent menus should control the focus of submenus](http://accessibility.athena-ict.com/aria/tests/menus.shtml)
   * Find a way to check if focus is being managed? Idk why, for testing?

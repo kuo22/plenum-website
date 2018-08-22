@@ -7,8 +7,20 @@
 		clip-path:url(#SVGID_2_);
 		fill:none;
 		stroke:#231F20;
-		stroke-width:3;
+		stroke-width:3px;
 	}
+	/*.nav__arrow {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+		animation: dash 5s linear forwards;
+    }
+
+	@keyframes dash {
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+	*/
 </style>
 <g>
 	<polyline
