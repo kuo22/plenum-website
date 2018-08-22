@@ -9,7 +9,7 @@
 
             :class="{ 'headroom--hidden': hideHeadroom }"
 
-            @onTop="atPageTop = true"
+            @onTop="isAtPageTop = true"
         >
             <header
                 class="article__info article__info--headroom"
@@ -19,7 +19,7 @@
             >
                 <div
                     class="article__info-container article__info-container--headroom"
-                    :class="{ 'article__info-container--hidden': atPageTop || scrollSessionFromTop }"
+                    :class="{ 'article__info-container--hidden': isAtPageTop || scrollSessionFromTop }"
                 >
                     <div>
                         <h1 class="article__title">
@@ -38,9 +38,11 @@
             </header>
         </vue-headroom>
 
-        <article-navigation
+        <text-article-navigation
             :allVisible="isNavExposed"
-        ></article-navigation>
+            :previousArticle="article"
+            :nextArticle="article"
+        ></text-article-navigation>
 
         <div class="article__header">
             <div
@@ -135,12 +137,12 @@ import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import APIService from '@/API';
-import ArticleNavigation from '@/components/ArticleNavigation';
+import TextArticleNavigation from '@/components/TextArticleNavigation';
 
 @Component({
     components: {
         headroom,
-        ArticleNavigation,
+        TextArticleNavigation,
     },
 })
 
@@ -161,14 +163,12 @@ export default class TextArticle extends Vue {
     private headerHovered: boolean;
     private footerHovered: boolean;
 
-    private startOfArticleFlag: boolean;
-    private endOfArticleFlag: boolean;
-
-    private atPageTop: boolean;
+    private isAtPageTop: boolean;
     private inStartThreshold: boolean;
+    private isNearPageBottom: boolean;
 
-    private lastPercentCenter: number = -1;
-    private maxPercentCenter: number = -1;
+    private lastPercentCenter: number;
+    private maxPercentCenter: number;
 
     private hideHeadroom: boolean;
     private scrollSessionFromTop: boolean;
@@ -184,11 +184,12 @@ export default class TextArticle extends Vue {
         this.headerHovered = false;
         this.footerHovered = false;
 
-        this.startOfArticleFlag = true;
-        this.endOfArticleFlag = false;
-
-        this.atPageTop = true;
+        this.isAtPageTop = true;
         this.inStartThreshold = true;
+        this.isNearPageBottom = false;
+
+        this.lastPercentCenter = -1;
+        this.maxPercentCenter = this.lastPercentCenter;
 
         this.hideHeadroom = true;
         this.scrollSessionFromTop = true;
@@ -201,11 +202,12 @@ export default class TextArticle extends Vue {
 
     //
     get hideArticleContents() {
-        return !(this.atPageTop || this.hideHeadroom);
+        return !(this.isAtPageTop || this.hideHeadroom);
     }
 
     get isNavExposed() {
-        return this.atPageTop || this.hideHeadroom;
+        // this.isAtPageTop || this.hideHeadroom ||
+        return this.isNearPageBottom;
     }
 
     @Watch('$route')
@@ -215,15 +217,12 @@ export default class TextArticle extends Vue {
 
     //
     private onEarlyScroll(e): void {
-        this.startOfArticleFlag = e.scrollPercent < 0.008;
-
-
         // If at top of page
         if (e.percentCenter === this.maxPercentCenter) {
-            this.atPageTop = true;
+            this.isAtPageTop = true;
             this.scrollSessionFromTop = true;
         } else {
-            this.atPageTop = false;
+            this.isAtPageTop = false;
         }
 
         // Set whether or not the headroom should be hidden
@@ -248,9 +247,9 @@ export default class TextArticle extends Vue {
     private onPresenceOfBiblio(e): void {
         if (e.percentTop > 0.5) {
             if (e.type === 'enter') {
-                this.endOfArticleFlag = true;
+                this.isNearPageBottom = true;
             } else if (e.type === 'exit') {
-                this.endOfArticleFlag = false;
+                this.isNearPageBottom = false;
             }
         }
     }

@@ -10,7 +10,7 @@
             class="article-preview-card"
         >
             <div class="article-preview-card__paper">
-                <article-title-card :article="article"></article-title-card>
+                <article-previews-title-card :article="article"></article-previews-title-card>
 
                 <h3 class="article-preview-card__abstract-title">ABSTRACT</h3>
                 <p
@@ -26,18 +26,18 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import ArticleTitleCard from '@/components/ArticleTitleCard';
+import ArticlePreviewsTitleCard from '@/components/ArticlePreviewsTitleCard';
 import {SubmenuLink} from '../classes/SubmenuLink';
 import {Article} from '../types/types';
 
 @Component({
     components: {
-        ArticleTitleCard,
+        ArticlePreviewsTitleCard,
     },
 })
 
 // Submenu associated with a unique main menu entry
-export default class ArticlePreview extends Vue {
+export default class ArticlePreviews extends Vue {
     @Prop({ type: Array < Article > [] })
     private articles!: Article[];
 

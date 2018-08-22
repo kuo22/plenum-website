@@ -22,7 +22,7 @@ import {Article} from '../types/types';
 })
 
 // Submenu associated with a unique main menu entry
-export default class ArticleTitleCard extends Vue {
+export default class ArticlePreviewsTitleCard extends Vue {
     @Prop() private article: Article;
 
     constructor() {
