@@ -10,7 +10,6 @@
             :class="{ 'headroom--hidden': hideHeadroom }"
 
             @onTop="atPageTop = true"
-            @onNotTop="atPageTop = false"
         >
             <header
                 class="article__info article__info--headroom"
@@ -18,35 +17,35 @@
                 @mouseover="headerHovered = true"
                 @mouseleave="headerHovered = false"
             >
-                <!--transition name="header-slide" -->
-                    <div
-                        class="article__info-container article__info-container--headroom"
-                        :class="{ 'article__info-container--hidden': atPageTop }"
-                    >
-                        <div>
-                            <h1 class="article__title">
-                                {{ article.title }}
-                            </h1>
-                            <h2 class="article__subtitle">
-                                {{  article.subtitle }}
-                            </h2>
-                        </div>
-                        <h3 class="article__author">
-                            <em>
-                                {{ article.author.firstName }} {{ article.author.lastName }}
-                            </em>
-                        </h3>
-                    </div >
-                <!-- /transition -->
+                <div
+                    class="article__info-container article__info-container--headroom"
+                    :class="{ 'article__info-container--hidden': atPageTop || scrollSessionFromTop }"
+                >
+                    <div>
+                        <h1 class="article__title">
+                            {{ article.title }}
+                        </h1>
+                        <h2 class="article__subtitle">
+                            {{  article.subtitle }}
+                        </h2>
+                    </div>
+                    <h3 class="article__author">
+                        <em>
+                            {{ article.author.firstName }} {{ article.author.lastName }}
+                        </em>
+                    </h3>
+                </div >
             </header>
         </vue-headroom>
+
         <article-navigation
-            :allVisible="articleNavigationVisible"
+            :allVisible="isNavExposed"
         ></article-navigation>
+
         <div class="article__header">
             <div
                 class="article__info article__info--embedded"
-                :class="{ 'article__info--embedded--hidden': isArticleInfoHidden }"
+                :class="{ 'article__info--embedded--hidden': hideArticleContents }"
             >
                 <div
                     class="article__info-container article__info-container--embedded"
@@ -72,7 +71,7 @@
             class="article__frame"
         >
             <div
-                v-view="startOfArticle"
+                v-view="onEarlyScroll"
                 class="article__page"
             >
                 <div class="article__abstract">
@@ -88,7 +87,7 @@
                     <p v-html="article.body"></p>
                 </div>
 
-                <hr v-view="endOfArticle">
+                <hr v-view="onPresenceOfBiblio">
 
                 <div
                     class="article__biblio"
@@ -153,7 +152,6 @@ export default class TextArticle extends Vue {
     @Prop() private mainTitleOffScreen: boolean;
 
     // Children props
-    private articleNavigationVisible: boolean = false;
 
     // Internal data
     private articleLoading: boolean;
@@ -167,7 +165,7 @@ export default class TextArticle extends Vue {
     private endOfArticleFlag: boolean;
 
     private atPageTop: boolean;
-    private articlePageAtTop: boolean;
+    private inStartThreshold: boolean;
 
     private lastPercentCenter: number = -1;
     private maxPercentCenter: number = -1;
@@ -190,7 +188,7 @@ export default class TextArticle extends Vue {
         this.endOfArticleFlag = false;
 
         this.atPageTop = true;
-        this.articlePageAtTop = false;
+        this.inStartThreshold = true;
 
         this.hideHeadroom = true;
         this.scrollSessionFromTop = true;
@@ -201,22 +199,26 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
-    get isArticleInfoHidden() {
-        if (this.atPageTop || this.hideHeadroom) {
-            return false;
-        } else {
-            return true;
-        }
+    //
+    get hideArticleContents() {
+        return !(this.atPageTop || this.hideHeadroom);
     }
 
-    // TODO: clean this method up...
-    private startOfArticle(e): void {
-        if (e.scrollPercent < 0.008) {
-            this.startOfArticleFlag = true;
-        } else {
-            this.startOfArticleFlag = false;
-        }
+    get isNavExposed() {
+        return this.atPageTop || this.hideHeadroom;
+    }
 
+    @Watch('$route')
+    private onRouteChanged(val, oldVal) {
+        this.fetchArticle();
+    }
+
+    //
+    private onEarlyScroll(e): void {
+        this.startOfArticleFlag = e.scrollPercent < 0.008;
+
+
+        // If at top of page
         if (e.percentCenter === this.maxPercentCenter) {
             this.atPageTop = true;
             this.scrollSessionFromTop = true;
@@ -224,6 +226,7 @@ export default class TextArticle extends Vue {
             this.atPageTop = false;
         }
 
+        // Set whether or not the headroom should be hidden
         if (e.type === 'exit') {
             this.hideHeadroom = false;
             this.scrollSessionFromTop = false;
@@ -241,7 +244,8 @@ export default class TextArticle extends Vue {
         }
     }
 
-    private endOfArticle(e): void {
+    //
+    private onPresenceOfBiblio(e): void {
         if (e.percentTop > 0.5) {
             if (e.type === 'enter') {
                 this.endOfArticleFlag = true;
@@ -249,11 +253,6 @@ export default class TextArticle extends Vue {
                 this.endOfArticleFlag = false;
             }
         }
-    }
-
-    @Watch('$route')
-    private onRouteChanged(val, oldVal) {
-        this.fetchArticle();
     }
 
     //
@@ -308,19 +307,16 @@ export default class TextArticle extends Vue {
 
     .article__header {
         position: relative;
-        height: $lefterWidth;
         width: 100%;
+        height: $lefterWidth;
     }
 
     .article__info {
         position: fixed;
-        //width: calc(100% - #{$lefterWidth} - 20px);
-        height: $lefterWidth;
         top: 0;
         left: calc(#{$lefterWidth} + 3px);
-        //margin-top: 30px;
+        height: $lefterWidth;
         margin-left: 30px;
-        //padding: 30px 0 30px 20px;
 
         z-index: 2;
 
@@ -329,7 +325,6 @@ export default class TextArticle extends Vue {
     }
 
     .article__info--embedded {
-        //position: static;
         position: relative;
         left: 0;
         height: 240px;
@@ -342,14 +337,10 @@ export default class TextArticle extends Vue {
     }
 
     .article__info-container {
-        //position: absolute;
-        //top: 0 !important;
-        //width: calc(100% - 40px);
-        //height: calc(100% - 40px);
-        top: 50%;
         position: relative;
-        transform: translateY(-50%);
         left: 0;
+        top: 50%;
+        transform: translateY(-50%);
         padding: 20px;
         z-index: -1;
 
@@ -357,7 +348,6 @@ export default class TextArticle extends Vue {
     }
 
     .article__info-container--headroom {
-        //outline: 3px solid black;
         box-shadow: 8px 8px 10px 2px #00000029;
     }
 
@@ -370,9 +360,10 @@ export default class TextArticle extends Vue {
     }
 
     .article__info-container--hidden {
-        transition: opacity 150ms ease;
-        opacity: 0;
         background: transparent;
+
+        opacity: 0;
+        transition: opacity 150ms ease;
     }
 
     .article__info-container--hidden * {
@@ -432,8 +423,8 @@ export default class TextArticle extends Vue {
 
     .footer__menu {
         position: absolute;
-        bottom: 0 !important;
         left: 0;
+        bottom: 0 !important;
         width: calc(100% - 2 * 10vw);
         height: 100%;
         padding: 0 10vw;
@@ -446,12 +437,11 @@ export default class TextArticle extends Vue {
 
     .footer__copyright {
         position: absolute;
+        left: 0;
         top: 0;
         bottom: 0;
-        left: 0;
         height: 5vh;
-        margin: auto;
-        margin-left: calc(3px + 3px);
+        margin: auto auto auto calc(3px + 3px);
     }
 
     .footer__copyright p {
@@ -472,7 +462,6 @@ export default class TextArticle extends Vue {
         bottom: 0;
         height: 5vh;
         margin: auto;
-        //margin: auto 15px 10px auto;
         padding: 0.5em 0.8em;
 
         color: #1b4eff;
@@ -488,7 +477,6 @@ export default class TextArticle extends Vue {
     /* HEADROOM */
 
     .headroom {
-        //height: calc(16vh + 90px + 3px);
         height: 240px;
     }
     .headroom--pinned {
@@ -525,27 +513,23 @@ export default class TextArticle extends Vue {
 
     .footer-slide-enter {
         transform: translate3d(0px, calc(100% + 3px), 0px);
-        //transform: translateY(calc(6vh + 3px));
     }
     .footer-slide-enter-active {
         transition: all 250ms;
-        //transition: all 0.2s ease;
     }
     .footer-slide-leave-active {
         transition: all 250ms;
-        //transition: all 0.3s ease;
     }
     .footer-slide-leave-to {
         transform: translate3d(0px, calc(100% + 3px), 0px);
-        //transform: translateY(calc(6vh + 3px));
     }
 
 
     /* STYLING FOR INSERTED HTML FROM DRUPAL */
 
     h4 {
-        font-size: 19px;
         margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+        font-size: 19px;
     }
 
     h5 {

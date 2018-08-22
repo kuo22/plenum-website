@@ -93,7 +93,7 @@ export default class ArticleNavigation extends Vue {
 
     .nav__menu-item--hovered a {
         opacity: 1;
-        transition: opacity 150ms ease;
+        transition: opacity 350ms ease;
 
     }
 
@@ -108,10 +108,11 @@ export default class ArticleNavigation extends Vue {
     .nav__menu-item a img {
         position: relative;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-31%);
         height: auto;
         width: auto;
-        max-height: 100%;
+        max-height: 60%;
+        min-height: 240px;
         max-width: 100%;
     }
 </style>
