@@ -4,62 +4,49 @@
         role="menu"
     >
         <li
-            class="nav__menu-item nav__menu-item--back"
-            :class="{ 'nav__menu-item--visible': backHovered || focusedIndex === 0 || allVisible }"
-            @mouseover="backHovered = true"
-            @mouseleave="backHovered = false"
+            v-for="(navButton, index) in navButtons"
+            class="nav__menu-item"
+
+            :class="{
+                'nav__menu-item--visible': navButton.hovered || focusedIndex === index || allVisible,
+                'nav__menu-item--previous': navButton.direction === 'previous',
+                'nav__menu-item--forward': navButton.direction === 'forward',
+            }"
+
+            @mouseover="navButton.hovered = true"
+            @mouseleave="navButton.hovered = false"
         >
             <a
-                tabindex="0"
-                @focus="focusedIndex = 0"
+                :tabindex="index === 0 ? 0 : -1"
+                @focus="focusedIndex = index"
                 @blur="focusedIndex = -1"
             >
                 <img
-                    src="../assets/nav/left-arrow.svg"
-                    @mouseover="navArrowHovered('back')"
-                    @mouseleave="navArrowUnhovered('back')"
+                    :src="getImageSource(navButton.direction)"
+                    :style="{ order: index }"
+
+                    @mouseover="navArrowHovered(index)"
+                    @mouseleave="navArrowUnhovered(index)"
                 />
                 <transition name="title-card-fade">
                     <text-article-title-card
-                            v-show="backArrowHovered || focusedIndex === 0"
-                            role="presentation"
-                            :hideTitleCard="false"
-                            :article="previousArticle"
+                        v-show="navButton.arrowHovered || focusedIndex === index"
+                        role="presentation"
+
+                        :title="navButton.article.title"
+                        :subtitle="navButton.article.subtitle"
+                        :author="navButton.article.author.firstName + ' ' + navButton.article.author.lastName"
+                        :hideTitleCard="false"
                     ></text-article-title-card>
                 </transition>
-            </a>
-        </li>
-        <li
-            class="nav__menu-item nav__menu-item--forward"
-            :class="{ 'nav__menu-item--visible': forwardHovered || focusedIndex === 1 || allVisible }"
-            @mouseover="forwardHovered = true"
-            @mouseleave="forwardHovered = false"
-        >
-            <a
-                @focus="focusedIndex = 1"
-                @blur="focusedIndex = -1"
-            >
-                <transition name="title-card-fade">
-                    <text-article-title-card
-                            v-show="forwardArrowHovered || focusedIndex === 1"
-                            class="nav__title-card--forward"
-                            role="presentation"
-                            :hideTitleCard="false"
-                            :article="nextArticle"
-                    ></text-article-title-card>
-                </transition>
-                <img
-                    src="../assets/nav/right-arrow.svg"
-                    @mouseover="navArrowHovered('forward')"
-                    @mouseleave="navArrowUnhovered('forward')"
-                />
+
             </a>
         </li>
     </ul>
 </template>
 
 <script lang="ts">
-import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
+import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import TextArticleTitleCard from '@/components/TextArticleTitleCard';
@@ -75,26 +62,30 @@ export default class TextArticleNavigation extends Vue {
     @Prop() private previousArticle!: Article;
     @Prop() private nextArticle!: Article;
 
+    private navButtons: Array<{}>;
     private focusedIndex: number;
-
-    private backHovered: boolean;
-    private forwardHovered: boolean;
-
-    private backArrowHovered: boolean;
-    private forwardArrowHovered: boolean;
 
     private $route: Route;
 
     constructor() {
         super();
 
+        this.navButtons = [
+            {
+                direction: 'previous',
+                hovered: false,
+                arrowHovered: false,
+                article: this.previousArticle,
+            },
+            {
+                direction: 'forward',
+                hovered: false,
+                arrowHovered: false,
+                article: this.nextArticle,
+            },
+        ];
+
         this.focusedIndex = -1;
-
-        this.backHovered = false;
-        this.forwardHovered = false;
-
-        this.backArrowHovered = false;
-        this.forwardArrowHovered = false;
     }
 
     // When view is mounted, retrieve article
@@ -103,51 +94,27 @@ export default class TextArticleNavigation extends Vue {
     }
 
     @Emit('navArrowHovered')
-    private navArrowHovered(direction: string): void {
-        if (direction === 'back') {
-            this.backArrowHovered = true;
-        } else if (direction === 'forward') {
-            this.forwardArrowHovered = true;
-        }
+    private navArrowHovered(navButtonIndex: number): void {
+        this.navButtons[navButtonIndex].arrowHovered = true;
         // Filler
     }
 
     @Emit('navArrowUnhovered')
-    private navArrowUnhovered(direction: string): void {
-        if (direction === 'back') {
-            this.backArrowHovered = false;
-        } else if (direction === 'forward') {
-            this.forwardArrowHovered = false;
-        }
+    private navArrowUnhovered(navButtonIndex: number): void {
+        this.navButtons[navButtonIndex].arrowHovered = false;
     }
 
-    // @Emit('navArrowHovered')
-    // private navArrowHovered(isForwardArrow: number) {
-    //     if (isForwardArrow) { // forward button
-    //         this.forwardArrowHovered = true;
-    //     } else {
-    //         this.backArrowHovered = true;
-    //     }
-    // }
-    //
-    // @Emit('navArrowUnhovered')
-    // private navArrowUnhovered(isForwardArrow: number) {
-    //     if (isForwardArrow) { // forward button
-    //         this.forwardArrowHovered = false;
-    //     } else {
-    //         this.backArrowHovered = false;
-    //     }
-    // }
-
-    private onNavItemHovered(e): void {
-        // Filler
+    // Returns the image file path that was transmuted by webpack
+    private getImageSource(direction: string): string {
+        const arrows = require.context('../assets/nav/', false, /\.svg$/);
+        return arrows('./' + direction + '-arrow.svg');
     }
 }
 </script>
 
 <style lang="scss" scoped>
     .nav {
-        position: absolute;
+        position: fixed;
         width: calc(100% - 60px);
         height: calc(100% - 60px);
         padding: 30px;
@@ -185,7 +152,7 @@ export default class TextArticleNavigation extends Vue {
 
     }
 
-    .nav__menu-item--back {
+    .nav__menu-item--previous {
         left: calc(240px + 3px);
         padding-right: calc((100vw - 243px - 50vw) / 4);
     }
@@ -202,7 +169,6 @@ export default class TextArticleNavigation extends Vue {
     .nav__menu-item a img {
         position: relative;
         display: inline-block;
-        order: 0;
         width: auto;
         height: 50vh;
         /*max-width: 100%;*/

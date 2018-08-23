@@ -4,13 +4,13 @@
         :class="{ 'title-card__container--hidden': hideTitleCard }"
     >
         <h1 class="title-card__title">
-            {{ article.title }}
+            {{ title }}
         </h1>
         <h2 class="title-card__subtitle">
-            {{  article.subtitle }}
+            {{ subtitle }}
         </h2>
         <h3 class="title-card__author">
-            {{ article.author.firstName }} {{ article.author.lastName }}
+            {{ author }}
         </h3>
     </div >
 </template>
@@ -25,9 +25,11 @@
         },
     })
 
-    export default class TextArticleNavigation extends Vue {
-        @Prop() private article!: boolean;
-        @Prop() private hideTitleCard!: boolean;
+    export default class TextArticleTitleCard extends Vue {
+        @Prop() private title!: string;
+        @Prop() private subtitle!: string;
+        @Prop() private author!: string;
+        @Prop({ default: false }) private hideTitleCard!: boolean;
 
         private $route: Route;
 
@@ -75,7 +77,7 @@
 
     .title-card__subtitle {
         margin-left: 30px;
-        \
+
         text-align: left;
     }
 

@@ -19,35 +19,16 @@
                     @mouseover="headerHovered = true"
                     @mouseleave="headerHovered = false"
                 >
-                    <div
+                    <text-article-title-card
                         class="article__info-container article__info-container--headroom"
-                        :class="{ 'article__info-container--hidden': isAtPageTop || scrollSessionFromTop }"
-                    >
-                        <div>
-                            <h1 class="article__title">
-                                {{ article.title }}
-                            </h1>
-                            <h2 class="article__subtitle">
-                                {{  article.subtitle }}
-                            </h2>
-                        </div>
-                        <h3 class="article__author">
-                            <em>
-                                {{ article.author.firstName }} {{ article.author.lastName }}
-                            </em>
-                        </h3>
-                    </div >
+                        :title="article.title"
+                        :subtitle="article.subtitle"
+                        :author="article.author.firstName + ' ' + article.author.lastName"
+                        :hideTitleCard="isAtPageTop || scrollSessionFromTop"
+                    ></text-article-title-card>
                 </header>
             </vue-headroom>
         </transition>
-
-        <text-article-navigation
-            :allVisible="isNavExposed"
-            :previousArticle="article"
-            :nextArticle="article"
-            @navArrowHovered="navArrowHovered = true"
-            @navArrowUnhovered="navArrowHovered = false"
-        ></text-article-navigation>
 
         <div class="article__header">
             <div
@@ -55,27 +36,18 @@
                 :class="{ 'article__info--embedded--hidden': hideArticleContents }"
             >
                 <transition name="header-title-fade">
-                    <div
-                        v-show="!navArrowHovered"
-                        class="article__info-container article__info-container--embedded"
-                    >
-                        <div>
-                            <h1 class="article__title">
-                                {{ article.title }}
-                            </h1>
-                            <h2 class="article__subtitle">
-                                {{  article.subtitle }}
-                            </h2>
-                        </div>
-                        <h3 class="article__author">
-                            <em>
-                                {{ article.author.firstName }} {{ article.author.lastName }}
-                            </em>
-                        </h3>
-                    </div>
+                    <text-article-title-card
+                            v-show="!navArrowHovered"
+                            class="article__info-container article__info-container--embedded"
+
+                            :title="article.title"
+                            :subtitle="article.subtitle"
+                            :author="article.author.firstName + ' ' + article.author.lastName"
+                    ></text-article-title-card>
                 </transition>
             </div>
         </div>
+
         <div
             id="article-frame"
             class="article__frame"
@@ -108,6 +80,7 @@
                 </div>
             </div>
         </div>
+
         <footer
             class="footer"
             @mouseover="footerHovered = true"
@@ -136,6 +109,15 @@
             </a>
 
         </footer>
+
+        <!-- :allVisible="isNavExposed"-->
+        <text-article-navigation
+                :allVisible="isNavExposed"
+                :previousArticle="article"
+                :nextArticle="article"
+                @navArrowHovered="navArrowHovered = true"
+                @navArrowUnhovered="navArrowHovered = false"
+        ></text-article-navigation>
     </main>
 </template>
 
@@ -146,11 +128,13 @@ import { Route } from 'vue-router';
 import { Article } from '@/types/types';
 import APIService from '@/API';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
+import TextArticleTitleCard from '../components/TextArticleTitleCard';
 
 @Component({
     components: {
         headroom,
         TextArticleNavigation,
+        TextArticleTitleCard,
     },
 })
 
@@ -365,6 +349,8 @@ export default class TextArticle extends Vue {
 
     .article__info-container--embedded {
         margin-left: 3px;
+        box-shadow: 0 0 0 0 transparent !important;
+
     }
 
     .article__info-container--outlined {
@@ -430,7 +416,7 @@ export default class TextArticle extends Vue {
         bottom: 0;
         width: calc(100% - calc(#{$lefterWidth}));
         height: 6vh;
-        z-index: 3;
+        z-index: 4;
     }
 
     .footer__menu {
