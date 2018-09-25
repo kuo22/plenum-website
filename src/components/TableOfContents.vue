@@ -30,7 +30,7 @@
                     @mouseover.native="radioTogglePreviewVisibleState(index)"
 
                     @click.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
-                    @keydown.rightprevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
+                    @keydown.right.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
                     @keydown.enter.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
                     @keydown.space.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
                     @keydown.esc.prevent.native="exitMenu(parentCollection)"

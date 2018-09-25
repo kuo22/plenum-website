@@ -1,7 +1,9 @@
 <template>
     <div
         class="title-card__container"
-        :class="{ 'title-card__container--hidden': hideTitleCard }"
+        :class="{
+            'title-card__container--hidden': hideTitleCard,
+        }"
     >
         <h1 class="title-card__title">
             {{ title }}
@@ -30,6 +32,7 @@
         @Prop() private subtitle!: string;
         @Prop() private author!: string;
         @Prop({ default: false }) private hideTitleCard!: boolean;
+        //@Prop() private focused!: boolean;
 
         private $route: Route;
 
@@ -48,17 +51,15 @@
     .title-card__container {
         position: relative;
         left: 0;
-        //top: 50%;
-        //transform: translateY(-50%);
         max-width: 50vw;
         padding: 20px;
-        z-index: -1;
-
-        box-shadow: 8px 8px 10px 2px #00000029;
+        z-index: 0;
 
         background: white;
 
         text-align: left;
+
+        box-shadow: 8px 8px 10px 2px #00000029;
     }
 
     .title-card__container--hidden {
@@ -66,6 +67,10 @@
 
         opacity: 0;
         transition: opacity 150ms ease;
+    }
+
+    .title-card__container--focused {
+        outline: 3px solid black;
     }
 
     .title-card__title,

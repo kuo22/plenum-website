@@ -8,6 +8,7 @@
             <!-- TODO: close menu when logo is activated -->
             <the-logo
                 :playLogo="animateLogo"
+                :dimension="navBarWidth"
                 @logoClicked="logoClicked"
             ></the-logo>
         </div>
@@ -48,6 +49,7 @@ import TheLogo from '@/components/TheLogo';
 export default class TheNavBar extends Vue {
     @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
     private animateLogo: boolean; // Whether or not the logo is animating
+    private navBarWidth: number = 240; // pixels
 
     constructor() {
         super();

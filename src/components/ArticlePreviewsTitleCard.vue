@@ -7,7 +7,6 @@
         >
             {{article.subtitle}}
         </div>
-        <!--<p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>-->
     </div>
 </template>
 
@@ -50,9 +49,10 @@ export default class ArticlePreviewsTitleCard extends Vue {
     }
 
     .author {
+        margin-top: 3px;
+
         font-weight: lighter;
         font-style: italic;
-        margin-top: 3px;
     }
 
 

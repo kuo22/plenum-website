@@ -180,6 +180,10 @@ export default class MainMenuFlyOutSections extends Vue {
                 document.getElementById(this.parentMenu.name + '-fly-out-menu-item-' + i).focus();
             }
         }
+        // document.getElementById(parentMenuItems.find((parentMenuItem) => {
+        //     console.log(parentMenuItem);
+        //     return parentMenuItem === this.menuTitle;
+        // })).focus();
         this.resetMenuItems();
         this.resetFocus();
     }

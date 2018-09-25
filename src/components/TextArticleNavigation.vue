@@ -5,41 +5,58 @@
     >
         <li
             v-for="(navButton, index) in navButtons"
-            class="nav__menu-item"
+            class="nav__option"
 
             :class="{
-                'nav__menu-item--visible': navButton.hovered || focusedIndex === index || allVisible,
-                'nav__menu-item--previous': navButton.direction === 'previous',
-                'nav__menu-item--forward': navButton.direction === 'forward',
+                'nav__option--visible': navButton.hovered || allVisible,
+                'nav__option--previous': navButton.direction === 'previous',
+                'nav__option--forward': navButton.direction === 'forward',
             }"
 
             @mouseover="navButton.hovered = true"
             @mouseleave="navButton.hovered = false"
         >
             <a
+                v-if="navButton.direction === 'previous'"
                 :tabindex="index === 0 ? 0 : -1"
+
                 @focus="focusedIndex = index"
-                @blur="focusedIndex = -1"
+                @blur="focusedIndex = 0"
             >
                 <img
+                    role="presentation"
                     :src="getImageSource(navButton.direction)"
-                    :style="{ order: index }"
 
                     @mouseover="navArrowHovered(index)"
                     @mouseleave="navArrowUnhovered(index)"
                 />
-                <transition name="title-card-fade">
-                    <text-article-title-card
-                        v-show="navButton.arrowHovered || focusedIndex === index"
+            </a>
+            <transition name="title-card-fade">
+                <text-article-title-card
+                        v-show="navButton.arrowHovered"
                         role="presentation"
+                        :class="index === 0 ? 'title-card-container--previous' : 'title-card-container--forward'"
 
                         :title="navButton.article.title"
                         :subtitle="navButton.article.subtitle"
                         :author="navButton.article.author.firstName + ' ' + navButton.article.author.lastName"
                         :hideTitleCard="false"
-                    ></text-article-title-card>
-                </transition>
+                ></text-article-title-card>
+            </transition>
+            <a
+                v-if="navButton.direction === 'forward'"
+                :tabindex="index === 0 ? 0 : -1"
 
+                @focus="focusedIndex = index"
+                @blur="focusedIndex = 0"
+            >
+                <img
+                    role="presentation"
+                    :src="getImageSource(navButton.direction)"
+
+                    @mouseover="navArrowHovered(index)"
+                    @mouseleave="navArrowUnhovered(index)"
+                />
             </a>
         </li>
     </ul>
@@ -95,6 +112,7 @@ export default class TextArticleNavigation extends Vue {
 
     @Emit('navArrowHovered')
     private navArrowHovered(navButtonIndex: number): void {
+        console.log('hovered');
         this.navButtons[navButtonIndex].arrowHovered = true;
         // Filler
     }
@@ -115,26 +133,52 @@ export default class TextArticleNavigation extends Vue {
 <style lang="scss" scoped>
     .nav {
         position: fixed;
-        width: calc(100% - 60px);
-        height: calc(100% - 60px);
-        padding: 30px;
+        left: 243px;
+        top: 0;
+        width: calc(100% - 243px);
+        height: 100vh;
         z-index: 3;
     }
 
-    .nav__menu-item {
-        position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
+    .nav__option {
+        position: absolute;
+        top: calc(240px - 27px); // Bottom of the headroom title card
         width: fit-content;
-        height: 100vh;
+        height: calc(100vh - 240px + 27px - 6vh); // 27px = margin around headroom title card
     }
 
-    .nav__menu-item a {
+    // TODO: universalize focus transition and keybaord focus nav
+    .nav__option:focus {
+        outline: none;
+    }
+    .nav__option a:focus {
+        outline: none;
+        opacity: 1;
+        transition: opacity 250ms ease;
+    }
+    .nav__option a:focus > img {
+        outline: 3px solid black;
+        opacity: 1;
+        transition: opacity 250ms ease;
+    }
+
+    .nav__menu-button-container {
         position: relative;
-        display: flex;
-        height: fit-content;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 0;
+        left: 0;
+        width: calc((50vw - 243px) / 2); // Page takes up 50% of screen
+        height: 100%;
+    }
+
+    .nav__option a {
+        position: relative;
+        display: inline-block;
+        left: 0;
+        top: 0;
+        // transform: translateY(0);
+        width: calc((50vw - 243px) / 2);
+        height: calc(100vh - 240px + 27px - 6vh);
+        margin: 0 auto;
 
         opacity: 0;
         transition: opacity 150ms ease;
@@ -142,39 +186,50 @@ export default class TextArticleNavigation extends Vue {
         align-items: center;
     }
 
-    .nav__menu-item a:hover {
+    .nav__option a:hover {
         cursor: pointer;
     }
 
-    .nav__menu-item--visible a {
+    .nav__option--visible a {
         opacity: 1;
         transition: opacity 250ms ease;
-
     }
 
-    .nav__menu-item--previous {
-        left: calc(240px + 3px);
-        padding-right: calc((100vw - 243px - 50vw) / 4);
+    .nav__option--previous {
     }
 
-    .nav__menu-item--forward {
+    .nav__option--forward {
         right: 0;
-        padding-left: calc((100vw - 243px - 50vw) / 4);
     }
 
     .nav__title-card--forward {
         box-shadow: -8px 8px 10px 2px #00000029 !important;
     }
 
-    .nav__menu-item a img {
+    .nav__option a img {
         position: relative;
         display: inline-block;
+        top: 50%;
+        transform: translateY(-50%);
         width: auto;
         height: 50vh;
-        /*max-width: 100%;*/
-        /*max-height: 60%;*/
-        /*min-height: 240px;*/
     }
+
+    .title-card-container--previous {
+        position: relative;
+        display: inline-block;
+        left: -8%;
+        top: -12%;
+    }
+
+    .title-card-container--forward {
+        position: relative;
+        display: inline-block;
+        left: 8%;
+        top: -12%;
+    }
+
+    /* Title Card Fade Animation */
 
     .title-card-fade-enter {
         opacity: 0;

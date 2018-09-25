@@ -350,7 +350,6 @@ export default class TextArticle extends Vue {
     .article__info-container--embedded {
         margin-left: 3px;
         box-shadow: 0 0 0 0 transparent !important;
-
     }
 
     .article__info-container--outlined {
@@ -394,9 +393,9 @@ export default class TextArticle extends Vue {
         padding: 5vw;
         margin: 0 auto $margin auto;
 
-        box-shadow: 3px 3px 8px 1px #d5d5d5;
-
         background: #fafafa;
+
+        box-shadow: 3px 3px 8px 1px #d5d5d5;
     }
 
     .article__biblio {
@@ -428,9 +427,9 @@ export default class TextArticle extends Vue {
         padding: 0 10vw;
         z-index: -1;
 
-        outline: 3px solid black;
-
         background: white;
+
+        outline: 3px solid black;
     }
 
     .footer__copyright {
@@ -472,7 +471,7 @@ export default class TextArticle extends Vue {
         line-height: 5vh; // Same as parent
     }
 
-    /* HEADROOM */
+    /* HEADROOM STATES */
 
     .headroom {
         height: 240px;

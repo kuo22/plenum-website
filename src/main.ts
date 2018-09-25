@@ -4,10 +4,6 @@ import router from './router';
 import store from '@/store/index';
 import checkView from 'vue-check-view';
 import headroom from 'vue-headroom';
-import {StoreOptions} from 'vuex';
-import Vuex from 'vuex';
-import {RootState} from '@/types/storeTypes';
-// import {index} from '@/store/modules/menuTree/menuTree';
 
 Vue.config.productionTip = false;
 

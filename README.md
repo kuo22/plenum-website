@@ -11,19 +11,23 @@
 5. Other
 
 ##### Files Todo
-* [] components/
-  * [x] MainMenuFlyOutSectionsPreviews.vue
-  * [x] TableOfContents.vue
-  * [x] ArticlePreviews.vue
-  * [x] MainMenuFlyOutSections.vue
-  * [x] MainMenuFlyOut.vue
-  * [x] TheMainMenu.vue
-  * [x] TheNavBar.vue
-  * [x] TheLogo.vue
-  * [] ArticleNavigation.vue
-* [] views/*
-  * [] TextArticle.vue
-* [x] App.vue
+* [x] components/
+  * [x] ArticlePreviews
+  * [x] ArticlePreviewsTitleCard
+  * [x] MainMenuFlyOut
+  * [x] MainMenuFlyOutSections
+  * [x] MainMenuFlyOutSectionsPreviews
+  * [x] TableOfContents
+  * [x] TextArticleNavigation
+  * [x] TextArticleTitleCard
+  * [x] TheLogo
+  * [x] TheMainMenu
+  * [x] TheNavBar
+* [x] views/*
+  * [x] Home
+  * [x] TableOfContents
+  * [x] TextArticle
+* [x] App
 
 ######Organize CSS Resources
 * [Get BEM](http://getbem.com/introduction/)
@@ -40,7 +44,7 @@ ___
     * [] ArticleNavigation
 * [] views/*
     * [] TextArticle
-* [] App.vue
+* [] App
 
 ###### Restructuring Resources
 
@@ -59,7 +63,7 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
     https://dequeuniversity.com/rules/axe/3.0/page-has-heading-one?application=AxeChrome
 * [] Decide if it is necessary to remove tabindex in vue structure
         https://www.w3.org/TR/WCAG20-TECHS/F44.html
-* [] Add arrow key controls [example](https://forum.vuejs.org/t/navigate-through-list-using-arrowkeys/30689)
+* [] Add arrow key controls [example](https://forumjs.org/t/navigate-through-list-using-arrowkeys/30689)
 * [] [Add breadcrumbs navigation for content pages?](https://www.w3.org/TR/wai-aria-practices/examples/breadcrumb/index.html)
 
 * [] [Parent menus should control the focus of submenus](http://accessibility.athena-ict.com/aria/tests/menus.shtml)
@@ -86,7 +90,7 @@ ___
 
 * [x] Maintain article preview grid as solid black while image preview and table of contents blend together
 
-#### [Fetching after Navigation](https://router.vuejs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
+#### [Fetching after Navigation](https://routerjs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
 * [] Add loading filler
 
 #### Logo
@@ -97,7 +101,7 @@ Design drafts for portable devices before implementing
 * [] Text article headroom breaks on some window resizes
 * [] Add min-height to main menu and navbar
 * [] Add width-change points
-* [] [Implement this method to scale fonts?](https://forum.vuejs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
+* [] [Implement this method to scale fonts?](https://forumjs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
 
 #### Main Content Area
 * [] Implement horizontal fixed window splitter (slider to move sections of the webpage)
