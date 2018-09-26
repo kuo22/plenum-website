@@ -125,7 +125,7 @@
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import { Article } from '@/types/types';
+import {Article, Collection} from "@/types/types";
 import APIService from '@/API';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
 import TextArticleTitleCard from '../components/TextArticleTitleCard';
@@ -139,7 +139,6 @@ import TextArticleTitleCard from '../components/TextArticleTitleCard';
 })
 
 export default class TextArticle extends Vue {
-    // TODO: clean up headroom visibility
     // TODO: clean up footer and header css
     // TODO: consider creating a footer (and maybe header) component?
 
@@ -152,6 +151,9 @@ export default class TextArticle extends Vue {
     private articleLoading: boolean;
     private article: Article;
     private articleError: boolean;
+
+    private issue: Collection;
+    private issuePosition: number; // index of current article within issue
 
     private headerHovered: boolean;
     private footerHovered: boolean;
@@ -177,6 +179,9 @@ export default class TextArticle extends Vue {
         this.article = null;
         this.articleError = null;
 
+        this.issue = null;
+        this.issuePosition = -1;
+
         this.headerHovered = false;
         this.footerHovered = false;
 
@@ -192,9 +197,14 @@ export default class TextArticle extends Vue {
     }
 
     // When view is mounted, retrieve article
-    public created() {
+    public mounted() {
         this.fetchArticle();
     }
+
+    // public mounted() {
+    //     this.issue = this.$store.getters['issues/getIssue'](this.article);
+    //     this.issuePosition = this.issue.articles.findIndex(art => art.uuid === this.article.uuid);
+    // }
 
     //
     get hideArticleContents() {
@@ -262,6 +272,23 @@ export default class TextArticle extends Vue {
 
         const drupalNodeID = this.$route.params.node;
 
+        // TODO: this is being called before store is filled with articles
+        let temp = this.$store.getters['issues/getArticle'](drupalNodeID);
+        if (temp.length > 0) {
+            this.article = temp[0];
+            this.issue = temp[1];
+            this.issuePosition = temp[2];
+        } else {
+            APIService.fetchArticle(drupalNodeID)
+                .then((response: Article) => {
+                    this.article = response;
+                    return response;
+                }).catch((error) => {
+                // TODO: plan for error
+                this.articleError = error.toString();
+            });
+        }
+
         // Request article from store
         // Within store, if article does not exist and
         // API request returns 404, then show error message
@@ -275,14 +302,7 @@ export default class TextArticle extends Vue {
 
         // if Article does not exist in current store variable of all articles
         // Then fetch article
-        APIService.fetchArticle(drupalNodeID)
-            .then((response: Article) => {
-                this.article = response;
-                return response;
-            }).catch((error) => {
-                // TODO: plan for error
-                this.articleError = error.toString();
-            });
+
     }
 }
 </script>

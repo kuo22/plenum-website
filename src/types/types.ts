@@ -17,7 +17,7 @@ export interface DrupalMenu {
 // A Drupal content node
 export interface DrupalNode {
     nodeNumber: number;
-    uuid: string;
+    uuid: string; // "081b98ba-4ec8-429d-9152-2c231f45885a"
     urlPath?: string;
 }
 
@@ -47,6 +47,7 @@ export interface Collection extends DrupalNode {
     articles: Article[];
     title: string;
     coverImageURL: string;
+    datePublished: string;
 }
 
 /*

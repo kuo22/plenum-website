@@ -17,7 +17,7 @@
             @mouseleave="navButton.hovered = false"
         >
             <a
-                v-if="navButton.direction === 'previous'"
+                v-if="navButton.direction === 'previous' && previousArticle !== undefined"
                 :tabindex="index === 0 ? 0 : -1"
 
                 @focus="focusedIndex = index"
@@ -44,7 +44,7 @@
                 ></text-article-title-card>
             </transition>
             <a
-                v-if="navButton.direction === 'forward'"
+                v-if="navButton.direction === 'forward' && nextArticle !== undefined"
                 :tabindex="index === 0 ? 0 : -1"
 
                 @focus="focusedIndex = index"

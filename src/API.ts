@@ -173,7 +173,6 @@ class API extends Vue {
     }
 
     public createArticleDrupalAPIData(articleData: any): Article {
-        console.log(articleData);
         const authorName: string[] = articleData.field_author[0].value.split(', ');
         const author: Author = {
             firstName: authorName[1],

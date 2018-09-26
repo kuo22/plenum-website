@@ -38,8 +38,6 @@ import { MainMenuItem } from './classes/MainMenuItem';
 import API from '@/API';
 import {SubmenuLink} from './classes/SubmenuLink';
 
-// TODO: move Menus out of view folder, it's a component!
-
 const namespace: string = 'menuTree';
 
 

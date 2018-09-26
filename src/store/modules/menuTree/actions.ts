@@ -1,38 +1,24 @@
 import { ActionTree } from 'vuex';
 import {Article, Author, Collection, DrupalMenu} from '@/types/types';
-import {MenuTreeState, RootState} from '@/types/storeTypes';
 import {error} from 'util';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 import {SubmenuLink} from '@/classes/SubmenuLink';
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 import APIService from '../../../API';
+import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
+import {RootState} from '@/store';
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Creates the app's navigation menus with data from Drupal
     // parameter(s) needed:
     //      { commit } = a reference to the this store variable's mutations
-    async createMenuItems({ commit }): Promise<any> {
+    async createMenuItems({ commit, dispatch }): Promise<any> {
         return APIService.fetchMenuTree()
             .then((menuTreeData) => { // : {}[]
-                // Parse through all Drupal data for node representations of Drupal entities
-                for (const menuItemData of menuTreeData) {
-                    if (menuItemData.link.title === 'Publications') {
-                        const submenuTree = menuItemData.subtree;
-                        for (const submenuSection of submenuTree) {
-                            for (const issueData of submenuSection.subtree) {
-                                const issueDataCleaned = issueData.link;
-                                if ('node' in issueDataCleaned.route_parameters) {
-                                    // Issue nodes accessed
-                                    // console.log(issueData.route_parameters.node);
-                                }
-                            }
-                        }
-                    }
-                }
                 return menuTreeData;
             }).then((menuTreeData: any) => {
-                return createMenuTreeFromData(menuTreeData)
+                return createMenuTreeFromData(menuTreeData, dispatch)
                     .then((drupalMenuTree) => {
                         return drupalMenuTree;
                     });
@@ -56,19 +42,13 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
     },
 };
 
-// function fetchIssues(menuTreeData): Promise<any> {
-//
-// }
-
-async function createMenuTreeFromData(menuTree: any): Promise<any> {
+async function createMenuTreeFromData(menuTree: any, dispatch): Promise<any> {
     const menus: DrupalMenu[] = [];
     const coverImageURL = '';
 
     if (menuTree.length > 0) {
 
         for (const menuNode of menuTree) {
-            // const menuNode = menuTree[i];
-
             const newMenu: DrupalMenu = {
                 title: menuNode.link.title,
                 description: menuNode.link.description,
@@ -76,23 +56,33 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
                 depth: menuNode.depth,
                 url: menuNode.link.url,
                 has_children: menuNode.has_children,
-                subtree: await createMenuTreeFromData(menuNode.subtree),
+                subtree: await createMenuTreeFromData(menuNode.subtree, dispatch),
             };
 
+            // // Parse through all Drupal data for node representations of Drupal entities
+            // menuTree
+            //     .find((mainMenuEntry: any) => {
+            //         return mainMenuEntry.link.title == 'Publications'
+            //     })['subtree']
+            //     .forEach((section: any) => {
+            //         section['subtree'].forEach((collection: any) => {
+            //             console.log(collection);
+            //             console.log(collection.link.route_parameters.node);
+            //         })
+            //     });
             // if menuNode is a Drupal entity
-            if ('node' in menuNode.link.route_parameters) {
+            if (menuNode.link.route_parameters.hasOwnProperty('node')) {
                 const nodeNumber = menuNode.link.route_parameters.node;
+                let issueUUID = '';
+                let releaseDate = '';
                 const contentData = await APIService.fetchContent(nodeNumber)
-                    .then((data) => {
-                        if (Object.keys(data).length > 0) {
-                        const articleUUIDs: string[] = [];
-
-                        for (const article of data.field_articles) {
-                                articleUUIDs.push(article.target_uuid);
-                            }
-
-                        newMenu.coverImageURL = data.field_cover_image[0].url + '';
-                        return APIService.fetchCollection(articleUUIDs);
+                    .then((issueData) => {
+                        if (Object.keys(issueData).length > 0) { // If issue/collection and not a content page
+                            issueUUID = issueData.uuid[0].value + "";
+                            releaseDate = issueData.field_release_date[0].value + "";
+                            let articleUUIDs: string[] = issueData.field_articles.map(article => article.target_uuid);
+                            newMenu.coverImageURL = issueData.field_cover_image[0].url + '';
+                            return APIService.fetchCollection(articleUUIDs);
                         }
                     }).then((articlesData) => {
                         const articles: Article[] = [];
@@ -109,8 +99,6 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
                                             // console.log(error);
                                         });
 
-                                } else {
-                                    // TODO: fill in or remove
                                 }
                             }
                         }
@@ -120,10 +108,13 @@ async function createMenuTreeFromData(menuTree: any): Promise<any> {
                             title: newMenu.title,
                             coverImageURL: newMenu.coverImageURL + '',
                             nodeNumber,
-                            uuid: '',
+                            uuid: issueUUID,
+                            datePublished: releaseDate
                         };
+                        if (collection.uuid.length > 0) {
+                            dispatch('issues/addIssue', collection, {root: true});
+                        }
                         newMenu.collection = collection;
-                        // return this.makeCollection(articles);
                     });
             } else {
                 newMenu.coverImageURL = '';
