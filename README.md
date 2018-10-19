@@ -1,3 +1,10 @@
+# How to Run
+- Fork the repository
+- Clone your forked repository onto your computer
+- Open in your favorite IDE (IntelliJ products are robust and free for students!)
+- Open terminal and run 'npm run serve'
+
+
 # To-do
 
 # Branch To-do's
