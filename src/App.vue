@@ -1,25 +1,25 @@
 <template>
     <div
         id="app"
-        @keydown.tab="closeFlyOut"
+        @keydown.tab="revertMenuSession"
     >
         <transition appear>
             <the-nav-bar
-                    class="lefter"
-                    :menuItems="menuItems"
-
-                    @logoClicked="closeFlyOut"
+                class="lefter"
+                @logoClicked="handleLogoClick"
+                @revertMenuSession="revertMenuSession"
+                @openContent="handleOpenContentEvent"
             ></the-nav-bar>
         </transition>
 
         <transition
-                name="component-fade"
-                mode="out-in"
+            name="component-fade"
+            mode="out-in"
         >
             <router-view
-                    class="content-section"
-                    @click.native="closeFlyOut"
-                    @focus.native="closeFlyOut"
+                class="content-section"
+                @click.native="revertMenuSession"
+                @focus.native="revertMenuSession"
             >
             </router-view>
         </transition>
@@ -27,127 +27,68 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
+import {Action} from 'vuex-class';
 import TheNavBar from '@/components/TheNavBar';
-import {Action, Getter} from 'vuex-class';
 import Home from '@/views/Home';
-
-import {Article, Collection} from './types/types';
-import { MainMenuItem } from './classes/MainMenuItem';
-
-import API from '@/API';
-import {SubmenuLink} from './classes/SubmenuLink';
-
-const namespace: string = 'menuTree';
-
 
 @Component({
     components: {
         TheNavBar,
-        Home,
+        Home
     },
 })
 
 export default class App extends Vue {
-    @Action('createMenuItems', { namespace }) private createMenuItems: any;
-    @Getter('menuTree', { namespace }) private menuTree: MainMenuItem[];
-    @Prop() private menuItems: MainMenuItem[];
+    @Action('menuTree/createMenu') private createMenu;
 
-    constructor() { super(); }
+    private menuLoading: boolean; // Menu loading state
 
-    // When the app is created, tell the store to fetch menu data
-    public async created(): void {
-        await this.createMenuItems()
+    constructor() {
+        super();
+        this.menuLoading = true;
+        // this.menuOpen = false; // TODO: Initialize to open for when collection URL is requested
+    }
+
+    // When the app is created, create the app's main navigation menu
+    public async created() {
+        await this.createMenu()
             .then(() => {
-                // TODO: don't change the prop, figure out how to initialize prop with 'menuTree' or convert all changes
-                // to menuItems via the store
-                this.menuItems = this.menuTree;
+                this.menuLoading = false;
             })
-            .catch();
+            .catch((err) => {
+                // TODO: Handle loading error
+                console.error(err);
+            });
     }
 
-    // Closes the flyout menu
-    private closeFlyOut(): void {
-
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (this.menuItems[i].open) {
-                for (const submenuItemKey: string in this.menuItems[i].subMenu) {
-                    if (this.menuItems[i].subMenu.hasOwnProperty(submenuItemKey)) {
-                        for (let j = 0; j < this.menuItems[i].subMenu[submenuItemKey].length; j++) {
-                            // (this.menuItems[i].subMenu[submenuItemKey][j] as Article).previewVisible = false;
-                            (this.menuItems[i].subMenu[submenuItemKey][j] as SubmenuLink).active = false;
-                            (this.menuItems[i].subMenu[submenuItemKey][j] as SubmenuLink).hidden = true;
-                        }
-                    }
-                }
-            }
-        }
-        // this.$refs.theMainMenu.closeMainMenuFlyOut();
-        for (const menuItemIndex: number in this.menuItems) {
-            if (this.menuItems.hasOwnProperty(menuItemIndex.toString())) {
-                this.menuItems[menuItemIndex].open = false;
-                setTimeout(() => {
-                    this.menuItems[menuItemIndex].hidden = true;
-                }, 400);
-            }
+    // Process to handle logo click event
+    private handleLogoClick(): void {
+        this.$router.push('/');
+        let visitCount = this.$store.getters['routerNav/getVisitCount'];
+        if (visitCount > 0) {
+            this.$store.dispatch('routerNav/resetVisitCount');
+            this.$store.dispatch('menuTree/closeMenuExpansions');
         }
     }
 
-    private getIssues(): void {
-        const issuesJSON = fetch('http://localhost:8888/plenum-drupal-dev/drupal-8.5.3/jsonapi/node/issue'
-                                + '?_format=json')
-            .then((response) =>
-                response.json().then((data) => ({
-                        data,
-                        status: response.status,
-                    }),
-                ).then((res) => {
-                    this.createIssues(res);
-                    // this.parseData(res.data[this.articleId]);
-                }))
-            .catch(); // Throw DOM display that article does not exist
+    // Handles the event from the user requesting an article
+    private handleOpenContentEvent(routerLinkLocation: string, keyBoardEvent: boolean) {
+        this.$store.dispatch('routerNav/resetVisitCount');
+        if (keyBoardEvent) {
+            this.$router.push(routerLinkLocation);
+        }
+        this.$store.dispatch('menuTree/closeMenuExpansions');
     }
 
-    private createIssues(responseData: any): Collection[] {
-        const data = responseData.data;
-        const issues: Collection[] = [];
-
-        for (const issueData of data) {
-            let imageCoverURL = '';
-            // fetch issue cover image urls from api
-
-            API.fetchContent(issueData.attributes.nid)
-                .then((coverURL) => {
-                    imageCoverURL = coverURL;
-                })
-                .catch();
-
-            // create issue in vue
-            // add issue to issue array in store?
-            const issue: Collection = {
-                title: issueData.attributes.title,
-                coverImageURL: imageCoverURL,
-                articles: [],
-                nodeNumber: null,
-                uuid: issueData.attributes.uuid,
-                collectionContentIDs: this.getArticleIds(issueData.relationships.field_articles.data),
-            };
-
-            issues.push(issue);
+    // Returns the app to the state that was before the menu session
+    private revertMenuSession(): void {
+        let visitCount = this.$store.getters['routerNav/getVisitCount'];
+        if (visitCount > 0) {
+            this.$router.go(visitCount * -1);
+            this.$store.dispatch('routerNav/resetVisitCount');
         }
-        // console.log(issues);
-        return issues;
-    }
-
-    // TODO create interface for article, so ID is recognized by INTELLIJ
-    private getArticleIds(articleData: [{}]): string[] {
-        const articleIds = [];
-
-        for (const article of articleData) {
-            articleIds.push(article.id);
-        }
-
-        return articleIds;
+        this.$store.dispatch('menuTree/closeMenuExpansions');
     }
 }
 </script>

@@ -2,82 +2,109 @@
     <ul
         role="menu"
         class="fly-out-menu"
-        :class="{ 'fly-out-menu--active': menu.active }"
+        :class="{ 'fly-out-menu--active': menu.expanded }"
         :style="{background: menu.color}"
 
         @mouseover="focusedIndex = -1"
     >
-        <li
-            v-for="(sectionLinks, menuTitle, index) in menu.subMenu"
-            :key="index"
-            :title="menuTitle + ' Content Menu-bar'"
+        <slot v-if="menu.hasSections">
+            <li
+                v-for="(section, index) in menu.submenu"
+                :key="index"
+                :title="section.title + ' Content Menu Bar'"
 
-            class="fly-out-menu__menu-item"
-            :aria-labelledby="menuTitle"
-        >
-            <a
-                :v-if="menu.subMenu"
-               :id="menu.name + '-fly-out-menu-item-' + index"
-
-               role="menuitem"
-               aria-haspopup="true"
-               aria-expanded="true"
-               :tabindex="index === focusedIndex ? '0' : '-1'"
-
-               @keydown.enter="enterSubmenu(menuTitle)"
-               @keydown.space="enterSubmenu(menuTitle)"
-               @keydown.right="enterSubmenu(menuTitle)"
-               @keydown.left.prevent="closeMainMenuFlyOut(menu, null, true)"
-               @keydown.esc.prevent="closeMainMenuFlyOut(menu, null, true)"
-               @keydown.up.prevent="moveUp"
-               @keydown.down.prevent="moveDown"
-               @keydown.home.prevent.native="focusedIndex = 0"
-               @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
-               @keydown.alphabet="focusByLetter($event.key, index)"
-
-               v-focus="index === focusedIndex"
-               @focus="focusedIndex = index"
+                class="fly-out-menu__menu-item"
+                :aria-labelledby="section.title"
             >
-                <span
-                    class="fly-out-menu__section-title menu-button-content"
-                    tabindex="-1"
+                <a
+                    :v-if="menu.submenu"
+                   :id="menu.title + '-fly-out-menu-item-' + index"
+
+                   role="menuitem"
+                   aria-haspopup="true"
+                   aria-expanded="true"
+                   :tabindex="index === focusedIndex ? '0' : '-1'"
+
+                   @keydown.enter="enterSubmenu(section.title)"
+                   @keydown.space="enterSubmenu(section.title)"
+                   @keydown.right="enterSubmenu(section.title)"
+                   @keydown.left.prevent="closeMainMenuFlyOut(menu, null, true)"
+                   @keydown.esc.prevent="closeMainMenuFlyOut(menu, null, true)"
+                   @keydown.up.prevent="moveUp"
+                   @keydown.down.prevent="moveDown"
+                   @keydown.home.prevent.native="focusedIndex = 0"
+                   @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+                   @keydown.alphabet="focusByLetter($event.key, index)"
+
+                   v-focus="index === focusedIndex"
+                   @focus="focusedIndex = index"
                 >
-                    {{ menuTitle }}
-                </span>
-            </a>
-            <main-menu-fly-out-sections
-                :menuTitle="menuTitle"
-                :menuItems="sectionLinks"
-                :parentMenu="menu"
-                @activateSubmenuLink="activateSubmenuLink"
-                @toggleOpen="toggleOpen"
-                @openArticle="openArticle"
-                @collectionActivated="collectionActivated"
+                    <span
+                        class="fly-out-menu__section-title menu-button-content"
+                        tabindex="-1"
+                    >
+                        {{ section.title }}
+                    </span>
+                </a>
+                <main-menu-fly-out-sections
+                    :menuTitle="section.title"
+                    :menuItems="section.submenu"
+                    :parentMenu="menu"
+                    @handleSubmenuLinkActivation="handleSubmenuLinkActivation"
+                    @toggleOpen="toggleOpen"
+                    @openArticle="openArticle"
+                    @collectionActivated="collectionActivated"
+                >
+                </main-menu-fly-out-sections>
+            </li>
+        </slot>
+        <slot v-else>
+            <li
+                :title="menu.title + ' Content Menu Bar'"
+
+                class="fly-out-menu__menu-item"
+                :aria-labelledby="menu.title"
             >
-            </main-menu-fly-out-sections>
-        </li>
+                <a>
+                    <span
+                        class="fly-out-menu__section-title menu-button-content"
+                        tabindex="-1"
+                    >
+                        {{ menu.title }}
+                    </span>
+                </a>
+                <main-menu-fly-out-sections
+                        :menuTitle="menu.title"
+                        :menuItems="menu.submenu"
+                        :parentMenu="menu"
+                        @toggleOpen="toggleOpen"
+                        @openArticle="openArticle"
+                        @collectionActivated="collectionActivated"
+                >
+                </main-menu-fly-out-sections>
+            </li>
+        </slot>
     </ul>
 </template>
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-import {MainMenuItem} from '@/classes/MainMenuItem';
-import {SubmenuLink} from '../classes/SubmenuLink';
 import ArticlePreview from '@/components/ArticlePreviews';
 import MainMenuFlyOutSections from '@/components/MainMenuFlyOutSections';
 import { mixin as focusMixin } from 'vue-focus';
+import { mapActions } from 'vuex';
 
 @Component({
     mixins: [focusMixin],
     components: {
         ArticlePreview,
         MainMenuFlyOutSections,
-    },
+    }
 })
 
 // Flyout submenu associated with a unique main menu entry
 export default class MainMenuFlyOut extends Vue {
-    @Prop() private menu!: MainMenuItem; // Parent menu item
+    @Prop() private menu!: Object; // Parent menu item
     private focusedIndex: number; //
     private collectionsClicked: number; //
 
@@ -89,28 +116,32 @@ export default class MainMenuFlyOut extends Vue {
 
     // Emits an open event to the parent
     @Emit('activateMenu')
-    public activateMenu(item: MainMenuItem): void {
+    public activateMenu(mainMenuItem: any): void {
         // Filler
     }
 
     @Emit('toggleOpen')
-    public toggleOpen(menu: MainMenuItem): void {
+    public toggleOpen(mainMenuItem: any): void {
         // Filler
     }
 
     @Emit('openArticle')
-    public openArticle(menu: MainMenuItem, routerLinkLocation: string) {
+    public openArticle() {
         // Filler
     }
 
     @Emit('closeMainMenuFlyOut')
-    public closeMainMenuFlyOut(menu: MainMenuItem, wasKeyboardEvent: boolean) {
+    public closeMainMenuFlyOut(mainMenuItem: any, wasKeyboardEvent: boolean) {
         // filler
     }
 
     @Emit('collectionActivated')
-    public collectionActivated(submenuLink: SubmenuLink) {
-        this.resetAllSubmenuLinksExcept(submenuLink);
+    public collectionActivated(submenuLink: {expanded}) {
+        if (submenuLink.expanded) {
+            this.$store.dispatch('menuTree/deactivateAllPreviews');
+        } else {
+            this.$store.dispatch('menuTree/activateSubmenuPreview', submenuLink);
+        }
     }
 
     // Moves focus to first submenu item of the menu matching the provided menu title
@@ -123,15 +154,29 @@ export default class MainMenuFlyOut extends Vue {
     // Reset submenu links to their initialized state except for the provided submenu link
     // parameter(s) needed:
     //      exception = the submenu link that is NOT reset
-    private resetAllSubmenuLinksExcept(exception: SubmenuLink): void {
-        const sectionTitles = Object.keys(this.menu.subMenu);
+    // TODO: move to store action
+    private resetAllSubmenuLinksExcept(exception: {uuid}): void {
+        let submenu = [...this.menu.submenu];
+        submenu.forEach(section => {
+            section.submenu.forEach(menuItem => { // Most likely an article collection
+                if (exception.uuid !== menuItem.uuid) {
+                    menuItem.expanded = false;
+                    menuItem.previewVisible = false;
+                } else {
+                    menuItem.expanded = true;
+                    menuItem.previewVisible = true;
+                }
+            })
+        });
+
+        const sectionTitles = Object.keys(this.menu.submenu);
         for (let i = 0; i < sectionTitles.length; i++) {
-            const submenuLinks: SubmenuLink[] = this.menu.subMenu[sectionTitles[i]];
+            const submenuLinks: Array<Object> = this.menu.submenu[sectionTitles[i]];
             for (let j = 0; j < submenuLinks.length; j++) {
-                if (exception.title !== this.menu.subMenu[sectionTitles[i]][j].title) {
-                    this.menu.subMenu[sectionTitles[i]][j].active = false;
-                    this.menu.subMenu[sectionTitles[i]][j].previewVisible = false;
-                    this.menu.subMenu[sectionTitles[i]][j].hidden = true;
+                if (exception.title !== this.menu.submenu[sectionTitles[i]][j].title) {
+                    this.menu.submenu[sectionTitles[i]][j].expanded = false;
+                    this.menu.submenu[sectionTitles[i]][j].previewVisible = false;
+                    // this.menu.submenu[sectionTitles[i]][j].hidden = true;
                 }
             }
         }
@@ -145,12 +190,12 @@ export default class MainMenuFlyOut extends Vue {
     // TODO: import these functions as mixin? to use in all menu components
     // Move focus down one menu item, or return to first menu item if at the end
     private moveDown() {
-        this.focusedIndex = this.focusedIndex === Object.keys(this.menu.subMenu).length - 1 ? 0 : this.focusedIndex + 1;
+        this.focusedIndex = this.focusedIndex === Object.keys(this.menu.submenu).length - 1 ? 0 : this.focusedIndex + 1;
     }
 
     // Move focus up one menu item, or return to last menu item if at the first
     private moveUp() {
-        this.focusedIndex = this.focusedIndex === 0 ? Object.keys(this.menu.subMenu).length - 1 : this.focusedIndex - 1;
+        this.focusedIndex = this.focusedIndex === 0 ? Object.keys(this.menu.submenu).length - 1 : this.focusedIndex - 1;
     }
 
     // Searches through the menu items and moves focus to the next menu item label that starts with the queried letter
@@ -159,9 +204,9 @@ export default class MainMenuFlyOut extends Vue {
     //      currentlyFocusedIndex = index of the menu item that is currently focused
     private focusByLetter(queryLetter: string, currentlyFocusedIndex: number) {
         // If not at the end of the menu...
-        if (currentlyFocusedIndex !== Object.keys(this.menu.subMenu).length - 1) {
-            for (let i = currentlyFocusedIndex + 1; i < Object.keys(this.menu.subMenu).length; i++) {
-                if (Object.keys(this.menu.subMenu)[i].toLowerCase().startsWith(queryLetter)) {
+        if (currentlyFocusedIndex !== Object.keys(this.menu.submenu).length - 1) {
+            for (let i = currentlyFocusedIndex + 1; i < Object.keys(this.menu.submenu).length; i++) {
+                if (Object.keys(this.menu.submenu)[i].toLowerCase().startsWith(queryLetter)) {
                     document.getElementById(this.menu.name + '-fly-out-menu-item-' + i).focus(); // fly-out-menu-item-1
                 }
             }
@@ -174,24 +219,24 @@ export default class MainMenuFlyOut extends Vue {
     //      sectionName = name of the submenu section of the activated submenu link
     //      submenuLink = the submenu link to be activated
     //      isKeyboardEvent = whether or not the native DOM event was from a key press or not
-    private activateSubmenuLink(item: MainMenuItem,
+    private handleSubmenuLinkActivation(mainMenuItem: any,
                                 sectionName: string,
                                 submenuLink: SubmenuLink,
                                 isKeyboardEvent: boolean) {
         let activatedFlag: boolean = true;
         // Deactivate all other submenu links, besides the submenu link to be activated
-        for (let i = 0; i < this.menu.subMenu[sectionName].length; i++) {
-            const menuItem: SubmenuLink = this.menu.subMenu[sectionName][i];
-            this.menu.subMenu[sectionName][i].active = (menuItem.title === submenuLink.title) && !submenuLink.active;
-            if ((menuItem.title === submenuLink.title) && !submenuLink.active) {
+        for (let i = 0; i < this.menu.submenu[sectionName].length; i++) {
+            const menuItem: SubmenuLink = this.menu.submenu[sectionName][i];
+            this.menu.submenu[sectionName][i].expanded = (menuItem.title === submenuLink.title) && !submenuLink.expanded;
+            if ((menuItem.title === submenuLink.title) && !submenuLink.expanded) {
                 activatedFlag = false;
             }
         }
 
         if (activatedFlag) {
-            this.activateMenu(item);
+            this.activateMenu(mainMenuItem);
             this.resetAllSubmenuLinksExcept(submenuLink);
-            submenuLink.active = true;
+            submenuLink.expanded = true;
             if (isKeyboardEvent) {
                 // Barely delay to give time for the menu to enter the DOM
                 setTimeout(() => {

@@ -4,7 +4,10 @@ import {MainMenuItem} from '@/classes/MainMenuItem';
 import {RootState} from '@/store';
 
 export const getters: GetterTree<MenuTreeState, RootState> = {
-    menuTree(state: MenuTreeState): MainMenuItem[] {
+    menuTree(state): Array<Object> {
         return state.main;
     },
+    anyMenuIsOpen(state): boolean {
+        return state.main.some((menuItem: any) => menuItem.expanded);
+    }
 };

@@ -13,7 +13,7 @@
                 role="none"
             >
                 <router-link
-                    :to="'/articles/' + article.nodeNumber"
+                    :to=getUrl(article)
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
 
                     class="table-of-contents__menu-item"
@@ -27,12 +27,12 @@
 
                     v-focus="index === focusedIndex"
 
-                    @mouseover.native="radioTogglePreviewVisibleState(index)"
+                    @mouseover.native="handleHoverEvent(index)"
 
-                    @click.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
-                    @keydown.right.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
-                    @keydown.enter.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
-                    @keydown.space.prevent.native="articleSelected(mainMenuAncestor, '/articles/' + article.nodeNumber); article.previewVisible = false;"
+                    @click.prevent.native="articleSelected('/article/' + article.uuid, false)"
+                    @keydown.right.prevent.native="articleSelected('/article/' + article.uuid)"
+                    @keydown.enter.prevent.native="articleSelected('/article/' + article.uuid)"
+                    @keydown.space.prevent.native="articleSelected('/article/' + article.uuid)"
                     @keydown.esc.prevent.native="exitMenu(parentCollection)"
                     @keydown.left.prevent.native="exitMenu(parentCollection)"
                     @keydown.down.prevent.native="moveFocusDownMenu"
@@ -50,7 +50,7 @@
                     >
                         {{ article.title }}
                     </p>
-                    <p class="table-of-contents__author">{{ article.author.firstName }} {{ article.author.lastName }}</p>
+                    <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
                 </router-link>
             </li>
         </ul>
@@ -60,7 +60,6 @@
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { mixin as focusMixin } from 'vue-focus';
 import {MainMenuItem} from '../classes/MainMenuItem';
-import {SubmenuLink} from '../classes/SubmenuLink';
 
 @Component({
     mixins: [focusMixin],
@@ -69,8 +68,9 @@ import {SubmenuLink} from '../classes/SubmenuLink';
 
 // Submenu associated with a unique main menu entry
 export default class TableOfContents extends Vue {
-    @Prop() private parentCollection!: SubmenuLink; //
-    @Prop() private mainMenuAncestor!: MainMenuItem; //
+    // TODO: remove parent collection and pass in individual attributes?
+    @Prop(Object) private parentCollection!: any;
+    @Prop(Object) private mainMenuAncestor!: any;
     private focusedIndex: number; //
     private scrollPosition: number; //
 
@@ -82,26 +82,34 @@ export default class TableOfContents extends Vue {
     }
 
     @Emit('articleSelected')
-    public articleSelected(menu: MainMenuItem, routerLinkLocation: string): void {
+    public articleSelected(routerLinkLocation: string, keyboardEvent?: boolean = true): void {
         this.resetFocus();
+        // TODO: reset hover states of table of content links
+        // this.resetHovers();
     }
 
     @Emit('exitMenu')
-    public exitMenu(parentMenu: SubmenuLink): void {
+    public exitMenu(parentMenu: any): void {
         // Filler
     }
 
+    // Constructs a URL from the provided article in the form of:
+    // /article/{{node}}|{{uuid}}
+    private getUrl(article: any): string {
+        return "/content/" + article.type.substring(article.type.indexOf('--') + 2) +  "/" + article.uuid;
+    }
     // Radio toggles the visibility of the article preview amongst all articles of a collection
     // except for the article menu item with the provided index
-    private radioTogglePreviewVisibleState(visibleMenuItemIndex: number): void {
-        for (let i = 0; i < this.parentCollection.articles.length; i++) {
-            if (i !== visibleMenuItemIndex) {
-                this.parentCollection.articles[i].previewVisible = false;
-            } else {
-                this.parentCollection.articles[visibleMenuItemIndex].previewVisible = true;
-            }
-        }
+    private handleHoverEvent(hoveredIndex: number): void {
+        this.parentCollection.articles = this.parentCollection.articles.map((article, i) => {
+            article.previewVisible = (i === hoveredIndex);
+            return article;
+        });
     }
+
+    /*********************************/
+    /* KEYBOARD NAVIGATION FUNCTIONS */
+    /*********************************/
 
     // Resets the focus so no menu item is in focus
     // TODO: make this global for menu components?

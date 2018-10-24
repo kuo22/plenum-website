@@ -38,11 +38,9 @@ import {Article} from '../types/types';
 
 // Submenu associated with a unique main menu entry
 export default class ArticlePreviews extends Vue {
-    @Prop({ type: Array < Article > [] })
-    private articles!: Article[];
+    @Prop({ type: Array, default: () => []}) private articles!: Array<Object>; // DEP: Array<Article>[]
 
-    @Prop({ type: SubmenuLink })
-    private parentCollection!: SubmenuLink;
+    @Prop(Object) private parentCollection!: Object; // DEP: SubmenuLink
 
     constructor() { super(); }
 

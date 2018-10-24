@@ -55,6 +55,7 @@ export default class TheLogo extends Vue {
     private logoSketch(animationSpeed: number, transitionSpeed: number): any {
         let sketch;
         const rotateSquare = false; // whether to rotate the thick square
+        const fadeActive = false; // whether the polygons fade in and out
 
         try {
             if (100 % transitionSpeed !== 0) {
@@ -92,7 +93,7 @@ export default class TheLogo extends Vue {
                         p.noFill();
 
                         fadeTextImage(p.map(degrees, 0, 100, 0, 255));
-                        rotatePolygons(keyframe, rotateSquare);
+                        rotatePolygons(keyframe, rotateSquare, fadeActive);
 
                         // Logic for accelerated movement
                         // Update keyframe position and position along degrees
@@ -118,8 +119,9 @@ export default class TheLogo extends Vue {
                         // parameter(s) needed:
                         //      keyframe = current frame of the animation
                         //      rotateSquare = whether or not the large bold square rotates
-                        function rotatePolygons(keyframe: number, rotateSquare: boolean) {
-                            for (let i = 0; i < 4; i++) {
+                        function rotatePolygons(keyframe: number, rotateSquare: boolean, fadeActive: boolean) {
+                            let numPolys = 4; // Standard 4
+                            for (let i = 0; i < numPolys; i++) {
                                 p.push();
                                 p.translate(p.width / 2, p.height / 2);
 
@@ -132,7 +134,7 @@ export default class TheLogo extends Vue {
                                     p.rotate(keyframe / (i * 50.0 + 100.0));
                                 }
 
-                                polygon(0, 0, 100 - i * 5.0, i + 4);
+                                polygon(0, 0, 100 - i * 5.0, i + 4, keyframe, fadeActive);
                                 p.pop();
                             }
                         }
@@ -143,15 +145,53 @@ export default class TheLogo extends Vue {
                         //      y       = y-coordinate
                         //      radius  = radius of a polygon's circumcircle
                         //      npoints = number of points on the polygon
-                        function polygon(x, y, radius, npoints) {
+                        function polygon(x, y, radius, npoints, keyframe, fadeActive) {
+                            const grad = p.lerpColor(p.color(218, 165, 32), p.color(0), 1.0);
                             const angle = p.TWO_PI / npoints;
+                            //p.stroke(p.lerpColor(p.color(0), p.color(255), 0));
                             p.beginShape();
                             p.strokeWeight(20.0 / (npoints * (0.4 * npoints)));
-                            p.stroke((npoints / 4.0) * 40.0 - 40.0);
 
                             for (let a = 0; a < p.TWO_PI; a += angle) {
                                 const sx = x + p.cos(a) * radius;
                                 const sy = y + p.sin(a) * radius;
+                                if (fadeActive) {
+                                    let speed;
+                                    let step;
+                                    let fade = 1;
+                                    switch (npoints) {
+                                        case 5:
+                                        case 8:
+                                            speed = 360;
+                                            step = (keyframe - npoints) % speed;
+                                            if (step < speed / 2) {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, 0, speed / 2, 0, 1)));
+                                            } else {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, speed / 2, speed, 1, 0)));
+                                            }
+                                            break;
+                                        case 6:
+                                        case 9:
+                                            speed = 240;
+                                            step = (keyframe - npoints) % speed;
+                                            if (step < speed / 2) {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, 0, speed / 2, 0, 1)));
+                                            } else {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, speed / 2, speed, 1, 0)));
+                                            }
+                                            break;
+                                        case 7:
+                                        case 10:
+                                            speed = 180;
+                                            step = (keyframe - npoints) % speed;
+                                            if (step < speed / 2) {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, 0, speed / 2, 0, 1)));
+                                            } else {
+                                                p.stroke(p.lerpColor(p.color(0), p.color(255), p.map(step, speed / 2, speed, 1, 0)));
+                                            }
+                                            break;
+                                    }
+                                }
                                 p.vertex(sx, sy);
                             }
 

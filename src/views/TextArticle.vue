@@ -23,7 +23,7 @@
                         class="article__info-container article__info-container--headroom"
                         :title="article.title"
                         :subtitle="article.subtitle"
-                        :author="article.author.firstName + ' ' + article.author.lastName"
+                        :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
                         :hideTitleCard="isAtPageTop || scrollSessionFromTop"
                     ></text-article-title-card>
                 </header>
@@ -42,7 +42,7 @@
 
                             :title="article.title"
                             :subtitle="article.subtitle"
-                            :author="article.author.firstName + ' ' + article.author.lastName"
+                            :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
                     ></text-article-title-card>
                 </transition>
             </div>
@@ -66,7 +66,12 @@
                 <hr>
 
                 <div class="article__body">
-                    <p v-html="article.body"></p>
+                    <section
+                        v-for="section in article.body"
+                        v-html="section.processed"
+                    >
+                    </section>
+
                 </div>
 
                 <hr v-view="onPresenceOfBiblio">
@@ -91,7 +96,7 @@
                     class="footer__copyright"
             >
                 <p>
-                    Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
+                    Copyright &#169; {{ authorCopyrightFormat }}
                     <br>
                     All rights reserved.
                 </p>
@@ -99,7 +104,7 @@
 
             <a
                 class="footer__download-button"
-                :title="'Download the Article: ' + article.title"
+                :title="'Download the Article, ' + article.title + ', as a PDF.'"
                 :href="article.downloadURL"
                 target="_blank"
 
@@ -125,7 +130,6 @@
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import {Article, Collection} from "@/types/types";
 import APIService from '@/API';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
 import TextArticleTitleCard from '../components/TextArticleTitleCard';
@@ -149,10 +153,10 @@ export default class TextArticle extends Vue {
 
     // Internal data
     private articleLoading: boolean;
-    private article: Article;
+    private article: any;
     private articleError: boolean;
 
-    private issue: Collection;
+    private issue: any;
     private issuePosition: number; // index of current article within issue
 
     private headerHovered: boolean;
@@ -197,10 +201,17 @@ export default class TextArticle extends Vue {
     }
 
     // When view is mounted, retrieve article
-    public mounted() {
+    private mounted() {
         this.fetchArticle();
     }
 
+    private get authorCopyrightFormat(): string {
+        let singleAuthor = (typeof this.article.author === 'string') ? this.article.author : this.article.author[0];
+        singleAuthor = singleAuthor.split(' ').reverse().join(', ');
+        singleAuthor = singleAuthor.substring(0, singleAuthor.indexOf(', ') + 3) + ".";
+        singleAuthor += (typeof this.article.author === 'string') ? "" : " et al.";
+        return singleAuthor;
+    }
     // public mounted() {
     //     this.issue = this.$store.getters['issues/getIssue'](this.article);
     //     this.issuePosition = this.issue.articles.findIndex(art => art.uuid === this.article.uuid);
@@ -261,7 +272,7 @@ export default class TextArticle extends Vue {
     }
 
     //
-    private fetchArticle() {
+    private async fetchArticle() {
         this.articleError = this.article = null;
         this.articleLoading = true;
 
@@ -270,39 +281,30 @@ export default class TextArticle extends Vue {
         // TODO: use publication to confirm or get article, currently arbitrary
         // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
 
-        const drupalNodeID = this.$route.params.node;
+        const uuid = this.$route.params.id;
+        const contentType = this.$route.params.content_type;
 
-        // TODO: this is being called before store is filled with articles
-        let temp = this.$store.getters['issues/getArticle'](drupalNodeID);
-        if (temp.length > 0) {
+        let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
+        if (temp !== undefined && temp.length > 0) {
             this.article = temp[0];
             this.issue = temp[1];
             this.issuePosition = temp[2];
+
+            this.articleLoading = false;
+            this.articleError = false;
         } else {
-            APIService.fetchArticle(drupalNodeID)
-                .then((response: Article) => {
-                    this.article = response;
-                    return response;
-                }).catch((error) => {
-                // TODO: plan for error
-                this.articleError = error.toString();
-            });
+            this.article = await APIService.fetchContentByUUID(uuid, contentType)
+                .then(article => {
+                    this.$store.dispatch('issues/addArticle', article);
+                    this.articleLoading = false;
+                    return article;
+                })
+                .catch(err => {
+                    this.articleError = true;
+                    this.articleLoading = false;
+                    console.error(err);
+                });
         }
-
-        // Request article from store
-        // Within store, if article does not exist and
-        // API request returns 404, then show error message
-        // this.api.getArticle(this.drupalNodeID)
-        //     .then((article: ArticlePeerReviewed) => {
-        //         this.article = article;
-        //     })
-        //     .catch(
-        //         // reveal error message
-        //     );
-
-        // if Article does not exist in current store variable of all articles
-        // Then fetch article
-
     }
 }
 </script>

@@ -8,35 +8,35 @@
     >
         <li
             v-for="(menu, index) in menuItems"
-            :id="menu.name.toLowerCase().replace(' ', '-') + '-main-menu-item'"
+            :id="menu.title.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             :key="index"
 
             class="main-menu__menu-item menu-button"
             :style="changeBackground(menu)"
 
-            @mouseenter="menu.hoverState = true"
-            @mouseleave="menu.hoverState = false"
+            @mouseenter="menu.hovered = true"
+            @mouseleave="menu.hovered = false"
         >
 
             <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
             <a
-                v-if="menu.subMenu && Object.getOwnPropertyNames(menu.subMenu).length > 1"
+                v-if="menu.submenu && Object.getOwnPropertyNames(menu.submenu).length > 1"
                 :id="'main-menu-item-' + index"
-                :key="'link-to-' + menu.name.replace(' ', '-')"
+                :key="'link-to-' + menu.title.replace(' ', '-')"
 
                 role="menuitem"
                 aria-haspopup="true"
-                :aria-expanded="menu.open ? 'true' : 'false'"
+                :aria-expanded="menu.expanded.toString()"
                 :tabindex="index === focusedIndex || (allFlyOutsAreClosed && index === 0) ? '0' : '-1'"
 
                 v-focus="index === focusedIndex"
 
-                @click="menu.open ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
-                @keydown.enter.prevent="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
-                @keydown.space="menu.open ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
-                @keydown.esc="menu.open ? closeMainMenuFlyOut(menu, index, true) : null"
-                @keydown.right="menu.open ? focusToFlyOut(menu) : openMainMenuFlyOut(menu, true)"
-                @keydown.left="menu.open ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
+                @click="menu.expanded ? closeMainMenuFlyOut(menu, index, false) : openMainMenuFlyOut(menu, false)"
+                @keydown.enter.prevent="menu.expanded ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
+                @keydown.space="menu.expanded ? closeMainMenuFlyOut(menu, index, true) : openMainMenuFlyOut(menu, true)"
+                @keydown.esc="menu.expanded ? closeMainMenuFlyOut(menu, index, true) : null"
+                @keydown.right="menu.expanded ? focusToFlyOut(menu) : openMainMenuFlyOut(menu, true)"
+                @keydown.left="menu.expanded ? focusToFlyOut(menu, true) : openMainMenuFlyOut(menu, true, true)"
                 @keydown.up.prevent="moveUp"
                 @keydown.down.prevent="moveDown"
                 @keydown.home.prevent="focusedIndex = 0"
@@ -48,14 +48,15 @@
                 <span
                     class="main-menu__menu-item-content menu-button-content"
                     tabindex="-1"
-                >
-                    {{ menu.name }}&nbsp;
+                ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
+                    {{ menu.title }}&nbsp;
                 </span>
             </a>
             <router-link
-                 v-else :to="'/' + menu.name.toLowerCase()"
+                 v-else
+                 :to="'/' + menu.title.toLowerCase()"
                  :id="'main-menu-item-' + index"
-                 :key="'link-to-' + menu.name.toLowerCase().replace(' ', '-')"
+                 :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
 
                  v-focus="index === focusedIndex"
 
@@ -63,9 +64,9 @@
                  aria-haspopup="false"
                  :tabindex="index === 0 || index === focusedIndex ? '0' : '-1'"
 
-                 @click.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
-                 @keydown.right.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
-                 @keydown.enter.prevent.native="activateRouterLink('/' + menu.name.toLowerCase())"
+                 @click.prevent.native="openContent('/' + menu.title.toLowerCase(), false)"
+                 @keydown.right.prevent.native="openContent('/' + menu.title.toLowerCase())"
+                 @keydown.enter.prevent.native="openContent('/' + menu.title.toLowerCase())"
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
@@ -74,22 +75,22 @@
                 <span
                     class="main-menu__menu-item-content menu-button-content"
                     tabindex="-1"
-                > <!-- TODO: get ride of this hacky &nbsp; -->
-                    {{ menu.name }}&nbsp;
+                > <!-- TODO: get ride of this hacky &nbsp; next to menu title-->
+                    {{ menu.title }}&nbsp;
                 </span>
             </router-link>
 
             <transition name="fly-out-slide">
                 <main-menu-fly-out
-                    v-show="menu.open"
+                    v-show="menu.expanded"
                     class="fly-out"
-                    :class="{ 'fly-out--open': menu.open, 'fly-out--hidden': menu.hidden }"
+                    :class="{ 'fly-out--open': menu.expanded, 'fly-out--hidden': menu.hidden }"
                     :menu="menu"
 
                     @activateMenu="openMainMenuFlyOut"
                     @toggleOpen="openMainMenuFlyOut"
                     @closeMainMenuFlyOut="closeMainMenuFlyOut"
-                    @openArticle="openArticle"
+                    @openArticle="openContent"
                     @collectionActivated="incrementPagesVisited"
                 >
                 </main-menu-fly-out>
@@ -100,10 +101,9 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
-import { MainMenuItem } from '@/classes/MainMenuItem';
 import MainMenuFlyOut from '@/components/MainMenuFlyOut';
-import { mixin as focusMixin } from 'vue-focus';
-import { SubmenuLink } from '../classes/SubmenuLink';
+import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' error
+
 
 @Component({
     mixins: [focusMixin],
@@ -114,86 +114,54 @@ import { SubmenuLink } from '../classes/SubmenuLink';
 
 // Main navigation
 export default class TheMainMenu extends Vue {
-    @Prop() private menuItems!: MainMenuItem[]; // Main Menu Items
+    @Prop(Array) private menuItems!: Array<any>; // Main Menu Items
 
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
     private focusedIndex: number; // Index of the focused menu item; Initialize to non-existent index value
-    private pagesVisited: number; // The number of pages visited in one menu session
-    // TODO: create a 'endMenuSession' method that runs a reset and proceed procedure
 
     constructor() {
         super();
         this.focusedIndex = -1;
-        this.pagesVisited = 0;
     }
 
-    // Emits an open event to the parent
-    @Emit('open')
-    public open(item: MainMenuItem, keyboardEvent: boolean): void {
-        /* TODO: tslint fix - 'no-empty blocks' */
-    }
+    // The procedure to open an article
+    // parameter(s) needed:
+    //      routerLinkLocation  = a url endpoint of the requested content
+    //      keyboardEvent?      = if the open content event was caused by a keyboard, defaults true
+    @Emit('openContent')
+    private openContent(routerLinkLocation: string, keyboardEvent?: boolean = true) {}
+
+    // Calls the router to go back in history to the page that was loaded before a menu session
+    @Emit('revertMenuSession')
+    private revertMenuSession(): void {}
 
     // Returns whether or not all of the fly out submenus are closed
     private get allFlyOutsAreClosed() {
-        let openFlag: boolean = true;
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (this.menuItems[i].open) {
-                openFlag = false;
-            }
-        }
-        return openFlag;
+        return !this.menuItems.some((menuItem: any) => menuItem.expanded);
     }
 
-    // Closes all of the fly out menus
-    public closeAllFlyOuts(): void {
-        this.routerBackToPreviousPage();
+    private handleHoverEvent(event, mainMenuItemIndex) {
+        if (event.type === 'mouseenter') {
 
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (this.menuItems[i].open) {
-                this.toggleOpenMenu(this.menuItems[i], false);
-                this.menuItems[i].open = false;
-            }
-        }
-    }
+        } else if (event.type === 'mouseleave') {
 
-    // Opens the provided URL
-    private activateRouterLink(routerURL: string): void {
-        this.$router.push(routerURL);
-    }
-
-    // TODO: DOES NOT BELONG IN MAIN MENU
-    // The procedure to open an article
-    // parameter(s) needed:
-    //      menu                = a main menu item
-    //      routerLinkLocation  = a url endpoint
-    private openArticle(menu: MainMenuItem, routerLinkLocation: string) {
-        this.pagesVisited = 0;
-        this.closeMainMenuFlyOut(menu, null, false); // TODO: get 'true' via parameters
-        this.$router.push(routerLinkLocation);
-    }
-
-    // Changes the background color of a menu item based on its hover state
-    // parameter(s) needed:
-    //      menuitem = menu item to be changed
-    private changeBackground(menuItem: MainMenuItem): {} {
-        let bg = {};
-
-        if (menuItem.hoverState || menuItem.open) {
-            bg = { background: 'transparent' };
         } else {
-            bg = { background: menuItem.color };
+            console.error('incorrectly used function: handleHoverEvent in TheMainMenu');
         }
+    }
 
-        // If another menu item is open, while this item is active -> show background
-        if (menuItem.open) {
-            for (const otherItem: MainMenuItem of this.menuItems) {
-                if (otherItem.name !== menuItem.name && otherItem.open) {
-                    bg = {background: menuItem.color};
-                }
-            }
+    // Sets the open menu and if the menu to open is already open, it closes
+    // parameter(s):
+    //      menuItem        = main menu item to be opened or closed
+    //      isKeyBoardEvent = whether or not the native DOM event was from a key press or not
+    //      toLastMenuItem  = whether or not focus goes to the last menu item; defaults to first menu item
+    private openMainMenuFlyOut(menuItem: any,
+                               isKeyboardEvent: boolean,
+                               toLastMenuItem?: boolean = false): void {
+        this.$store.dispatch('menuTree/openMainMenuItem', menuItem);
+        if (isKeyboardEvent) {
+            this.focusToFlyOut(menuItem, toLastMenuItem);
         }
-
-        return bg;
     }
 
     // Closes the flyout submenu for the provided main menu item and optionally moves focus to the parent menu item
@@ -201,20 +169,10 @@ export default class TheMainMenu extends Vue {
     //      menuItem         = parent menu item of the to-be closed flyout submenu
     //      menuItemIndex    = index of the main menu item in the main menu list
     //      wasKeyboardEvent = if the event that called this method was from a keyboard action
-    private closeMainMenuFlyOut(menuItem: MainMenuItem,
+    private closeMainMenuFlyOut(menuItem: any,
                                 menuItemIndex: number,
                                 returnFocusToMainMenuItem?: boolean = false) {
-        if (menuItem.open) {
-            this.toggleOpenMenu(menuItem, false);
-        } else {
-            this.resetSubmenuLinks(menuItemIndex);
-        }
-
-        if (menuItemIndex === null) {
-            menuItemIndex = this.getIndexOfMenuItem(menuItem);
-        }
-        this.menuItems[menuItemIndex].open = false;
-
+        // Returns focus for keyboard navigation
         if (returnFocusToMainMenuItem) {
             setTimeout(() => {
                 this.focusedIndex = menuItemIndex;
@@ -225,112 +183,44 @@ export default class TheMainMenu extends Vue {
             this.focusedIndex = -1;
         }
 
-        this.routerBackToPreviousPage();
+        this.revertMenuSession();
     }
 
-    // Sets the open menu and if the menu to open is already open, it closes
-    // parameter(s):
-    //      menuItem        = main menu item to be opened or closed
-    //      isKeyBoardEvent = whether or not the native DOM event was from a key press or not
-    //      toLastMenuItem  = whether or not focus goes to the last menu item; defaults to first menu item
-    private openMainMenuFlyOut(menuItem: MainMenuItem,
-                               isKeyboardEvent: boolean,
-                               toLastMenuItem?: boolean = false): void {
-        const index: number = this.getIndexOfMenuItem(menuItem);
-        // Close all flyouts
-        for (const menuItem of this.menuItems) {
-            this.menuItems[index].open = false;
-        }
-
-        if (menuItem.subMenu) {
-            this.menuItems[index].open = true;
-            this.menuItems[index].hidden = false; // TODO: what is the purpose of hidden?
-        } else {
-            this.toggleOpenMenu(menuItem);
-        }
-
-        if (isKeyboardEvent) {
-            this.focusToFlyOut(menuItem, toLastMenuItem);
-        }
-
-    }
-
-    // Calls the router to go back in history to the page that was loaded before a menu session
-    private routerBackToPreviousPage(): void {
-        if (this.pagesVisited > 0) {
-            this.$router.go(this.pagesVisited * -1);
-            this.pagesVisited = 0;
-        }
-    }
-
+    // TODO: rename to event handler and does this belong here?
     // Increments the number of pages visited during a menu session
-    private incrementPagesVisited(submenuLink: SubmenuLink): void {
-        this.pagesVisited++;
+    private incrementPagesVisited(): void {
+        this.$store.dispatch('routerNav/pageVisited');
     }
+
+    /*****************/
+    /* CSS FUNCTIONS */
+    /*****************/
+
+    // Changes the provided menu item background to transparent if the menu item is being hovered over or is active
+    // parameter(s) needed:
+    //      menuItem = menu item to be changed
+    private changeBackground(menuItem): {} {
+        if (menuItem.hovered || menuItem.expanded) {
+            return { background: 'transparent' };
+        } else {
+            return { background: menuItem.color };
+        }
+    }
+
+    /*********************************/
+    /* KEYBOARD NAVIGATION FUNCTIONS */
+    /*********************************/
+    // TODO: Find library to handle keyboard navigation, or globalize these functions for each menu
 
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
     // parameter(s) needed:
     //      menu           = parent menu of the flyout to be focused on
     //      toLastMenuItem = whether or not focus goes to the last menu item; defaults to first menu item
-    private focusToFlyOut(menu: MainMenuItem, toLastMenuItem?: boolean = false) {
-        const index: number = toLastMenuItem ? Object.keys(menu.subMenu).length - 1 : 0;
+    private focusToFlyOut(menu: any, toLastMenuItem?: boolean = false) {
+        const index: number = toLastMenuItem ? Object.keys(menu.submenu).length - 1 : 0;
         setTimeout(() => {
-            document.getElementById(menu.name + '-fly-out-menu-item-' + index.toString()).focus();
+            document.getElementById(menu.title + '-fly-out-menu-item-' + index.toString()).focus();
         }, 10);
-    }
-
-    // Toggles the active state of main menu item or optionally declares the active state
-    // parameter(s):
-    //      item    = main menu item
-    //      open  = whether or not the main menu item's fly out is open
-    private toggleOpenMenu(item: MainMenuItem, open?: boolean = !item.open): void {
-        // Reset all submenus
-        const index: number = this.getIndexOfMenuItem(item);
-
-        this.menuItems[index].open = open;
-
-
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (i !== index) {
-                this.menuItems[i].open = false;
-                this.menuItems[i].hidden = true;
-            } else {
-                if (this.menuItems[index].subMenu && Object.keys(this.menuItems[index].subMenu).length > 0) {
-                    this.resetSubmenuLinks(index);
-                }
-            }
-        }
-
-        this.menuItems[index].hidden = false;
-    }
-
-    // Resets all submenu links provided to be deactivated
-    // parameter(s) needed:
-    //      mainMenuItemIndex = the locational index of a main menu item
-    private resetSubmenuLinks(mainMenuItemIndex: number) {
-        for (const submenuItemKey: string in this.menuItems[mainMenuItemIndex].subMenu) {
-            if (this.menuItems[mainMenuItemIndex].subMenu.hasOwnProperty(submenuItemKey)) {
-                for (let j = 0; j < this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey].length; j++) {
-                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].previewVisible = false;
-                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].active = false;
-                    this.menuItems[mainMenuItemIndex].subMenu[submenuItemKey][j].hidden = true;
-                }
-            }
-        }
-    }
-
-    // Returns the locational index of the provided menu item
-    // parameter(s) needed:
-    //      menuItem = a main menu item
-    private getIndexOfMenuItem(menuItem: MainMenuItem): number {
-        let index = -1;
-        for (let i = 0; i < this.menuItems.length - 1; i++) {
-            if (this.menuItems[i].name === menuItem.name) {
-                index = i;
-            }
-        }
-
-        return index;
     }
 
     // Setter for the data of the index of the focused menu item
@@ -355,13 +245,12 @@ export default class TheMainMenu extends Vue {
     //      queryLetter           = single letter to be queried across menu item labels
     //      currentlyFocusedIndex = index of the menu item that is currently focused
     private focusByLetter(queryLetter: string, currentlyFocusedIndex: number) {
-        // If not at the end of the menu...
+        // If not at the end of the menu... This logic follows WAI-ARIA keyboard nav standards
         if (currentlyFocusedIndex !== this.menuItems.length - 1) {
-            for (let i = currentlyFocusedIndex + 1; i < this.menuItems.length; i++) {
-                if (this.menuItems[i].name.toLowerCase().startsWith(queryLetter)) {
-                    document.getElementById('main-menu-item-' + i).focus();
-                }
-            }
+            let el = 'main-menu-item-' + this.menuItems
+                .slice(currentlyFocusedIndex + 1)
+                .findIndex((menuItem: any) => menuItem.title.toLowerCase().startsWith(queryLetter));
+            document.getElementById(el).focus();
         }
     }
 }

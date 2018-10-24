@@ -1,18 +1,18 @@
-import Vue from "vue";
 import {Module} from "vuex";
 
 import {RootState} from "@/store";
 import {Article, Collection} from '@/types/types';
 
-
 interface IssuesState {
     issues: Array<Collection>; // Key is JSON API ID ("081b98ba-4ec8-429d-9152-2c231f45885a")
+    articles: Array<Object>;
 }
 
 export const IssuesStoreModule: Module<IssuesState, RootState>  = {
     namespaced: true,
     state: {
-        issues: []
+        issues: [],
+        articles: []
     },
     getters: {
         getIssue: (state) => (article: Article) => {
@@ -22,8 +22,11 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
                 });
             });
         },
-        getArticle: (state) => (nodeNum: number) => {
-            console.log(state.issues.length);
+        // TODO: return article with issue information?
+        getArticleByUUID: (state) => (uuid: string) => {
+            return state.articles.find((article: any) => article.uuid == uuid);
+        },
+        getArticleByNode: (state) => (nodeNum: number) => {
             let issues = [...state.issues];
             let issueCount = state.issues.length;
             for (let i = 0; i < issueCount; i++) {
@@ -45,11 +48,22 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
             state.issues = tempIssues.sort((issueA, issueB) => {
                 return issueA.datePublished.split('T')[0] < issueB.datePublished.split('T')[0] ? -1: 1;
             });
+        },
+
+        addArticle(state, article: Object) {
+            state.articles.push(article);
         }
     },
     actions: {
-        addIssue(context, issue: Collection) {
-            context.commit('addIssue', issue);
+        addIssue({ commit }, issue: Collection) {
+            commit('addIssue', issue);
+        },
+
+        addArticle({ commit, state }, article: any) {
+            // If article does not already exist in store
+            if (!state.articles.find((storeArticle: any) => storeArticle.uuid === article.uuid)) {
+                commit('addArticle', article);
+            }
         }
     }
 };
