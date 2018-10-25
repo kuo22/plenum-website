@@ -1,359 +1,200 @@
 import { ActionTree } from 'vuex';
-import {Article, Author, Collection, DrupalMenu} from '@/types/types';
-import {MenuTreeState, RootState} from '@/types/storeTypes';
-import {error} from 'util';
-import {MainMenuItem} from '@/classes/MainMenuItem';
-import {SubmenuLink} from '@/classes/SubmenuLink';
+
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
+
 import APIService from '../../../API';
+import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
+import {RootState} from '@/store';
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
-    // Creates the app's navigation menus with data from Drupal
-    // parameter(s) needed:
-    //      { commit } = a reference to the this store variable's mutations
-    async createMenuItems({ commit }): Promise<any> {
+    // Create the app's navigation menus via API data
+    async createMenu({ commit, dispatch }): Promise<any> {
         return APIService.fetchMenuTree()
-            .then((menuTreeData) => { // : {}[]
-                // Parse through all Drupal data for node representations of Drupal entities
-                for (const menuItemData of menuTreeData) {
-                    if (menuItemData.link.title === 'Publications') {
-                        const submenuTree = menuItemData.subtree;
-                        for (const submenuSection of submenuTree) {
-                            for (const issueData of submenuSection.subtree) {
-                                const issueDataCleaned = issueData.link;
-                                if ('node' in issueDataCleaned.route_parameters) {
-                                    // Issue nodes accessed
-                                    // console.log(issueData.route_parameters.node);
-                                }
-                            }
-                        }
-                    }
-                }
-                return menuTreeData;
-            }).then((menuTreeData: any) => {
-                return createMenuTreeFromData(menuTreeData)
-                    .then((drupalMenuTree) => {
-                        return drupalMenuTree;
-                    });
-            }).then((drupalMenuTree) => {
-                let menuTree: MainMenuItem[];
+            .then(dirtyMenuTreeData => dirtyMenuTreeData.map(processMenuData))
+            .then(menuTreeData => fillMissingDataInMenuTree(menuTreeData, 1, dispatch))
+            .then(minimalMenuTree => {
+                let menuColors = getPerceptuallyUniformColors(27, minimalMenuTree.length);
+                minimalMenuTree.map((mainMenuItem, i) => mainMenuItem.color =  menuColors[i]);
 
-                drupalMenuTree.sort(
-                    (menu1, menu2) => {
-                        return menu1.weight - menu2.weight;
-                    },
-                );
+                commit('menusLoaded', minimalMenuTree);
 
-                menuTree = createMenuItems(drupalMenuTree);
-
-                commit('menusLoaded', menuTree);
-
-                return menuTree;
-            }).catch((error) => {
-                // console.log(error);
+                return minimalMenuTree;
+            }).catch((err) => {
+                // TODO: handle error
+                console.error(err);
             });
     },
+
+    closeMenuExpansions({ commit, getters }) {
+        if (getters.anyMenuIsOpen) {
+            commit('deactivateAllPreviews');
+            commit('deactivateMainMenuItems');
+        }
+    },
+
+    closeMainMenu({ commit }) {
+        commit('deactivateMainMenuItems');
+    },
+
+    openMainMenuItem({ commit, getters }, menuItem) {
+        // TODO: remove redundancy with closeMenuExpansions
+        if (getters.anyMenuIsOpen) {
+            commit('deactivateAllPreviews');
+            commit('deactivateMainMenuItems');
+        }
+        commit('activateMainMenuItem', menuItem);
+    },
+
+    // Deactivates current preview, and turns on requested preview
+    activateSubmenuPreview({ commit, state }, newActivation) {
+        let menuTree = [...state.main];
+        // TODO: make toggleActivation 'global' to prevent remaking of function on each call to this method
+        let toggleActivation = (submenuItem) => {
+            submenuItem.expanded = submenuItem.uuid === newActivation.uuid;
+            return submenuItem;
+        };
+        menuTree = menuTree.map((mainMenuItem: any) => {
+            if (mainMenuItem.expanded && mainMenuItem.hasSections) { // Expanded with sections
+                mainMenuItem.submenu.map(section => {
+                    section.submenu.map(toggleActivation)
+                })
+            } else if (mainMenuItem.expanded) { // Expanded with links
+                mainMenuItem.submenu.map(toggleActivation)
+            }
+            return mainMenuItem;
+        });
+
+        commit('updateMenuTree', menuTree);
+    },
+
+    deactivateAllPreviews({ commit, state }) {
+        let menuTree = [...state.main];
+        menuTree = menuTree.map(deactivateSubmenus);
+        commit('updateMenuTree', menuTree);
+    }
 };
 
-// function fetchIssues(menuTreeData): Promise<any> {
-//
-// }
+// Processes Drupal data from the Menu Items API and returns a front-end ready menu tree
+// parameter:
+//      Object = Object tree of menu item nodes
+let processMenuData = ({title, description, uri, uuid, expanded, weight, below}) => {
+    let menuItem: any = {title, description, weight, uuid};
 
-async function createMenuTreeFromData(menuTree: any): Promise<any> {
-    const menus: DrupalMenu[] = [];
-    const coverImageURL = '';
-
-    if (menuTree.length > 0) {
-
-        for (const menuNode of menuTree) {
-            // const menuNode = menuTree[i];
-
-            const newMenu: DrupalMenu = {
-                title: menuNode.link.title,
-                description: menuNode.link.description,
-                weight: menuNode.link.weight,
-                depth: menuNode.depth,
-                url: menuNode.link.url,
-                has_children: menuNode.has_children,
-                subtree: await createMenuTreeFromData(menuNode.subtree),
-            };
-
-            // if menuNode is a Drupal entity
-            if ('node' in menuNode.link.route_parameters) {
-                const nodeNumber = menuNode.link.route_parameters.node;
-                const contentData = await APIService.fetchContent(nodeNumber)
-                    .then((data) => {
-                        if (Object.keys(data).length > 0) {
-                        const articleUUIDs: string[] = [];
-
-                        for (const article of data.field_articles) {
-                                articleUUIDs.push(article.target_uuid);
-                            }
-
-                        newMenu.coverImageURL = data.field_cover_image[0].url + '';
-                        return APIService.fetchCollection(articleUUIDs);
-                        }
-                    }).then((articlesData) => {
-                        const articles: Article[] = [];
-                        if (articlesData !== undefined) {
-                            for (const articleData of articlesData) {
-                                if ('field_download_' in articleData.relationships) {
-                                    createArticle(articleData)
-                                        .then((article: Article | void) => {
-                                            if (article) {
-                                                articles.push(article);
-                                            }
-                                        })
-                                        .catch((error) => {
-                                            // console.log(error);
-                                        });
-
-                                } else {
-                                    // TODO: fill in or remove
-                                }
-                            }
-                        }
-
-                        const collection: Collection = {
-                            articles,
-                            title: newMenu.title,
-                            coverImageURL: newMenu.coverImageURL + '',
-                            nodeNumber,
-                            uuid: '',
-                        };
-                        newMenu.collection = collection;
-                        // return this.makeCollection(articles);
-                    });
-            } else {
-                newMenu.coverImageURL = '';
-            }
-            menus.push(newMenu);
-        }
+    if (uri.match(/\d+/g)) { // If any digit in URI (Drupal nodes contain digits, menu groups do not)
+        menuItem.node = uri.substring(5, uri.length);
     }
 
-    return menus.sort(
-        (menu1, menu2) => {
-            return menu1.weight - menu2.weight;
-        },
-    );
-}
+    menuItem.hovered= false;
 
-async function createArticle(articleData: any): Promise<Article | void> {
-    const authorName: string[] = (articleData.attributes.field_author.toString()).split(', ');
-    const author: Author = {
-        lastName: authorName[0],
-        firstName: authorName[1],
-    };
+    if (below) {
+        menuItem.expanded = expanded;
+        menuItem.submenu = below.map(processMenuData).sort((a, b) => a.weight - b.weight);
+    }
 
-    return await APIService.getDownloadURL(articleData.relationships.field_download_.links.related.toString())
-        .then((downloadURL: string) => {
-            const article: Article = {
-                author,
-                title: articleData.attributes.field_title,
-                subtitle: articleData.attributes.field_subtitle,
-                abstract: articleData.attributes.field_abstract,
-                body: articleData.attributes.body[0].processed,
-                refs: articleData.attributes.field_references.processed,
-                copyright: articleData.attributes.field_copyright,
-                downloadURL,
-                nodeNumber: articleData.attributes.nid,
-                uuid: articleData.attributes.uuid,
-                previewVisible: false,
-            };
+    return menuItem;
+};
 
-            return article;
-        })
-        .catch((error) => {
-            // console.log(error);
+// Deactivates provided submenu item
+// parameter:
+//      submenuItem = fly out submenu item
+let deactivateAll = (submenuItem) => {
+    submenuItem.expanded = false;
+    return submenuItem;
+};
+
+// Deactivates all submenu items of the provided main menu item parent
+let deactivateSubmenus = (mainMenuItem) => {
+    if (mainMenuItem.expanded && mainMenuItem.hasSections) { // Expanded with sections
+        mainMenuItem.submenu = mainMenuItem.submenu.map(section => {
+            section.submenu = section.submenu.map(deactivateAll); //this.submenuFn
+            return section;
         });
-}
+    } else if (mainMenuItem.expanded) { // Expanded with links // TODO: deprecate, straight links should not preview
+        mainMenuItem.submenu = mainMenuItem.submenu.map(deactivateAll) //this.submenuFn
+    }
+    return mainMenuItem;
+};
 
-// Returns a list of main menu objects derived from Drupal-provided data
-// parameter(s) needed:
-//      drupalMenuTree = tree of menu objects from drupal data
-// TODO: Replace contents with fetch command to wordpress API
-function createMenuItems(drupalMenuTree: DrupalMenu[]): MainMenuItem[] {
-    const menuItems: MainMenuItem[] = [];
-    const menuColors: string[] = getUniformColors(30, drupalMenuTree.length);
-    let count = 0;
+// Returns a menu tree containing all basic data for the menu
+async function fillMissingDataInMenuTree(menuTree, depth, dispatch): Promise<any> {
+    let menus = await Promise.all(menuTree.slice(0).map(async (item) => { // Map a copy of the inputted menuTree
+        item.depth = depth;
 
-    for (const drupalMenu of drupalMenuTree) {
-        let menuSections: { [sectionHeader: string]: SubmenuLink[] };
-        let isSectioned: boolean = true;
+        if (item.node && item.depth == 3) { // CURRENT MENU ITEM IS A CONTENT COLLECTION (MENUBAR AND BUTTON)
+            let collectionData = await APIService.fetchCollectionMenuData(item.uuid);
 
-        if (drupalMenu.has_children) { // If a submenu exists
-
-            for (let i = 0; i < drupalMenu.subtree.length; i++) {
-                const section = drupalMenu.subtree[i];
-                if (!section.has_children) {
-                    isSectioned = false;
-                }
+            if (collectionData[collectionData.length - 1].type.startsWith('file')) {
+                // TODO: make sure to reference drupal hostname and port in production
+                item.imageURL = window.location.origin.replace(/0/g, '8') + collectionData.pop().attributes.url;
             }
 
-            menuSections = menuSectionsFromDrupalMenu(
-                drupalMenu.subtree,
-                drupalMenu.title + '',
-                isSectioned);
-        } else { // No submenu exists, i.e. 'Volunteer' & 'Contribute'
-            menuSections = {};
+            console.log(collectionData);
+            item.articles = collectionData.map(({ attributes, type }) => {
+                //console.log(attributes);
+                return {
+                    type: type,
+                    uuid: attributes.uuid,
+                    // node: attributes.type
+                    author: attributes.field_author.split(';').map(fullname => {
+                        return fullname.split(',').reverse().map(name => name.trim()).join(' ');
+                    }),
+                    title: attributes.field_title,
+                    subtitle: attributes.field_subtitle,
+                    abstract: attributes.field_abstract,
+                    previewVisible: false
+                }
+            });
+
+            item.expanded = false;
+        } else if (item.node) {     // MENU LINK
+            item.href = "/" + item.title.toLowerCase().replace(/ /g, '-');
+        } else if (item.submenu) {  // ELSE IF SUBMENU AND NO NODE, CURRENT MENUITEM IS A MENUBAR/ GROUP
+            item.submenu = await fillMissingDataInMenuTree(item.submenu, depth + 1, dispatch);
+        } else {                    // CURRENT MENU ITEM IS UNDER CONSTRUCTION / UNAVAILABLE
+            item.disabled = true;
         }
 
-        menuItems.push(
-            new MainMenuItem(
-                drupalMenu.title,
-                menuColors[count],
-                // url
-                // drupalMenu.url,
-                '',
-                menuSections,
-                //
-                // recurse to create menuItems, if
-                // object array with keys from first submenu
-                // and array of values obtained from children of submenu
-                // {
-                //     test: ['test1', 'test2'],
-                // },
-            ),
-        );
+        item.hasSections = (item.depth == 1) && item.submenu && item.submenu.some(menu => !menu.uuid);
 
-        count++;
-    }
+        return item;
+    }));
 
-    return menuItems;
-
-    // Returns a list of menu sections derived from the provided drupal-like menu
-    // parameter(s) needed:
-    //      subTree     =
-    //      parentTitle =
-    function menuSectionsFromDrupalMenu(drupalSections: DrupalMenu[],
-                                        parentTitle: string,
-                                        hasSections: boolean): { [sectionTitle: string]: SubmenuLink[] } {
-        const menuSections: { [sectionTitle: string]: SubmenuLink[] } = {};
-
-
-        if (hasSections) {
-            for (let i = 0; i < drupalSections.length; i++) {
-                const drupalSection = drupalSections[i];
-                const sectionList: SubmenuLink[] = [];
-
-                if (drupalSection.has_children && drupalSection.depth === 2) {
-                    // Then add title of section to list of rendered menu sections
-                    // sectionLink : DrupalMenu
-                    for (const sectionLink of drupalSection.subtree) {
-
-                        if (sectionLink.coverImageURL === undefined) {
-                            sectionLink.coverImageURL = 'poop';
-                        }
-
-                        let submenuLink: SubmenuLink;
-
-                        if (sectionLink.collection) {
-                            submenuLink =
-                                new SubmenuLink(
-                                    sectionLink.title,
-                                    sectionLink.coverImageURL + '',
-                                    sectionLink.collection.articles,
-                                    0,
-                                    'uuid',
-                                    sectionLink.url,
-                                );
-                        } else {
-                            submenuLink =
-                                new SubmenuLink(
-                                    sectionLink.title,
-                                    sectionLink.coverImageURL + '',
-                                    {},
-                                    0,
-                                    'uuid',
-                                    sectionLink.url,
-                                );
-                        }
-
-                        sectionList.push(submenuLink);
-
-                        // console.log(submenuLink);
-
-                    }
-                    menuSections[drupalSection.title] = sectionList;
-                }
-                // } else if (!drupalSection.has_children && drupalSection.depth === 2) { // Else if submenu links
-                //     console.log('error');
-                //     const submenuLink: SubmenuLink = new SubmenuLink(drupalSection.title, drupalSection.url);
-                //     sectionList.push(submenuLink);
-                //     menuSections[parentTitle] = sectionList;
-                // }
-            }
-        } else { // If the submenu links belong to no section except the main menu entry
-            // console.log(drupalSections);
-            const menuList: SubmenuLink[] = [];
-            // link : DrupalMenu
-            for (const link of drupalSections) {
-                if (link.coverImageURL === undefined) {
-                    link.coverImageURL = '';
-                }
-
-                const submenuLink: SubmenuLink = new SubmenuLink(
-                    link.title,
-                    link.coverImageURL,
-                    {},
-                    0,
-                    'uuid',
-                    link.url,
-                );
-                menuList.push(submenuLink);
-            }
-            menuSections[parentTitle] = menuList;
-        }
-
-        return menuSections;
-    }
+    return menus.sort((a: any, b: any) => a.weight - b.weight);
 }
+
 
 // Returns a collection of perceptually uniform colors in RGB form
 // Colors are selected at equal intervals along the LCH uniform color space
 // with the starting point along the gradient determined by the provided parameter
 // parameter(s) needed:
-//      start = starting point of color selection along a cylical color wheel
+//      start = starting point of color selection along a cyclical color wheel
 //                  must be 0 - 90
-function getUniformColors(start: number, numberOfColors: number): string[] {
-    const uniformColors: number[][] = [];
-    const uniformColorsAsString: string[] = [];
+function getPerceptuallyUniformColors(start: number, numberOfColors: number): string[] {
+    const uniformColors: string[] = [];
 
     if (start > 90 || start < 0) {
-        error('Number can\'t be 90 or greater. Number provided: ' + start);
+        console.error('Number can\'t be 90 or greater. Number provided: ' + start);
     } else {
-        const L: number = 90; // 95
-        const C: number = 25; // 50
-        const hMax: number = 360; // 360
+        const L = 90;       // Lightness
+        const C = 25;       // Chroma
+        const hMax = 360;   // Hue
+        const hInterval = hMax / numberOfColors;
 
-        let index = 0;
-        start = 27;
-        for (let i = start; i < 360; i += hMax / numberOfColors) {
-            uniformColors[index] = hsluv.hsluvToRgb((hsluv.lchToHsluv([L, C, i])));
-            index++;
+        for (let H = start; H < hMax; H += hInterval) {
+            uniformColors.push(hsluv.hsluvToRgb((hsluv.lchToHsluv([L, C, H]))).reduce(decimalColorToString, 'rgb('));
         }
     }
 
-    return colorToString(uniformColors);
+    return uniformColors;
 }
 
-// Returns an rgb style string of a provided color
-// Provided color must be in the form of a matrix
+// Returns an rgb style string of a provided rgb color in decimal form
 // parameter(s) needed:
-//      colors = set of colors in the form of a matrix
-function colorToString(colors: number[][]): string[] {
-    const uniformColorsAsString: string[] = [];
-
-    for (const color of colors) {
-        const colorString: string = 'rgb(' +
-            // Rounded numbers to work with chrome
-            Math.round(color[0] * 255) + ', ' +
-            Math.round(color[1] * 255) + ', ' +
-            Math.round(color[2] * 255) + ')';
-        uniformColorsAsString.push(colorString);
-    }
-
-    return uniformColorsAsString;
-}
+//      colorString         = accumulation of rgb string
+//      singleColorValue    = decimal value of an isolated rgb value (r, g, or b)
+//      i                   = current index of the reduced array
+let decimalColorToString = (colorString: string, singleColorValue: number, i: number): string => {
+    return colorString + Math.round(singleColorValue * 255) + (i === 2 ? ')' : ', ');
+};
 

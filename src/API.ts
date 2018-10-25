@@ -1,6 +1,5 @@
 import {Article, Author} from '@/types/types';
 import axios, {AxiosStatic} from 'axios';
-import {DrupalMenu} from '@/types/types';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
 import {error} from 'util';
@@ -8,61 +7,191 @@ import {error} from 'util';
 const namespace: string = 'menuTree';
 
 class API extends Vue {
-    // @Action('setMenuTree', { namespace }) public setMenuTree: any; // Action that calls Drupal API
     @Action('setMenuTree', { namespace }) public setMenuTree: any;
 
     // Content Management System URL path
     private port: string = '8888';
-    private localHost: string = 'http://localhost:' + this.port;
-    private CMSPath: string = this.localHost + '/plenum-drupal-dev/drupal-8.5.3';
+    private hostname: string = 'http://localhost:' + this.port;
+    private CMSPath: string = this.hostname + '/plenum-drupal-dev/drupal-8.5.3';
     private fetcher: AxiosStatic;
 
-    private jsonAPIPath: string = '/jsonapi/node';
-    private drupalAPIPath: string = '/node';
-    private articleEntityPath: string = '/article/';
+    private jsonAPIPath: string = 'jsonapi/node/';
+    private drupalAPIPath: string = 'node/';
+    private articleEntityPath: string = 'article/';
+    private nonAcademicEntityPath: string = 'non_academic_text/';
     private format: string = 'json';
-
 
     constructor() {
         super();
 
         axios.defaults.baseURL = this.CMSPath;
         this.fetcher = axios;
-
     }
 
     // Fetches the navigation hierarchy from the Drupal API
     // and returns a promise for the data
-    public async fetchMenuTree(): Promise<any> {
-        return await this.fetcher({
-            url: 'entity/menu/main/tree',
+    public fetchMenuTree(): Promise<any> {
+        return this.fetcher({
+            url: 'api/menu_items/main', // Rest menu items API
             params: {
                 _format: 'json',
             },
-            timeout: 1000,
+            timeout: 10000,
+        }).then(response => response.data);
+    }
 
-        }).then((response: any) => {
-            return response.data;
+    public fetchCollectionMenuData(collectionUUID: string): Promise<any> {
+        return this.fetcher({
+            url: "jsonapi/node/issue/" + collectionUUID,
+            params: {
+                _format:                'json',
+                include:                'field_articles,field_cover_image',
+                "fields[node--issue]":  'field_release_date,field_cover_image,field_articles',
+                "fields[node--article]":'uuid,field_author,field_title,field_subtitle,field_abstract',
+                "fields[node--non_academic_text]": 'uuid,field_author,field_title,field_subtitle'
+            },
+            timeout: 10000
+        }).then(response => response.data)
+            .then(data => data.included);
+    }
+
+    public async fetchNonAcademicTextByUUID(uuid: string) {
+        const url: string = this.jsonAPIPath + this.articleEntityPath + uuid;
+        const fieldsKey = "fields[node--non_academic_text]";
+        let params = {
+            _format: this.format,
+        };
+        params[fieldsKey] =
+            'uuid,' +
+            'body,' +
+            'field_author,' +
+            'field_title,' +
+            'field_subtitle,' +
+            "field_body," +
+            'field_copyright,' +
+            "field_download_," +
+            'field_tags,' +
+            'field_images';
+
+        return await this.fetcher({
+            url,
+            params: params,
+            timeout: 10000,
+        }).then((response) => {
+            let attributes = response.data.data.attributes;
+            let relationships = response.data.data.relationships;
+            let included = response.data.included;
+            let content = {
+                uuid: attributes.uuid,
+                author: attributes.field_author,
+                title: attributes.field_title,
+                subtitle: attributes.field_subtitle,
+                body: attributes.body,
+                copyright: attributes.field_copyright,
+                downloadURL: this.hostname + included.find(node => node.attributes.filemime.endsWith('pdf')).attributes.url,
+                tags: [],
+                images: []
+            };
+            return content;
         });
     }
 
-    public async fetchCollection(articleUUIDs: string[]): Promise<any> {
-        const articlePromises: Array<Promise<any>> = [];
+    public async fetchContent(node: string, uuid: string) {
+        return this.fetchContentType(node)
+            .then(contentType => {
+                return this.fetchContentByUUID(uuid, contentType);
+            });
+    }
 
-        for (const articleUUID of articleUUIDs) {
-            const articlePromise = this.fetchNodeDataByUUID(articleUUID);
-            articlePromises.push(articlePromise);
+    public async fetchContentType(node: string) {
+        let url = this.drupalAPIPath + node;
+        let params = {
+            _format: this.format
+        };
+
+        return await this.fetcher({
+            url,
+            params: params,
+            timeout: 10000
+        }).then(response => {
+            return response.data.type[0].target_id;
+        })
+    }
+
+    public async fetchContentByUUID(uuid: string, contentType: string): Promise<any> {
+        const url: string = this.jsonAPIPath + contentType.substring(contentType.indexOf('--') + 1) + "/" + uuid;
+        let params = {
+            _format: this.format,
+            include: 'field_download_'
+        };
+        if (contentType.includes("article")) {
+            params["fields[node--" + contentType + "]"] =
+                'uuid,' +
+                'nid,' +
+                'body,' +
+                'field_author,' +
+                'field_title,' +
+                'field_subtitle,' +
+                'field_abstract,' +
+                'field_copyright,' +
+                'field_references,' +
+                'field_download_,' +
+                'field_tags,' +
+                'field_images';
+        } else if (contentType.includes("non_academic_text")) {
+            params["fields[node--" + contentType + "]"] =
+                'uuid,' +
+                'nid,' +
+                'body,' +
+                'field_author,' +
+                'field_title,' +
+                'field_subtitle,' +
+                "field_body," +
+                'field_copyright,' +
+                "field_download_," +
+                'field_tags,' +
+                'field_images';
         }
 
-        return Promise.all(articlePromises)
-            .then((articles) => {
-                return articles;
+        return await this.fetcher({
+            url,
+            params: params,
+            timeout: 10000,
+        }).then((response) => {
+            let attributes = response.data.data.attributes;
+            let relationships = response.data.data.relationships;
+            let included = response.data.included;
+            let article = {
+                uuid: attributes.uuid,
+                node: attributes.nid,
+                author: this.getAuthor(attributes.field_author),
+                title: attributes.field_title,
+                subtitle: attributes.field_subtitle,
+                abstract: attributes.field_abstract,
+                body: attributes.body,
+                references: attributes.field_references,
+                copyright: attributes.field_copyright,
+                downloadURL: (included) ? this.hostname + included.find(node => node.attributes.filemime.endsWith('pdf')).attributes.url : null,
+                tags: [],
+                images: []
+            };
+            return article;
+        });
+    }
+
+    private getAuthor(authorData: string): string | Array<string> {
+        if (authorData.includes(';')) {
+            return authorData.split(';').map(fullname => {
+                return fullname.split(',').reverse().map(name => name.trim()).join(' ');
             });
+        } else {
+            return authorData.split(',').reverse().map(name => name.trim()).join(' ');
+        }
     }
 
     // Fetch the cover image URL of a submenu link representing a Drupal entity
     // and returns a promise for that URL
-    public async fetchContent(nodeID: string): Promise<any> {
+    public async fetchContentByNode(nodeID: string): Promise<any> {
         const url: string = 'node/' + nodeID;
 
         return await this.fetcher({
@@ -70,7 +199,7 @@ class API extends Vue {
             params: {
                 _format: 'json',
             },
-            timeout: 1000,
+            timeout: 10000,
         }).then((response: any) => {
             if ('field_cover_image' in response.data && 'field_articles' in response.data) {
                 return response.data;
@@ -81,19 +210,18 @@ class API extends Vue {
         });
     }
 
-    public async fetchArticle(nodeID: string): Promise<any> {
-        const url: string = 'node/' + nodeID;
+    public async fetchArticleByNode(nodeID: string): Promise<any> {
+        const url: string = this.drupalAPIPath + nodeID;
 
         return await this.fetcher({
             url,
             params: {
                 _format: 'json',
             },
-            timeout: 1000,
+            timeout: 10000,
         }).then((response) => {
             return this.createArticleDrupalAPIData(response.data);
         });
-
     }
 
 
@@ -122,7 +250,7 @@ class API extends Vue {
     //      fileNodeURL = the download file's endpoint from the related relationships of another Drupal entity
     public async getDownloadURL(fileNodeURL: string): Promise<any> {
         return await this.fetcher({
-            url: this.jsonAPIPath + fileNodeURL.substr(fileNodeURL.indexOf('node') + ('node').length,
+            url: "/" + this.jsonAPIPath + fileNodeURL.substr(fileNodeURL.indexOf('node') + ('node').length,
                 fileNodeURL.length),
             params: {},
             timeout: 1000,
@@ -130,7 +258,7 @@ class API extends Vue {
             if (response !== undefined &&
                 Object.keys(response.data.data).length > 0 &&
                 'url' in response.data.data.attributes) {
-                return this.localHost + response.data.data.attributes.url + '';
+                return this.hostname + response.data.data.attributes.url + '';
             } else {
                 return '';
             }

@@ -1,13 +1,13 @@
 <template>
     <div
         class="navbar"
-        @mouseover="playLogo = true"
-        @mouseout="playLogo = false"
+        @mouseover="isLogoAnimated = true"
+        @mouseout="isLogoAnimated = false"
     >
         <div class="navbar__logo-frame grid-frame">
-            <!-- TODO: close menu when logo is activated -->
             <the-logo
-                :playLogo="playLogo"
+                :playLogo="isLogoAnimated"
+                :dimension="navBarWidth"
                 @logoClicked="logoClicked"
             ></the-logo>
         </div>
@@ -17,7 +17,11 @@
             role="navigation"
             aria-label="Plenum Main Navigation"
         >
-            <the-main-menu :menuItems="menuItems"></the-main-menu>
+            <the-main-menu
+                :menuItems="menuTree"
+                @revertMenuSession="revertMenuSession"
+                @openContent="openContent"
+            ></the-main-menu>
         </nav>
 
         <div class="navbar__about grid-frame">
@@ -31,38 +35,47 @@
 </template>
 
 <script lang="ts">
-import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+import {Component, Emit, Vue} from 'vue-property-decorator';
 import TheMainMenu from '@/components/TheMainMenu';
-import {MainMenuItem} from '../classes/MainMenuItem';
 import TheLogo from '@/components/TheLogo';
-
+import { mapGetters } from 'vuex';
 
 @Component({
     components: {
         TheMainMenu,
-        TheLogo,
+        TheLogo
     },
+    computed: {
+        ...mapGetters({
+            "menuTree": 'menuTree/menuTree'
+        })
+    }
 })
 
-// The main navigation bar for the app, each entry represents a page of wordpress content
+// The main navigation bar for the app
 export default class TheNavBar extends Vue {
-    @Prop() private menuItems!: MainMenuItem[]; // Main Menu Options
-    private animateLogo: boolean; // Whether or not the logo is animating
+    private isLogoAnimated: boolean; // Animation state of the logo
+    private navBarWidth: number = 240; // Width of the navigation bar
 
     constructor() {
         super();
-        this.animateLogo = false;
+        this.isLogoAnimated = false;
     }
 
+    @Emit('openContent')
+    private openContent(routerLinkLocation: string, keyboardEvent?: boolean = true) {}
+
+    @Emit('revertMenuSession')
+    private revertMenuSession(): void {}
+
+    // Emits logo click event to parent
     @Emit('logoClicked')
-    private logoClicked(): void {
-        // Filler
-    }
+    private logoClicked(): void {}
 }
 </script>
 
 <style lang="scss" scoped>
-    $lefterWidth: 240px;
+    $navBarWidth: 240px;
     $border: 3px solid black;
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
 
@@ -71,7 +84,7 @@ export default class TheNavBar extends Vue {
         top: 0;
         left: 0;
         height: 100vh;
-        width: $lefterWidth;
+        width: $navBarWidth;
         z-index: 5;
 
         background: white;
@@ -82,7 +95,8 @@ export default class TheNavBar extends Vue {
     }
 
     .navbar__main-menu {
-        height: calc(100% - (#{$lefterWidth} * 2) - 30px - 3px); // subtracting padding and border width
+        // (Full height) - (Two squares with navBarWidth dimension) - (Top and Bottom padding) - (Top-border width)
+        height: calc(100% - (#{$navBarWidth} * 2) - (15px * 2) - 3px);
         padding: 15px 15px 0 15px;
 
         background: white;
@@ -92,7 +106,7 @@ export default class TheNavBar extends Vue {
         position: absolute;
         bottom: 0;
         left: 0;
-        width: calc(#{$lefterWidth} - 30px);
+        width: calc(#{$navBarWidth} - 30px);
         padding: 15px 15px 0 15px;
 
         border-top: $border;
@@ -103,7 +117,8 @@ export default class TheNavBar extends Vue {
 
     .navbar__about p {
         vertical-align: middle;
-        font-size: 15.41px; // TODO: make responsive?
+        margin: 1em 0;
+        font-size: 15.41px; // TODO: make responsive
         text-align: left;
         line-height: 20px;
         text-indent: unset;

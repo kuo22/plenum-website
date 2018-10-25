@@ -13,24 +13,24 @@
             role="none"
         >
             <router-link
-                :to="'/' + parentMenu.name.toLowerCase() +
+                :to="'/' + parentMenu.title.toLowerCase() +
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
                 :id="menuTitle.replace(' ', '') + '-section-menu-item-' + index"
 
                 role="menuitem"
                 aria-haspopup="true"
-                :aria-expanded="menuLink.active ? 'true' : 'false'"
+                :aria-expanded="menuLink.expanded ? 'true' : 'false'"
                 :tabindex="index === focusedIndex ? '0' : '-1'"
 
                 v-focus="index === focusedIndex"
 
                 @mouseover.native="menuLink.hovered = true"
                 @mouseleave.native="menuLink.hovered = false"
-                @click.native="activateSubmenuLink(parentMenu, menuTitle, menuLink, false)"
-                @keydown.enter.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                @keydown.right.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
-                @keydown.space.prevent.native="menuLink.active ? focusToTOC(menuLink) : activateSubmenuLink(parentMenu, menuTitle, menuLink, true)"
+                @click.native="handleLinkActivation(parentMenu, menuTitle, menuLink, false)"
+                @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
                 @keydown.esc.prevent.native="exitMenu(menuTitle)"
                 @keydown.left.prevent.native="exitMenu(menuTitle)"
                 @keydown.down.prevent.native="moveDown"
@@ -41,7 +41,7 @@
             >
                 <span
                     class="collection-group-menu__menu-item-content menu-button-content"
-                    :class="{ 'collection-group-menu__menu-item-content--active': menuLink.active }"
+                    :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
                     tabindex="-1"
                 >
                     {{ menuLink.title }}&nbsp;
@@ -58,7 +58,7 @@
                 <main-menu-fly-out-sections-previews
                     v-show="isPreviewVisible(index)"
 
-                    :menuLink="menuLink"
+                    :sectionMenuItem="menuLink"
                     :parentMenu="parentMenu"
 
                     @mouseleave.native="toggleOffAllArticleItemHovers(index)"
@@ -76,8 +76,6 @@
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { mixin as focusMixin } from 'vue-focus';
 import MainMenuFlyOutSectionsPreviews from './MainMenuFlyOutSectionsPreviews';
-import {MainMenuItem} from '@/classes/MainMenuItem';
-import {SubmenuLink} from '@/classes/SubmenuLink';
 
 @Component({
     mixins: [focusMixin],
@@ -88,9 +86,9 @@ import {SubmenuLink} from '@/classes/SubmenuLink';
 
 // Submenu associated with a unique main menu entry
 export default class MainMenuFlyOutSections extends Vue {
-    @Prop() private menuItems!: SubmenuLink[]; // Parent sectionMenu item
-    @Prop() private menuTitle!: string; // Title of the fly out's menu parent
-    @Prop() private parentMenu!: MainMenuItem; // Parent menu of theses fly out sections
+    @Prop(Array) private menuItems!: Array<any>; // Parent sectionMenu item
+    @Prop(String) private menuTitle!: string; // Title of the fly out's menu parent
+    @Prop(Object) private parentMenu!: any; // Parent menu of theses fly out sections
     private focusedIndex: number;
 
     constructor() {
@@ -98,33 +96,29 @@ export default class MainMenuFlyOutSections extends Vue {
         this.focusedIndex = -1;
     }
 
-    @Emit('activateSubmenuLink')
-    public activateSubmenuLink(item: MainMenuItem,
-                               menuTitle: string,
-                               menuLink: SubmenuLink): void {
-        this.collectionActivated(menuLink);
+    @Emit('handleLinkActivation')
+    public handleLinkActivation(mainMenuParent: Object,
+                               sectionTitle: string,
+                               submenuLink: Object): void {
+        this.collectionActivated(submenuLink);
     }
 
     @Emit('toggleOpen')
-    public toggleOpen(menu: MainMenuItem): void {
-        /* Filler */
-    }
+    public toggleOpen(mainMenuItem: any): void {}
 
     @Emit('openArticle')
-    public openArticle(menu: MainMenuItem, routerLinkLocation: string): void {
+    public openArticle(): void {
         this.resetFocus();
     }
 
     @Emit('collectionActivated')
-    public collectionActivated(submenuLink: SubmenuLink): void {
-        // Filler
-    }
+    public collectionActivated(submenuLink: any): void {}
 
     // Returns whether or not the collection preview should be visible
     // parameter(s) needed:
     //      menuItemIndex = the index location of the menu item in the menu list
     private isPreviewVisible(menuItemIndex: number): boolean {
-        return this.menuItems[menuItemIndex].active ||
+        return this.menuItems[menuItemIndex].expanded ||
             this.menuItems[menuItemIndex].hovered ||
             this.focusedIndex === menuItemIndex;
     }
@@ -133,15 +127,12 @@ export default class MainMenuFlyOutSections extends Vue {
     // and return the preview to the collection image
     //      index = the index location of the menu item in the menu list
     private toggleOffAllArticleItemHovers(index: number): void {
-        for (let i = 0; i < this.menuItems.length; i++) {
-            if (this.menuItems[i].active) {
-                for (let j = 0; j < this.menuItems[i].articles.length; j++) {
-                    this.menuItems[i].articles[j].previewVisible = false;
-                }
-            }
-        }
-        this.menuItems[index].previewVisible = false;
+        this.menuItems.find(item => item.expanded).articles.forEach(article => article.previewVisible = false);
     }
+
+    /*********************************/
+    /* KEYBOARD NAVIGATION FUNCTIONS */
+    /*********************************/
 
     // Send focus to a specific collection menu item depending on the provided index number of the menu item
     // parameter:
@@ -153,14 +144,14 @@ export default class MainMenuFlyOutSections extends Vue {
     // Move focus to the provided main menu item's flyout, default focuses on the first menu item of the flyout
     // parameter(s) needed:
     //      menu           = parent menu of the flyout to be focused on
-    private focusToTOC(menu: SubmenuLink) {
+    private focusToTOC(submenuLink: any) {
         setTimeout(() => {
-            document.getElementById(menu.title.replace(' ', '') + '-entry-0').focus();
+            document.getElementById(submenuLink.title.replace(' ', '') + '-entry-0').focus();
         }, 5);
     }
 
     // Focus on the provided submenu link
-    private setFocusOnMenuItem(parentMenu: SubmenuLink) {
+    private setFocusOnMenuItem(parentMenu: any) {
         for (let index = 0; index <= this.menuItems.length - 1; index++) {
             if (this.menuItems[index] === parentMenu) {
                 const focusedIndex = this.focusedIndex === -1 ? 0 : this.focusedIndex;
@@ -174,12 +165,16 @@ export default class MainMenuFlyOutSections extends Vue {
 
     // Moves focus to this menu parent menu item (the menu title)
     private exitMenu() {
-        const parentMenuItems: string[] = Object.keys(this.parentMenu.subMenu);
+        const parentMenuItems: string[] = Object.keys(this.parentMenu.submenu);
         for (let i = 0; i <= parentMenuItems.length - 1; i++) {
             if (parentMenuItems[i] === this.menuTitle) {
-                document.getElementById(this.parentMenu.name + '-fly-out-menu-item-' + i).focus();
+                document.getElementById(this.parentMenu.title + '-fly-out-menu-item-' + i).focus();
             }
         }
+        // document.getElementById(parentMenuItems.find((parentMenuItem) => {
+        //     console.log(parentMenuItem);
+        //     return parentMenuItem === this.menuTitle;
+        // })).focus();
         this.resetMenuItems();
         this.resetFocus();
     }
@@ -190,8 +185,7 @@ export default class MainMenuFlyOutSections extends Vue {
 
     private resetMenuItems(): void {
         for (let i = 0; i < this.menuItems.length; i++) {
-            this.menuItems[i].active = false;
-            this.menuItems[i].previewVisible = false;
+            // this.menuItems[i].expanded = false;
             this.menuItems[i].hidden = true;
         }
     }

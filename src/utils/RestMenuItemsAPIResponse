@@ -1,0 +1,145 @@
+[
+  {
+      "title": "About",
+      "description": "About sections",
+      "uri": "base:about",
+      "external": false,
+      "weight": "-49",
+      "expanded": false,
+      "uuid": null,
+      "below": [
+          {
+              "title": "About Plenum",
+              "description": null,
+              "uri": "node/4",
+              "external": false,
+              "weight": "0",
+              "expanded": false,
+              "uuid": "082ee128-6826-42a1-8279-55b720c0c51e"
+          },
+          {
+              "title": "About the Authors",
+              "description": null,
+              "uri": "node/5",
+              "external": false,
+              "weight": "0",
+              "expanded": false,
+              "uuid": "0cfce944-2d9a-4057-b306-fa8e9a43e3bc"
+          },
+          {
+              "title": "About the Editors",
+              "description": "Descriptions of the Editors of Plenum",
+              "uri": "node/6",
+              "external": false,
+              "weight": "0",
+              "expanded": false,
+              "uuid": "10e1b1cb-fc56-440b-8cd7-e03e1cf9ba67"
+          }
+      ]
+  },
+  {
+      "title": "Publications",
+      "description": "All issued publications",
+      "uri": "base:pubs",
+      "external": false,
+      "weight": "-48",
+      "expanded": false,
+      "uuid": null,
+      "below": [
+          {
+              "title": "Peer-Reviewed",
+              "description": null,
+              "uri": "base:peer-review",
+              "external": false,
+              "weight": "0",
+              "expanded": false,
+              "uuid": null,
+              "below": [
+                  {
+                      "title": "Plenum 2015",
+                      "description": null,
+                      "uri": "node/2",
+                      "external": false,
+                      "weight": "-50",
+                      "expanded": false,
+                      "uuid": "cc487849-65da-4561-a24b-f5d8ead3ce87"
+                  },
+                  {
+                      "title": "Plenum 2013",
+                      "description": null,
+                      "uri": "node/11",
+                      "external": false,
+                      "weight": "-48",
+                      "expanded": false,
+                      "uuid": "3c0a517d-4a27-4bd6-aed7-10e858442f92"
+                  },
+                  {
+                      "title": "Plenum 2012",
+                      "description": null,
+                      "uri": "node/14",
+                      "external": false,
+                      "weight": "-47",
+                      "expanded": false,
+                      "uuid": "8bb215a1-90b5-4bb7-b8fb-a2a6f1ecc301"
+                  }
+              ]
+          }
+      ]
+  },
+  {
+      "title": "Atlas",
+      "description": "Interactive atlas of student work",
+      "uri": "base:atlas",
+      "external": false,
+      "weight": "-47",
+      "expanded": false,
+      "uuid": null
+  },
+  {
+      "title": "Showcase",
+      "description": "Student work of all kinds",
+      "uri": "base:showcase",
+      "external": false,
+      "weight": "-46",
+      "expanded": false,
+      "uuid": null
+  },
+  {
+      "title": "Contribute",
+      "description": "Contribute parent menu",
+      "uri": "base:contribute",
+      "external": false,
+      "weight": "-44",
+      "expanded": false,
+      "uuid": null,
+      "below": [
+          {
+              "title": "Paper Submissions",
+              "description": "Contribute to Plenum",
+              "uri": "node/8",
+              "external": false,
+              "weight": "-45",
+              "expanded": false,
+              "uuid": "04a0f29e-2842-46b1-a5e1-77ab793d1f27"
+          },
+          {
+              "title": "GIS Submissions",
+              "description": null,
+              "uri": "node/13",
+              "external": false,
+              "weight": "0",
+              "expanded": false,
+              "uuid": "2e5ab0f0-2cb1-419e-bd9b-631d00d1e023"
+          }
+      ]
+  },
+  {
+      "title": "Volunteer",
+      "description": "Volunteer with Plenum",
+      "uri": "node/9",
+      "external": false,
+      "weight": "-43",
+      "expanded": false,
+      "uuid": "79c958a9-6f81-4f68-a853-65568b400fdb"
+  }
+]

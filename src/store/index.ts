@@ -1,17 +1,33 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
-import { RootState } from '@/types/storeTypes';
-import { menuTree } from '@/store/modules/menuTree/menuTree';
+import {IssuesStoreModule} from '@/store/modules/issues/_store';
+import {MenuTreeStoreModule} from '@/store/modules/menuTree/menuTreeModule';
+import {RouterNavStoreModule} from '@/store/modules/routerNav/_store';
 
 Vue.use(Vuex);
 
-const store: StoreOptions<RootState> = {
-    state: {
-        version: '1.0.0', // a simple property
-    },
-    modules: {
-        menuTree,
-    },
-};
+export interface RootState {
 
-export default new Vuex.Store<RootState>(store);
+}
+
+export default new Vuex.Store<RootState>({
+    strict: false,
+    //strict: process.env.NODE_ENV !== 'production',
+    modules: {
+        issues: IssuesStoreModule,
+        menuTree: MenuTreeStoreModule,
+        routerNav: RouterNavStoreModule
+    },
+    state: {
+
+    },
+    getters: {
+
+    },
+    mutations: { // For synchronous transactions
+
+    },
+    actions: { // For asynchronous transactions
+
+    },
+});

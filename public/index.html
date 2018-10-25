@@ -16,7 +16,6 @@
     <!-- built files will be auto injected -->
   </body>
   <style type="text/css">
-
     .menu-button-content {
       text-decoration: none;
     }
@@ -30,12 +29,16 @@
 
     }
 
-    .button:focus > .button-content
+    .button:focus > .button-content {
+
+    }
 
     .menu-button a .menu-button-content {
-      display: inline-block;
+      /* display: inline-block; */
       height: 100%;
+      width: 100%;
       transition: outline 75ms ease-out;
+      transform: translateY(-2px);
     }
 
     .menu-button > a {
