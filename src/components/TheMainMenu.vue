@@ -12,6 +12,7 @@
             :key="index"
 
             class="main-menu__menu-item menu-button"
+            :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
             :style="changeBackground(menu)"
 
             @mouseenter="menu.hovered = true"
@@ -75,7 +76,7 @@
                 <span
                     class="main-menu__menu-item-content menu-button-content"
                     tabindex="-1"
-                > <!-- TODO: get ride of this hacky &nbsp; next to menu title-->
+                >
                     {{ menu.title }}&nbsp;
                 </span>
             </router-link>
@@ -200,11 +201,16 @@ export default class TheMainMenu extends Vue {
     // parameter(s) needed:
     //      menuItem = menu item to be changed
     private changeBackground(menuItem): {} {
-        if (menuItem.hovered || menuItem.expanded) {
-            return { background: 'transparent' };
-        } else {
-            return { background: menuItem.color };
-        }
+        //if (!menuItem.disabled) {
+            if (menuItem.hovered || menuItem.expanded) {
+                return {background: 'transparent'};
+            } else {
+                return {background: menuItem.color};
+            }
+        // } else {
+        //      Grayscale version of HCL(..., 25, 90)
+        //     return {background: 'rgb(226, 226, 226)'};
+        // }
     }
 
     /*********************************/
@@ -277,10 +283,17 @@ export default class TheMainMenu extends Vue {
     .main-menu__menu-item a[role=link] {
         height: $menuItemHeight;
 
+        cursor: pointer;
+
         font-size: 1.75em;
         font-weight: bold;
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
         text-align: right;
+    }
+
+    .main-menu__menu-item--disabled a {
+        cursor: no-drop !important;
+        text-decoration: line-through;
     }
 
     .main-menu__menu-item a[role=menuitem]:focus,

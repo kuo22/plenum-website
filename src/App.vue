@@ -12,6 +12,13 @@
             ></the-nav-bar>
         </transition>
 
+        <span
+            class="content-section content-section__overlay"
+            :class="this.$store.getters['menuTree/anyMenuIsOpen'] ? 'content-section__overlay--dimmed' : null"
+        >
+
+        </span>
+
         <transition
             name="component-fade"
             mode="out-in"
@@ -37,6 +44,9 @@ import Home from '@/views/Home';
         TheNavBar,
         Home
     },
+    computed: {
+
+    }
 })
 
 export default class App extends Vue {
@@ -164,6 +174,22 @@ export default class App extends Vue {
         top: 0;
 
         overflow-x: hidden;
+    }
+
+    .content-section__overlay {
+        position: fixed;
+        z-index: 4;
+        background: rgba(0, 0, 0, 0.02);
+        pointer-events: none;
+        opacity: 0;
+
+        transition: opacity 0.3s ease;
+    }
+
+    .content-section__overlay--dimmed {
+        opacity: 1;
+
+        transition: opacity 0.3s ease;
     }
 
     .component-fade-enter-active, .component-fade-leave-active {

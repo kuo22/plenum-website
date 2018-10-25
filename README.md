@@ -1,33 +1,17 @@
-# To-do
+# README Disclaimer
+* To-do lists stored here are temporary. They will be moved to the Projects section of Github.
+* Instructions on set-up will be added soon (updated local environment variables, how to serve website, etc.)
+* Instructions on repository pushing/pulling will be added soon
+* Branches will soon be cleaned up/removed and an organized branching system will be implemented soon
 
-# Branch To-do's
-## Organize CSS
+# Standards Used
 
- [Implement Vue CSS Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
+ [Vue CSS Organization Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
 1. Box
 2. Border
 3. Background
 4. Text
 5. Other
-
-##### Files Todo
-* [x] components/
-  * [x] ArticlePreviews
-  * [x] ArticlePreviewsTitleCard
-  * [x] MainMenuFlyOut
-  * [x] MainMenuFlyOutSections
-  * [x] MainMenuFlyOutSectionsPreviews
-  * [x] TableOfContents
-  * [x] TextArticleNavigation
-  * [x] TextArticleTitleCard
-  * [x] TheLogo
-  * [x] TheMainMenu
-  * [x] TheNavBar
-* [x] views/*
-  * [x] Home
-  * [x] TableOfContents
-  * [x] TextArticle
-* [x] App
 
 ######Organize CSS Resources
 * [Get BEM](http://getbem.com/introduction/)
@@ -35,27 +19,18 @@
 
 ___
 
-## "Props Up Events Down"
+## "Props Down Events Up"
 
-[Restructure Vue to Use Props Down Events Up](https://vuejs.org/v2/style-guide/#Implicit-parent-child-communication-use-with-caution)
-
-##### Files Todo
-* [] components/*
-    * [] ArticleNavigation
-* [] views/*
-    * [] TextArticle
-* [] App
-
-###### Restructuring Resources
+[Vue Components to Use Props Down Events Up](https://vuejs.org/v2/style-guide/#Implicit-parent-child-communication-use-with-caution)
 
 ___
 
-# Etc. To-dos
+# Implement WAI-ARIA Accessibility Standards
 
-## Accessibility
-* [] Add alt attribute to all images (in Drupal too)
-* [] Contain website in one landmark? 
-https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
+## Accessibility To-Dos
+* [] Add alt attribute to all images (add alt content via Drupal)
+* [] [Contain website in one landmark?](https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
+)
 * [] Move focus to issue index after issue selection (insert articles into 'tabindex' order between submenu section link 'tabindex's)
 * [] Implement main tags in each main content view
 https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
@@ -87,8 +62,6 @@ ___
 ## Design
 
 #### Navigation
-
-* [x] Maintain article preview grid as solid black while image preview and table of contents blend together
 
 #### [Fetching after Navigation](https://routerjs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
 * [] Add loading filler

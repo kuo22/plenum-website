@@ -1,6 +1,6 @@
 <template>
     <main
-        :v-show="article !== null"
+        :v-show="articleLoading || article !== null"
         class="article"
     >
         <transition name="header-title-fade">
@@ -55,7 +55,9 @@
             <div
                 v-view="onEarlyScroll"
                 class="article__page"
+                :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: transparent}"
             >
+                <!-- TODO: render article page with 'loading background' while article is loading -->
                 <div class="article__abstract">
                     <h4 id="article__abstract-title">ABSTRACT</h4>
                     <p>
@@ -200,6 +202,11 @@ export default class TextArticle extends Vue {
         this.scrollSessionFromTop = true;
     }
 
+    @Watch('$route')
+    private onRouteChanged(val, oldVal) {
+        this.fetchArticle();
+    }
+
     // When view is mounted, retrieve article
     private mounted() {
         this.fetchArticle();
@@ -212,10 +219,6 @@ export default class TextArticle extends Vue {
         singleAuthor += (typeof this.article.author === 'string') ? "" : " et al.";
         return singleAuthor;
     }
-    // public mounted() {
-    //     this.issue = this.$store.getters['issues/getIssue'](this.article);
-    //     this.issuePosition = this.issue.articles.findIndex(art => art.uuid === this.article.uuid);
-    // }
 
     //
     get hideArticleContents() {
@@ -227,9 +230,11 @@ export default class TextArticle extends Vue {
         return this.isNearPageBottom;
     }
 
-    @Watch('$route')
-    private onRouteChanged(val, oldVal) {
-        this.fetchArticle();
+    // TODO: make global for any component that needs to access images in '/assets/
+    private getImageSource(fileName: string): string {
+        const image = require.context('../assets/', false, /\.png$/);
+        console.log(image('./' + fileName + '.png'));
+        return image('./' + fileName + '.png');
     }
 
     //
@@ -276,19 +281,14 @@ export default class TextArticle extends Vue {
         this.articleError = this.article = null;
         this.articleLoading = true;
 
-        // https://github.com/nuxt-community/typescript-template/issues/23
-
-        // TODO: use publication to confirm or get article, currently arbitrary
-        // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
-
         const uuid = this.$route.params.id;
         const contentType = this.$route.params.content_type;
 
         let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
         if (temp !== undefined && temp.length > 0) {
-            this.article = temp[0];
-            this.issue = temp[1];
-            this.issuePosition = temp[2];
+            this.article = temp;
+            //this.issue = ;
+            //this.issuePosition = ;
 
             this.articleLoading = false;
             this.articleError = false;

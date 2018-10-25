@@ -24,7 +24,7 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
         },
         // TODO: return article with issue information?
         getArticleByUUID: (state) => (uuid: string) => {
-            return state.articles.find((article: any) => article.uuid == uuid);
+            return state.articles.find((article: any) => article.uuid === uuid);
         },
         getArticleByNode: (state) => (nodeNum: number) => {
             let issues = [...state.issues];
