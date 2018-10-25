@@ -1,35 +1,17 @@
-# How to Run
-- Fork the repository
-- Clone your forked repository onto your computer
-- Open in your favorite IDE (IntelliJ products are robust and free for students!)
-- Open terminal and run 'npm run serve'
+# README Disclaimer
+* To-do lists stored here are temporary. They will be moved to the Projects section of Github.
+* Instructions on set-up will be added soon (updated local environment variables, how to serve website, etc.)
+* Instructions on repository pushing/pulling will be added soon
+* Branches will soon be cleaned up/removed and an organized branching system will be implemented soon
 
+# Standards Used
 
-# To-do
-
-# Branch To-do's
-## Organize CSS
-
- [Implement Vue CSS Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
+ [Vue CSS Organization Standards](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
 1. Box
 2. Border
 3. Background
 4. Text
 5. Other
-
-##### Files Todo
-* [x] components/
-  * [x] MainMenuFlyOutSectionsPreviews.vue
-  * [x] TableOfContents.vue
-  * [x] ArticlePreviews.vue
-  * [x] MainMenuFlyOutSections.vue
-  * [x] MainMenuFlyOut.vue
-  * [x] TheMainMenu.vue
-  * [x] TheNavBar.vue
-  * [x] TheLogo.vue
-* [x] views/*
-  * [x] TextArticle.vue
-* [x] App.vue
 
 ######Organize CSS Resources
 * [Get BEM](http://getbem.com/introduction/)
@@ -37,25 +19,18 @@
 
 ___
 
-## "Props Up Events Down"
+## "Props Down Events Up"
 
-[Restructure Vue to Use Props Down Events Up](https://vuejs.org/v2/style-guide/#Implicit-parent-child-communication-use-with-caution)
-
-##### Files Todo
-* [] components/*
-* [] views/*
-* [] App.vue
-
-###### Restructuring Resources
+[Vue Components to Use Props Down Events Up](https://vuejs.org/v2/style-guide/#Implicit-parent-child-communication-use-with-caution)
 
 ___
 
-# Etc. To-dos
+# Implement WAI-ARIA Accessibility Standards
 
-## Accessibility
-* [] Add alt attribute to all images (in Drupal too)
-* [] Contain website in one landmark? 
-https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
+## Accessibility To-Dos
+* [] Add alt attribute to all images (add alt content via Drupal)
+* [] [Contain website in one landmark?](https://dequeuniversity.com/rules/axe/3.0/landmark-one-main?application=AxeChrome
+)
 * [] Move focus to issue index after issue selection (insert articles into 'tabindex' order between submenu section link 'tabindex's)
 * [] Implement main tags in each main content view
 https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
@@ -63,10 +38,8 @@ https://dequeuniversity.com/rules/axe/3.0/bypass?application=AxeChrome
     https://dequeuniversity.com/rules/axe/3.0/page-has-heading-one?application=AxeChrome
 * [] Decide if it is necessary to remove tabindex in vue structure
         https://www.w3.org/TR/WCAG20-TECHS/F44.html
-* [] Add arrow key controls [example](https://forum.vuejs.org/t/navigate-through-list-using-arrowkeys/30689)
-* [x] Fix focus container size for main menu items
-* [x] Fix focusability on main menu elements
-* [x] Focusability on logo
+* [] Add arrow key controls [example](https://forumjs.org/t/navigate-through-list-using-arrowkeys/30689)
+* [] [Add breadcrumbs navigation for content pages?](https://www.w3.org/TR/wai-aria-practices/examples/breadcrumb/index.html)
 
 * [] [Parent menus should control the focus of submenus](http://accessibility.athena-ict.com/aria/tests/menus.shtml)
   * Find a way to check if focus is being managed? Idk why, for testing?
@@ -90,9 +63,7 @@ ___
 
 #### Navigation
 
-* [x] Maintain article preview grid as solid black while image preview and table of contents blend together
-
-#### [Fetching after Navigation](https://router.vuejs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
+#### [Fetching after Navigation](https://routerjs.org/guide/advanced/data-fetching.html#fetching-after-navigation) Implementation
 * [] Add loading filler
 
 #### Logo
@@ -100,9 +71,10 @@ ___
 
 #### Responsiveness
 Design drafts for portable devices before implementing
+* [] Text article headroom breaks on some window resizes
 * [] Add min-height to main menu and navbar
 * [] Add width-change points
-* [] [Implement this method to scale fonts?](https://forum.vuejs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
+* [] [Implement this method to scale fonts?](https://forumjs.org/t/scaling-font-size-to-container-in-idiomatic-vue/17442)
 
 #### Main Content Area
 * [] Implement horizontal fixed window splitter (slider to move sections of the webpage)

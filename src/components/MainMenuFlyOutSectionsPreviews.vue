@@ -2,15 +2,15 @@
     <div
         role="presentation"
         class="collection-preview"
-        :class="{'collection-preview--active': menuLink.active }"
+        :class="{'collection-preview--active': sectionMenuItem.expanded }"
     >
         <div class="preview-grid-half">
             <div class="collection-preview__cover-image-frame">
                 <img
-                    :alt="menuLink.title + ' Cover Image'"
+                    :alt="sectionMenuItem.title + ' Cover Image'"
                     class="collection-preview__cover-image"
-                    :class="{ 'collection-preview__cover-image--active': menuLink.active }"
-                    :src="menuLink.coverImageURL"
+                    :class="{ 'collection-preview__cover-image--active': sectionMenuItem.expanded }"
+                    :src="sectionMenuItem.imageURL"
                 >
             </div>
         </div>
@@ -21,15 +21,15 @@
         >
             <article-previews
                 class="preview-grid-half preview-grid-half--previews"
-                :articles="menuLink.articles"
-                :parentCollection="menuLink"
+                :articles="sectionMenuItem.articles"
+                :parentCollection="sectionMenuItem"
             ></article-previews>
             <div
                 role="presentation"
                 class="preview-grid-half preview-grid-half--right-half"
             >
                 <table-of-contents
-                    :parentCollection="menuLink"
+                    :parentCollection="sectionMenuItem"
                     :mainMenuAncestor="parentMenu"
                     @toggleOpen="toggleOpen"
                     @articleSelected="openArticle"
@@ -43,8 +43,6 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-import {MainMenuItem} from '../classes/MainMenuItem';
-import {SubmenuLink} from '../classes/SubmenuLink';
 import ArticlePreviews from '@/components/ArticlePreviews';
 import TableOfContents from '@/components/TableOfContents';
 
@@ -57,23 +55,19 @@ import TableOfContents from '@/components/TableOfContents';
 
 // The main navigation bar for the app, each entry represents a page of wordpress content
 export default class MainMenuFlyOutSectionsPreviews extends Vue {
-    @Prop() private menuLink!: SubmenuLink; // The menu item link of the collection this previews shows
-    @Prop() private parentMenu!: MainMenuItem; // The parent fly out menu of this previews
+    @Prop(Object) private sectionMenuItem!: Object; // The menu item link of the collection this previews shows
+    @Prop(Object) private parentMenu!: Object;  // The parent fly out menu of this previews
 
     constructor() { super(); }
 
     @Emit('toggleOpen')
-    public toggleOpen(menu: MainMenuItem): void { /* Filler */ }
+    public toggleOpen(mainMenuItem: any): void {}
 
     @Emit('openArticle')
-    public openArticle(menu: MainMenuItem, routerLinkLocation: string): void {
-        // Filler
-    }
+    public openArticle(): void {}
 
     @Emit('exitMenu')
-    public exitMenu(parentMenu: SubmenuLink) {
-        // Filler
-    }
+    public exitMenu(mainMenuItem: any) {}
 
 }
 </script>
@@ -114,7 +108,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
         background: white;
     }
 
-    // TODO: figure out so there is no stutter bug when preview swap between collections
+    // TODO: figure out so there is no stutter bug when preview swaps between collections
     .collection-preview--active {
         z-index: 1;
     }

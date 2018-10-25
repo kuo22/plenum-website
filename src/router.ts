@@ -33,8 +33,8 @@ export default new Router({
             component: TableOfContents,
         },
         {
-            //
-            path: '/articles/:node',
+            // TODO: find way to change component based on parameter/path
+            path: '/content/:content_type/:id',
             name: 'publication-article',
             component: TextArticle,
         },

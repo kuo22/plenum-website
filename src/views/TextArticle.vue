@@ -1,28 +1,63 @@
 <template>
     <main
-        :v-if="article"
+        :v-show="articleLoading || article !== null"
         class="article"
     >
-        <header class="article__info">
-            <div>
-                <h1 class="article__title">
-                    {{ article.title }}
-                </h1>
-                <h2 class="article__subtitle">
-                    {{  article.subtitle }}
-                </h2>
+        <transition name="header-title-fade">
+            <vue-headroom
+                v-show="!navArrowHovered"
+                :z-index="3"
+                :upTolerance="8"
+
+                :class="{ 'headroom--hidden': hideHeadroom }"
+
+                @onTop="isAtPageTop = true"
+            >
+                <header
+                    class="article__info article__info--headroom"
+
+                    @mouseover="headerHovered = true"
+                    @mouseleave="headerHovered = false"
+                >
+                    <text-article-title-card
+                        class="article__info-container article__info-container--headroom"
+                        :title="article.title"
+                        :subtitle="article.subtitle"
+                        :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                        :hideTitleCard="isAtPageTop || scrollSessionFromTop"
+                    ></text-article-title-card>
+                </header>
+            </vue-headroom>
+        </transition>
+
+        <div class="article__header">
+            <div
+                class="article__info article__info--embedded"
+                :class="{ 'article__info--embedded--hidden': hideArticleContents }"
+            >
+                <transition name="header-title-fade">
+                    <text-article-title-card
+                            v-show="!navArrowHovered"
+                            class="article__info-container article__info-container--embedded"
+
+                            :title="article.title"
+                            :subtitle="article.subtitle"
+                            :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                    ></text-article-title-card>
+                </transition>
             </div>
-            <h3 class="article__author">
-                <em>
-                    {{ article.author.firstName }} {{ article.author.lastName }}
-                </em>
-            </h3>
-        </header>
+        </div>
+
         <div
             id="article-frame"
             class="article__frame"
         >
-            <div class="article__page">
+            <div
+                v-view="onEarlyScroll"
+                class="article__page"
+                :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: transparent}"
+            >
+                <!-- TODO: render article page with 'loading background' while article is loading -->
                 <div class="article__abstract">
                     <h4 id="article__abstract-title">ABSTRACT</h4>
                     <p>
@@ -33,30 +68,37 @@
                 <hr>
 
                 <div class="article__body">
-                    <p v-html="article.body"></p>
+                    <section
+                        v-for="section in article.body"
+                        v-html="section.processed"
+                    >
+                    </section>
+
                 </div>
 
-                <hr>
+                <hr v-view="onPresenceOfBiblio">
 
-                <div class="article__biblio">
+                <div
+                    class="article__biblio"
+                >
                     <h4>BIBLIOGRAPHY</h4>
 
                     <p v-html="article.refs"></p>
                 </div>
             </div>
         </div>
+
         <footer
             class="footer"
-            :class="{ 'footer--all-visible': footerComplete }"
             @mouseover="footerHovered = true"
             @mouseleave="footerHovered = false"
         >
             <div
-                v-if="article.copyright"
-                class="footer__copyright"
+                    v-if="article.copyright"
+                    class="footer__copyright"
             >
                 <p>
-                    Copyright &#169; {{ article.author.firstName }} {{ article.author.lastName }}.
+                    Copyright &#169; {{ authorCopyrightFormat }}
                     <br>
                     All rights reserved.
                 </p>
@@ -64,7 +106,7 @@
 
             <a
                 class="footer__download-button"
-                :title="'Download the Article: ' + article.title"
+                :title="'Download the Article, ' + article.title + ', as a PDF.'"
                 :href="article.downloadURL"
                 target="_blank"
 
@@ -74,50 +116,90 @@
             </a>
 
         </footer>
+
+        <!-- :allVisible="isNavExposed"-->
+        <text-article-navigation
+                :allVisible="isNavExposed"
+                :previousArticle="article"
+                :nextArticle="article"
+                @navArrowHovered="navArrowHovered = true"
+                @navArrowUnhovered="navArrowHovered = false"
+        ></text-article-navigation>
     </main>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import { Article } from '@/types/types';
 import APIService from '@/API';
+import TextArticleNavigation from '@/components/TextArticleNavigation';
+import TextArticleTitleCard from '../components/TextArticleTitleCard';
 
 @Component({
     components: {
-
+        headroom,
+        TextArticleNavigation,
+        TextArticleTitleCard,
     },
 })
 
 export default class TextArticle extends Vue {
+    // TODO: clean up footer and header css
+    // TODO: consider creating a footer (and maybe header) component?
+
     @Prop() private mainTitleOffScreen: boolean;
 
+    // Children props
+    private navArrowHovered: boolean;
+
+    // Internal data
     private articleLoading: boolean;
-    private article: Article;
+    private article: any;
     private articleError: boolean;
 
+    private issue: any;
+    private issuePosition: number; // index of current article within issue
+
+    private headerHovered: boolean;
     private footerHovered: boolean;
+
+    private isAtPageTop: boolean;
+    private inStartThreshold: boolean;
+    private isNearPageBottom: boolean;
+
+    private lastPercentCenter: number;
+    private maxPercentCenter: number;
+
+    private hideHeadroom: boolean;
+    private scrollSessionFromTop: boolean;
 
     private $route: Route;
 
     constructor() {
         super();
+
+        this.navArrowHovered = false;
+
         this.articleLoading = false;
         this.article = null;
         this.articleError = null;
 
+        this.issue = null;
+        this.issuePosition = -1;
+
+        this.headerHovered = false;
         this.footerHovered = false;
-    }
 
-    // When view is mounted, retrieve article
-    public created() {
-        this.fetchArticle();
-    }
+        this.isAtPageTop = true;
+        this.inStartThreshold = true;
+        this.isNearPageBottom = false;
 
-    get footerComplete(): boolean {
-        const el = document.getElementById('article-frame');
-        // console.log(el.scrollHeight);
-        return this.footerHovered || el.scrollTop !== 1;
+        this.lastPercentCenter = -1;
+        this.maxPercentCenter = this.lastPercentCenter;
+
+        this.hideHeadroom = true;
+        this.scrollSessionFromTop = true;
     }
 
     @Watch('$route')
@@ -125,45 +207,110 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
+    // When view is mounted, retrieve article
+    private mounted() {
+        this.fetchArticle();
+    }
+
+    private get authorCopyrightFormat(): string {
+        let singleAuthor = (typeof this.article.author === 'string') ? this.article.author : this.article.author[0];
+        singleAuthor = singleAuthor.split(' ').reverse().join(', ');
+        singleAuthor = singleAuthor.substring(0, singleAuthor.indexOf(', ') + 3) + ".";
+        singleAuthor += (typeof this.article.author === 'string') ? "" : " et al.";
+        return singleAuthor;
+    }
+
     //
-    private fetchArticle() {
+    get hideArticleContents() {
+        return !(this.isAtPageTop || this.hideHeadroom);
+    }
+
+    get isNavExposed() {
+        // this.isAtPageTop || this.hideHeadroom ||
+        return this.isNearPageBottom;
+    }
+
+    // TODO: make global for any component that needs to access images in '/assets/
+    private getImageSource(fileName: string): string {
+        const image = require.context('../assets/', false, /\.png$/);
+        console.log(image('./' + fileName + '.png'));
+        return image('./' + fileName + '.png');
+    }
+
+    //
+    private onEarlyScroll(e): void {
+        // If at top of page
+        if (e.percentCenter === this.maxPercentCenter) {
+            this.isAtPageTop = true;
+            this.scrollSessionFromTop = true;
+        } else {
+            this.isAtPageTop = false;
+        }
+
+        // Set whether or not the headroom should be hidden
+        if (e.type === 'exit') {
+            this.hideHeadroom = false;
+            this.scrollSessionFromTop = false;
+        } else if (e.percentCenter < this.lastPercentCenter) { // Scrolling down
+            this.hideHeadroom = this.scrollSessionFromTop;
+        } else if (e.percentCenter > this.lastPercentCenter) { // Scrolling up
+            // Filler
+        } else {
+            this.scrollSessionFromTop = true;
+        }
+
+        this.lastPercentCenter = e.percentCenter;
+        if (this.lastPercentCenter > this.maxPercentCenter) {
+            this.maxPercentCenter = this.lastPercentCenter;
+        }
+    }
+
+    //
+    private onPresenceOfBiblio(e): void {
+        if (e.percentTop > 0.5) {
+            if (e.type === 'enter') {
+                this.isNearPageBottom = true;
+            } else if (e.type === 'exit') {
+                this.isNearPageBottom = false;
+            }
+        }
+    }
+
+    //
+    private async fetchArticle() {
         this.articleError = this.article = null;
         this.articleLoading = true;
 
-        // https://github.com/nuxt-community/typescript-template/issues/23
+        const uuid = this.$route.params.id;
+        const contentType = this.$route.params.content_type;
 
-        // TODO: use publication to confirm or get article, currently arbitrary
-        // e.g .../issue-2014/1 & ...issue-banana/1 will retrieve the same article
+        let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
+        if (temp !== undefined && temp.length > 0) {
+            this.article = temp;
+            //this.issue = ;
+            //this.issuePosition = ;
 
-        const drupalNodeID = this.$route.params.node;
-
-        // Request article from store
-        // Within store, if article does not exist and
-        // API request returns 404, then show error message
-        // this.api.getArticle(this.drupalNodeID)
-        //     .then((article: ArticlePeerReviewed) => {
-        //         this.article = article;
-        //     })
-        //     .catch(
-        //         // reveal error message
-        //     );
-
-        // if Article does not exist in current store variable of all articles
-        // Then fetch article
-        APIService.fetchArticle(drupalNodeID)
-            .then((response: Article) => {
-                this.article = response;
-                return response;
-            }).catch((error) => {
-                // TODO: plan for error
-                this.articleError = error.toString();
-            });
+            this.articleLoading = false;
+            this.articleError = false;
+        } else {
+            this.article = await APIService.fetchContentByUUID(uuid, contentType)
+                .then(article => {
+                    this.$store.dispatch('issues/addArticle', article);
+                    this.articleLoading = false;
+                    return article;
+                })
+                .catch(err => {
+                    this.articleError = true;
+                    this.articleLoading = false;
+                    console.error(err);
+                });
+        }
     }
 }
 </script>
 
 <style lang="scss" scoped>
-    $pageWidth: calc(50vw);
+    $pageWidth: 50vw;
     $margin: calc(#{$pageWidth} / 8.5);
     $lefterWidth: 240px;
     $borderWidth: 3px;
@@ -175,15 +322,71 @@ export default class TextArticle extends Vue {
         font-family: 'Amiri', serif;
     }
 
+    .article__header {
+        position: relative;
+        width: 100%;
+        height: $lefterWidth;
+    }
+
     .article__info {
         position: fixed;
-        width: calc(100% - #{$lefterWidth});
-        padding: 30px 0 30px 20px;
+        top: 0;
+        left: calc(#{$lefterWidth} + 3px);
+        height: $lefterWidth;
+        margin-left: 30px;
 
         z-index: 2;
 
         text-align: left;
         font-weight: normal;
+    }
+
+    .article__info--embedded {
+        position: relative;
+        left: 0;
+        height: 240px;
+        z-index: 1;
+        outline: 3px solid transparent;
+    }
+
+    .article__info--embedded--hidden {
+        visibility: hidden;
+    }
+
+    .article__info-container {
+        position: relative;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        max-width: 50vw;
+        padding: 20px;
+        z-index: -1;
+
+        background: white;
+    }
+
+    .article__info-container--headroom {
+        box-shadow: 8px 8px 10px 2px #00000029;
+    }
+
+    .article__info-container--embedded {
+        margin-left: 3px;
+        box-shadow: 0 0 0 0 transparent !important;
+    }
+
+    .article__info-container--outlined {
+        outline: 3px solid black;
+    }
+
+    .article__info-container--hidden {
+        background: transparent;
+
+        opacity: 0;
+        transition: opacity 150ms ease;
+    }
+
+    .article__info-container--hidden * {
+        visibility: hidden;
     }
 
     .article__subtitle {
@@ -202,19 +405,19 @@ export default class TextArticle extends Vue {
 
     /* ARTICLE CONTENT BELOW TITLES */
     .article__frame {
-        margin-top: 15%;
-        padding: $margin;
+        margin-top: calc(240px * 0.5);
 
         text-align: left;
     }
 
     .article__page {
-        width: $pageWidth;
+        width: calc(#{$pageWidth} - 10vw);
+        padding: 5vw;
         margin: 0 auto $margin auto;
 
-        box-shadow: 3px 3px 8px 1px #d5d5d5;
-
         background: #fafafa;
+
+        box-shadow: 3px 3px 8px 1px #d5d5d5;
     }
 
     .article__biblio {
@@ -234,30 +437,36 @@ export default class TextArticle extends Vue {
         bottom: 0;
         width: calc(100% - calc(#{$lefterWidth}));
         height: 6vh;
-        z-index: 2;
-
-        background: transparent;
-        outline: 3px solid transparent;
-        transition: all 100ms ease-in;
+        z-index: 4;
     }
 
-    .footer--all-visible {
-        transition: all 100ms ease-out;
+    .footer__menu {
+        position: absolute;
+        left: 0;
+        bottom: 0 !important;
+        width: calc(100% - 2 * 10vw);
+        height: 100%;
+        padding: 0 10vw;
+        z-index: -1;
+
         background: white;
+
         outline: 3px solid black;
     }
 
     .footer__copyright {
         position: absolute;
+        left: 0;
         top: 0;
         bottom: 0;
-        left: 0;
         height: 5vh;
-        margin: auto;
-        margin-left: calc(3px + 3px);
+        margin: auto auto auto calc(3px + 3px);
     }
 
     .footer__copyright p {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
         margin: 0;
 
         font-size: 12px;
@@ -271,19 +480,94 @@ export default class TextArticle extends Vue {
         top: 0;
         bottom: 0;
         height: 5vh;
-        //margin: auto 15px 10px auto;
-        padding: 5px 8px;
+        margin: auto;
+        padding: 0.5em 0.8em;
 
         color: #1b4eff;
 
+        font-size: 1.2em;
         text-decoration: underline;
     }
+
+    .footer__download-button * {
+        line-height: 5vh; // Same as parent
+    }
+
+    /* HEADROOM STATES */
+
+    .headroom {
+        height: 240px;
+    }
+    .headroom--pinned {
+    }
+    .headroom--unpinned {
+    }
+    .headroom--top {
+    }
+    .headroom--not-top {
+    }
+    .headroom--bottom {
+    }
+    .headroom--not-bottom {
+    }
+
+    .headroom--hidden {
+        display: none;
+    }
+
+    /* TRANSITIONS */
+
+    .header-slide-enter {
+        transform: translateY(calc(-1 * 100%));
+    }
+    .header-slide-enter-active {
+        transition: all 0.2s ease;
+    }
+    .header-slide-leave-active {
+        transition: all 0.3s ease;
+    }
+    .header-slide-leave-to {
+        transform: translateY(calc(-1 * 100%));
+    }
+
+    .footer-slide-enter {
+        transform: translate3d(0px, calc(100% + 3px), 0px);
+    }
+    .footer-slide-enter-active {
+        transition: all 250ms;
+    }
+    .footer-slide-leave-active {
+        transition: all 250ms;
+    }
+    .footer-slide-leave-to {
+        transform: translate3d(0px, calc(100% + 3px), 0px);
+    }
+
+    .header-title-fade-enter {
+        opacity: 0;
+    }
+    .header-title-fade-enter-active {
+        transition: opacity 150ms ease;
+    }
+    .header-title-fade-enter-to {
+        opacity: 1;
+    }
+    .header-title-fade-leave {
+        opacity: 1;
+    }
+    .header-title-fade-leave-active {
+        transition: opacity 250ms ease;
+    }
+    .header-title-fade-leave-to {
+        opacity: 0;
+    }
+
 
     /* STYLING FOR INSERTED HTML FROM DRUPAL */
 
     h4 {
-        font-size: 19px;
         margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+        font-size: 19px;
     }
 
     h5 {

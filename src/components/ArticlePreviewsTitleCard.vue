@@ -7,7 +7,6 @@
         >
             {{article.subtitle}}
         </div>
-        <!--<p title="author " class="author">{{article.author.firstName}} {{article.author.lastName}}</p>-->
     </div>
 </template>
 
@@ -22,7 +21,7 @@ import {Article} from '../types/types';
 })
 
 // Submenu associated with a unique main menu entry
-export default class ArticleTitleCard extends Vue {
+export default class ArticlePreviewsTitleCard extends Vue {
     @Prop() private article: Article;
 
     constructor() {
@@ -50,9 +49,10 @@ export default class ArticleTitleCard extends Vue {
     }
 
     .author {
+        margin-top: 3px;
+
         font-weight: lighter;
         font-style: italic;
-        margin-top: 3px;
     }
 
 
