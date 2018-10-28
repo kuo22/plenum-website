@@ -120,6 +120,10 @@ export default class App extends Vue {
         padding: 0;
         color: black;
         list-style-type: none;
+        font-weight: normal;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        font-size: 12px;
     }
 
     a {
@@ -171,7 +175,7 @@ export default class App extends Vue {
 
     .content-section {
         position: absolute;
-        width: calc(100% - #{$lefterWidth} * 3);
+        width: calc(100% - #{$lefterWidth} * 4);
         height: 100vh;
         left: calc(#{$lefterWidth} * 1.5);
         top: 0;
