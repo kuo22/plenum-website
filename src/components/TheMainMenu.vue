@@ -4,9 +4,10 @@
         :class="navHovered ? 'main-menu--expanded' : null"
         role="menubar"
         aria-label="Plenum Main Navigation"
+        :aria-expanded="(navHovered || focusedIndex !== -1).toString()"
 
         @mouseover="handleNavHoverEvent()"
-        @mouseleave="navHovered = false"
+        @mouseleave="navHovered = true"
     >
         <li
             v-for="(menu, index) in menuItems"
@@ -126,7 +127,7 @@ export default class TheMainMenu extends Vue {
     constructor() {
         super();
         this.focusedIndex = -1;
-        this.navHovered = false;
+        this.navHovered = true; // false
     }
 
     // The procedure to open an article
@@ -289,6 +290,7 @@ export default class TheMainMenu extends Vue {
 
     .main-menu--expanded {
         width: $menuItemWidth;
+        overflow: visible;
 
         transition: width 0.3s ease;
     }

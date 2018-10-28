@@ -14,8 +14,8 @@
 
         <span
             class="content-section content-section__overlay"
-            :class="this.$store.getters['menuTree/anyMenuIsOpen'] ? 'content-section__overlay--dimmed' : null"
         >
+            <!--            :class="this.$store.getters['menuTree/anyMenuIsOpen'] ? 'content-section__overlay--dimmed' : null"-->
 
         </span>
 
