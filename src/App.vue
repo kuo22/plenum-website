@@ -175,7 +175,7 @@ export default class App extends Vue {
 
     .content-section {
         position: absolute;
-        width: calc(100% - #{$lefterWidth} * 4);
+        width: calc(100% - #{$lefterWidth} * 4.5);
         height: 100vh;
         left: calc(#{$lefterWidth} * 1.5);
         top: 0;

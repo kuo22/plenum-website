@@ -59,17 +59,17 @@ export default class TheSiteFooter extends Vue {
 
 <style lang="scss" scoped>
     .uw-menu {
-        height: 100%;
         position: absolute;
         right: 0;
-        padding: 0 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 0 10px;
     }
 
     .uw-menu-item {
         position: relative;
         display: inline-block;
         font-weight: normal;
-        font-size: 10px;
 
         margin: 0 10px;
 
@@ -82,6 +82,10 @@ export default class TheSiteFooter extends Vue {
 
     .uw-menu-item:last-child {
         margin-right: 0;
+    }
+
+    .uw-menu-item a span {
+        font-size: 1.2em;
     }
 
     .uw-logo {

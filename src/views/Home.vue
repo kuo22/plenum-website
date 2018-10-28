@@ -84,13 +84,13 @@ export default class Home extends Vue {
     }
 
     .basic-page__section {
-        padding-left: 50px;
+        padding-left: 80px;
     }
 
     .basic-page__section /deep/ > *:not(h2) {
         padding-left: 2%;
         font-family: 'Amiri', serif;
-        font-size: 2.25em;
+        font-size: 2.3em;
         line-height: 1.3em;
     }
 
