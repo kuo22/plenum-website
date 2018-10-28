@@ -30,6 +30,8 @@
             >
             </router-view>
         </transition>
+
+        <the-site-footer class="site-footer"></the-site-footer>
     </div>
 </template>
 
@@ -38,9 +40,11 @@ import {Component, Vue} from 'vue-property-decorator';
 import {Action} from 'vuex-class';
 import TheNavBar from '@/components/TheNavBar';
 import Home from '@/views/Home';
+import TheSiteFooter from './components/TheSiteFooter';
 
 @Component({
     components: {
+        TheSiteFooter,
         TheNavBar,
         Home
     },
@@ -167,9 +171,9 @@ export default class App extends Vue {
 
     .content-section {
         position: absolute;
-        width: calc(100% - #{$lefterWidth});
+        width: calc(100% - #{$lefterWidth} * 3);
         height: 100vh;
-        right: 0;
+        left: calc(#{$lefterWidth} * 1.5);
         top: 0;
 
         overflow-x: hidden;
@@ -189,6 +193,14 @@ export default class App extends Vue {
         opacity: 1;
 
         transition: opacity 0.3s ease;
+    }
+
+    .site-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        background: transparent;
     }
 
     .component-fade-enter-active, .component-fade-leave-active {

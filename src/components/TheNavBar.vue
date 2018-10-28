@@ -85,8 +85,6 @@ export default class TheNavBar extends Vue {
         left: 0;
         height: 100vh;
         z-index: 5;
-
-        background: lightyellow;
     }
 
     .navbar__logo-frame {

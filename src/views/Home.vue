@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main class="content-container">
         <section v-for="page in pages">
             <h1>
                 {{page.title}}
@@ -46,4 +46,19 @@ export default class Home extends Vue {
 </script>
 
 <style>
+
+    .content-container::-webkit-scrollbar {
+        width: 0;
+        position: fixed;
+        right: 0;
+    }
+
+    .content-container::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    }
+
+    .content-container::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 1px solid slategrey;
+    }
 </style>
