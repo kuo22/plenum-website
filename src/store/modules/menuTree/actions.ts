@@ -129,13 +129,10 @@ async function fillMissingDataInMenuTree(menuTree, depth, dispatch): Promise<any
                 item.imageURL = window.location.origin.replace(/0/g, '8') + collectionData.pop().attributes.url;
             }
 
-            console.log(collectionData);
             item.articles = collectionData.map(({ attributes, type }) => {
-                //console.log(attributes);
                 return {
                     type: type,
                     uuid: attributes.uuid,
-                    // node: attributes.type
                     author: attributes.field_author.split(';').map(fullname => {
                         return fullname.split(',').reverse().map(name => name.trim()).join(' ');
                     }),
@@ -160,7 +157,7 @@ async function fillMissingDataInMenuTree(menuTree, depth, dispatch): Promise<any
         return item;
     }));
 
-    return menus.sort((a: any, b: any) => a.weight - b.weight);
+    return menus.sort((a: any, b: any) => a.disabled ? 1 : a.weight - b.weight);
 }
 
 

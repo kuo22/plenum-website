@@ -1,10 +1,12 @@
 <template>
     <ul
         class="main-menu"
+        :class="navHovered ? 'main-menu--expanded' : null"
         role="menubar"
         aria-label="Plenum Main Navigation"
 
-        @mouseover="focusedIndex = -1"
+        @mouseover="handleNavHoverEvent()"
+        @mouseleave="navHovered = false"
     >
         <li
             v-for="(menu, index) in menuItems"
@@ -15,8 +17,8 @@
             :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
             :style="changeBackground(menu)"
 
-            @mouseenter="menu.hovered = true"
-            @mouseleave="menu.hovered = false"
+            @mouseenter="handleMenuItemHoverEvent($event, menu)"
+            @mouseleave="handleMenuItemHoverEvent($event, menu)"
         >
 
             <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
@@ -116,6 +118,7 @@ import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' erro
 // Main navigation
 export default class TheMainMenu extends Vue {
     @Prop(Array) private menuItems!: Array<any>; // Main Menu Items
+    private navHovered: boolean;
 
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
     private focusedIndex: number; // Index of the focused menu item; Initialize to non-existent index value
@@ -123,6 +126,7 @@ export default class TheMainMenu extends Vue {
     constructor() {
         super();
         this.focusedIndex = -1;
+        this.navHovered = false;
     }
 
     // The procedure to open an article
@@ -141,13 +145,18 @@ export default class TheMainMenu extends Vue {
         return !this.menuItems.some((menuItem: any) => menuItem.expanded);
     }
 
-    private handleHoverEvent(event, mainMenuItemIndex) {
+    private handleNavHoverEvent() {
+        this.navHovered = true;
+        this.focusedIndex = -1;
+    }
+
+    private handleMenuItemHoverEvent(event, menu) {
         if (event.type === 'mouseenter') {
-
+            menu.hovered = true;
         } else if (event.type === 'mouseleave') {
-
+            menu.hovered = false;
         } else {
-            console.error('incorrectly used function: handleHoverEvent in TheMainMenu');
+            console.error('incorrectly used function: handleMenuItemHoverEvent in TheMainMenu');
         }
     }
 
@@ -203,7 +212,7 @@ export default class TheMainMenu extends Vue {
     private changeBackground(menuItem): {} {
         //if (!menuItem.disabled) {
             if (menuItem.hovered || menuItem.expanded) {
-                return {background: 'transparent'};
+                return {background: 'white'};
             } else {
                 return {background: menuItem.color};
             }
@@ -264,15 +273,40 @@ export default class TheMainMenu extends Vue {
 
 <style lang="scss" scoped>
     $menuItemHeight: 45px;
+    $menuItemWidth: 210px;
     $border: 3px solid black;
     $lefterWidth: 240px;
     $buttonTextCenterAdjustment: 3px;
 
+    .main-menu {
+        width: $menuItemHeight;
+        left: calc(50% - 45px / 2);
+        position: relative;
+        overflow: hidden;
+
+        transition: width 0.3s ease;
+    }
+
+    .main-menu--expanded {
+        width: $menuItemWidth;
+
+        transition: width 0.3s ease;
+    }
+
     .main-menu__menu-item {
+        width: calc(#{$lefterWidth} - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
 
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
+    }
+
+    .main-menu__menu-item:first-child {
+        margin-top: 0;
+    }
+
+    .main-menu__menu-item:last-child {
+        margin-bottom: 0;
     }
 
     .main-menu__menu-item:hover {
@@ -291,9 +325,8 @@ export default class TheMainMenu extends Vue {
         text-align: right;
     }
 
-    .main-menu__menu-item--disabled a {
-        cursor: no-drop !important;
-        text-decoration: line-through;
+    .main-menu__menu-item--disabled a span {
+        color: grey;
     }
 
     .main-menu__menu-item a[role=menuitem]:focus,

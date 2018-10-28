@@ -127,7 +127,10 @@ export default class MainMenuFlyOutSections extends Vue {
     // and return the preview to the collection image
     //      index = the index location of the menu item in the menu list
     private toggleOffAllArticleItemHovers(index: number): void {
-        this.menuItems.find(item => item.expanded).articles.forEach(article => article.previewVisible = false);
+        let foundItem = this.menuItems.find(item => item.expanded);
+        if (foundItem) {
+            this.menuItems.find(item => item.expanded).articles.forEach(article => article.previewVisible = false);
+        }
     }
 
     /*********************************/
@@ -218,7 +221,7 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     .collection-group-menu__menu-item a:hover {
-        text-decoration: underline;
+        //text-decoration: underline;
     }
 
     .collection-group-menu__menu-item[role=menuitem] * {

@@ -28,6 +28,16 @@ class API extends Vue {
         this.fetcher = axios;
     }
 
+    public fetchFrontPage(): Promise<any> {
+        return this.fetcher({
+            url: 'frontpage',
+            params: {
+                _format: 'api_json'
+            },
+            timeout: 10000
+        }).then(response => response.data);
+    }
+
     // Fetches the navigation hierarchy from the Drupal API
     // and returns a promise for the data
     public fetchMenuTree(): Promise<any> {

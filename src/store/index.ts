@@ -3,6 +3,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import {IssuesStoreModule} from '@/store/modules/issues/_store';
 import {MenuTreeStoreModule} from '@/store/modules/menuTree/menuTreeModule';
 import {RouterNavStoreModule} from '@/store/modules/routerNav/_store';
+import {PagesModule} from '@/store/modules/pages/_store';
 
 Vue.use(Vuex);
 
@@ -16,7 +17,8 @@ export default new Vuex.Store<RootState>({
     modules: {
         issues: IssuesStoreModule,
         menuTree: MenuTreeStoreModule,
-        routerNav: RouterNavStoreModule
+        routerNav: RouterNavStoreModule,
+        pages: PagesModule
     },
     state: {
 

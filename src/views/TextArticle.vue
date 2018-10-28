@@ -1,6 +1,6 @@
 <template>
     <main
-        :v-show="articleLoading || article !== null"
+        :v-show="article !== null && article !== undefined"
         class="article"
     >
         <transition name="header-title-fade">
@@ -20,6 +20,7 @@
                     @mouseleave="headerHovered = false"
                 >
                     <text-article-title-card
+                        v-if="article"
                         class="article__info-container article__info-container--headroom"
                         :title="article.title"
                         :subtitle="article.subtitle"
@@ -37,6 +38,7 @@
             >
                 <transition name="header-title-fade">
                     <text-article-title-card
+                            v-if="article"
                             v-show="!navArrowHovered"
                             class="article__info-container article__info-container--embedded"
 
@@ -53,9 +55,10 @@
             class="article__frame"
         >
             <div
+                v-if="article"
                 v-view="onEarlyScroll"
                 class="article__page"
-                :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: transparent}"
+                :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: 'transparent'}"
             >
                 <!-- TODO: render article page with 'loading background' while article is loading -->
                 <div class="article__abstract">
@@ -89,13 +92,14 @@
         </div>
 
         <footer
+            v-if="article"
             class="footer"
             @mouseover="footerHovered = true"
             @mouseleave="footerHovered = false"
         >
             <div
-                    v-if="article.copyright"
-                    class="footer__copyright"
+                v-if="article.copyright"
+                class="footer__copyright"
             >
                 <p>
                     Copyright &#169; {{ authorCopyrightFormat }}
@@ -114,11 +118,11 @@
             >
                 <span tabindex="-1">Download Article</span>
             </a>
-
         </footer>
 
         <!-- :allVisible="isNavExposed"-->
         <text-article-navigation
+                v-if="article"
                 :allVisible="isNavExposed"
                 :previousArticle="article"
                 :nextArticle="article"
@@ -182,8 +186,12 @@ export default class TextArticle extends Vue {
         this.navArrowHovered = false;
 
         this.articleLoading = false;
-        this.article = null;
-        this.articleError = null;
+        this.article = {
+            title: '',
+            subtitle: '',
+            author: ''
+        };
+        this.articleError = false;
 
         this.issue = null;
         this.issuePosition = -1;

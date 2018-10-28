@@ -112,7 +112,7 @@ export default class TextArticleNavigation extends Vue {
 
     @Emit('navArrowHovered')
     private navArrowHovered(navButtonIndex: number): void {
-        console.log('hovered');
+        //console.log('hovered');
         this.navButtons[navButtonIndex].arrowHovered = true;
         // Filler
     }

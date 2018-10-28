@@ -106,7 +106,7 @@ export default class App extends Vue {
 <style lang="scss">
     $menuFont: 'Avenir', 'Open Sans', sans-serif;
     $readFont: 'Crimson Text', serif;
-    $lefterWidth: 240px;
+    $lefterWidth: 120px;
     $activeSubmenuWidth: 20px;
     $borderWidth: 3px;
     $border: 3px solid black;
@@ -123,6 +123,7 @@ export default class App extends Vue {
     }
 
     #app {
+        position: fixed;
         width: 99vw; // 100vw adds a scroll bar to the bottom of page
         height: 100vh;
 
@@ -141,13 +142,11 @@ export default class App extends Vue {
         width: $lefterWidth;
         height: 100%;
         z-index: 4;
-
-        outline: $border;
     }
 
     .grid-frame {
         width: $lefterWidth;
-        height: $lefterWidth;
+        height: $lefterWidth * 2;
 
         background: white;
 
