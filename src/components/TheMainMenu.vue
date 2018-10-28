@@ -319,10 +319,14 @@ export default class TheMainMenu extends Vue {
 
         cursor: pointer;
 
-        font-size: 1.75em;
-        font-weight: bold;
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
         text-align: right;
+    }
+
+    .main-menu__menu-item a[role=menuitem] span,
+    .main-menu__menu-item a[role=link] span {
+        font-size: 2em;
+        font-weight: bold;
     }
 
     .main-menu__menu-item--disabled a span {
