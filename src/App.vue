@@ -108,18 +108,17 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-    $menuFont: 'Avenir', 'Open Sans', sans-serif;
-    $readFont: 'Crimson Text', serif;
-    $lefterWidth: 120px;
-    $activeSubmenuWidth: 20px;
-    $borderWidth: 3px;
-    $border: 3px solid black;
+    @import 'styles/_settings';
 
     * {
         margin: 0;
         padding: 0;
         color: black;
         list-style-type: none;
+        font-weight: normal;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        font-size: 12px;
     }
 
     a {
@@ -134,7 +133,7 @@ export default class App extends Vue {
         color: #2c3e50;
 
         text-align: center;
-        font-family: $menuFont;
+        font-family: $sansSerifFont;
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
     }
@@ -171,7 +170,7 @@ export default class App extends Vue {
 
     .content-section {
         position: absolute;
-        width: calc(100% - #{$lefterWidth} * 3);
+        width: calc(100% - #{$lefterWidth} * 4.5);
         height: 100vh;
         left: calc(#{$lefterWidth} * 1.5);
         top: 0;
@@ -199,7 +198,7 @@ export default class App extends Vue {
         position: fixed;
         bottom: 0;
         width: 100%;
-        height: 60px;
+        height: $footerHeight;
         background: transparent;
     }
 

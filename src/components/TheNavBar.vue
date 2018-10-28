@@ -76,8 +76,7 @@ export default class TheNavBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $navBarWidth: 240px;
-    $menuFont: 'Avenir', 'Open Sans', sans-serif;
+    @import '../styles/_settings';
 
     .navbar {
         position: relative;
@@ -118,7 +117,7 @@ export default class TheNavBar extends Vue {
         width: calc(#{$navBarWidth} - 30px);
         padding: 15px 15px 0 15px;
 
-        font-family: $menuFont;
+        font-family: $sansSerifFont;
         font-weight: bold;
     }
 

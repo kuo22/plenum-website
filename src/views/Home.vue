@@ -1,15 +1,19 @@
 <template>
     <main class="content-container">
-        <section v-for="page in pages">
-            <h1>
+        <article
+                v-for="page in pages"
+                class="basic-page"
+        >
+            <h1 class="basic-page__title">
                 {{page.title}}
             </h1>
-            <p
+            <section
+                class="basic-page__section"
                 v-for="section in page.body"
                 v-html="section.processed"
-            ></p>
-            <hr>
-        </section>
+            ></section>
+        </article>
+        <hr>
     </main>
 </template>
 
@@ -45,7 +49,8 @@ export default class Home extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+    @import '../styles/basic-page';
 
     .content-container::-webkit-scrollbar {
         width: 0;
