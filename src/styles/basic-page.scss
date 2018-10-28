@@ -1,0 +1,88 @@
+@import '_settings';
+
+.basic-page {
+  text-align: left;
+}
+
+.basic-page:last-of-type {
+  margin-bottom: 50px;
+}
+
+.basic-page__title {
+  height: 240px;
+  line-height: 240px;
+  vertical-align: middle;
+  font-weight: bold;
+
+  font-size: 6em;
+}
+
+.basic-page__section {
+  padding-left: 80px;
+}
+
+.basic-page__section /deep/ a {
+  color: #0070c4;
+  text-decoration: underline;
+}
+
+.basic-page__section /deep/ strong {
+  font-weight: bolder;
+}
+
+.basic-page__section /deep/ h2 {
+  font-weight: normal;
+  font-size: 3em;
+  margin-left: 100px;
+  padding: 30px 0;
+}
+
+.basic-page__section /deep/ h3 {
+  font-family: $sansSerifFont;
+  font-weight: normal;
+  font-size: 2.5em;
+  margin-left: 100px;
+  padding: 30px 0;
+}
+
+.basic-page__section /deep/ > *:not(h2):not(h3):not(h4):not(h5):not(h6) {
+  padding-left: 2%;
+  font-family: $serifFont;
+  font-size: 2.3em;
+  line-height: 1.3em;
+}
+
+.basic-page__section /deep/ ol, .basic-page__section /deep/ ul {
+  margin-left: 50px;
+}
+
+.basic-page__section /deep/ ol li {
+  list-style-type: decimal;
+  padding: 3px 0;
+}
+
+.basic-page__section /deep/ ul li {
+  list-style-type: circle;
+  padding: 3px 0;
+}
+
+.basic-page__section /deep/ > * > * {
+  font-size: 1em;
+  line-height: 1.3em;
+}
+
+.basic-page__section /deep/ p:first-of-type {
+  padding-top: 0;
+}
+
+.basic-page__section /deep/ p {
+  padding: 15px 0;
+}
+
+.basic-page__section /deep/ p:last-of-type {
+  padding-bottom: 0;
+}
+
+.basic-page__section:first-of-type /deep/ h2 {
+  padding-top: 0;
+}

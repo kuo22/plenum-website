@@ -272,11 +272,9 @@ export default class TheMainMenu extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import "../styles/_settings";
     $menuItemHeight: 45px;
     $menuItemWidth: 210px;
-    $border: 3px solid black;
-    $lefterWidth: 240px;
-    $buttonTextCenterAdjustment: 3px;
 
     .main-menu {
         width: $menuItemHeight;
@@ -294,7 +292,7 @@ export default class TheMainMenu extends Vue {
     }
 
     .main-menu__menu-item {
-        width: calc(#{$lefterWidth} - 15px * 2);
+        width: calc(#{$lefterWidth} * 2 - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
 

@@ -58,6 +58,8 @@ export default class TheSiteFooter extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
+
     .uw-menu {
         position: absolute;
         right: 0;
@@ -90,7 +92,7 @@ export default class TheSiteFooter extends Vue {
 
     .uw-logo {
         position: relative;
-        height: calc(0.75 * 60px); /* 60px is height of foot */
+        height: calc(0.75 * #{$footerHeight}); /* 60px is height of foot */
         width: auto;
     }
 </style>

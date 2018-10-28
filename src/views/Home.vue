@@ -50,6 +50,7 @@ export default class Home extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/basic-page';
 
     .content-container::-webkit-scrollbar {
         width: 0;
@@ -65,70 +66,4 @@ export default class Home extends Vue {
         background-color: darkgrey;
         outline: 1px solid slategrey;
     }
-
-    .basic-page {
-        text-align: left;
-    }
-
-    .basic-page:last-of-type {
-        margin-bottom: 50px;
-    }
-
-    .basic-page__title {
-        height: 240px;
-        line-height: 240px;
-        vertical-align: middle;
-        font-weight: bold;
-
-        font-size: 6em;
-    }
-
-    .basic-page__section {
-        padding-left: 80px;
-    }
-
-    .basic-page__section /deep/ > *:not(h2) {
-        padding-left: 2%;
-        font-family: 'Amiri', serif;
-        font-size: 2.3em;
-        line-height: 1.3em;
-    }
-
-    .basic-page__section /deep/ ol {
-        margin-left: 50px;
-    }
-
-    .basic-page__section /deep/ ol li {
-        list-style-type: decimal;
-    }
-
-    .basic-page__section /deep/ > * > * {
-        font-size: 1em;
-        line-height: 1.3em;
-    }
-
-    .basic-page__section /deep/ p:first-of-type {
-        padding-top: 0;
-    }
-
-    .basic-page__section /deep/ p {
-        padding: 15px 0;
-    }
-
-    .basic-page__section /deep/ p:last-of-type {
-        padding-bottom: 0;
-    }
-
-    .basic-page__section /deep/ h2 {
-        font-weight: normal;
-        font-size: 3em;
-        margin-left: 100px;
-        padding: 30px 0;
-    }
-
-    .basic-page__section:first-of-type /deep/ h2 {
-        padding-top: 0;
-    }
-
-
 </style>
