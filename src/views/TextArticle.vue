@@ -1,6 +1,7 @@
 <template>
     <main
         :v-show="article !== null && article !== undefined"
+        v-if="article"
         class="article"
     >
         <transition name="header-title-fade">
@@ -55,14 +56,13 @@
                 class="article__frame"
             >
                 <div
-                    v-if="article"
                     v-view="onEarlyScroll"
                     class="article__page"
-                    :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: 'transparent'}"
+                    :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : null"
                 >
                     <!-- TODO: render article page with 'loading background' while article is loading -->
                     <section class="article__abstract">
-                        <h4 id="article__abstract-title">ABSTRACT</h4>
+                        <h2 id="article__abstract-title">ABSTRACT</h2>
                         <p>
                             {{ article.abstract }}
                         </p>
@@ -84,7 +84,7 @@
                     <section
                         class="article__biblio"
                     >
-                        <h4>BIBLIOGRAPHY</h4>
+                        <h2>BIBLIOGRAPHY</h2>
 
                         <p v-html="article.references.processed"></p>
                     </section>
@@ -109,6 +109,17 @@
                         All rights reserved.
                     </p>
                 </div>
+
+                <!--a
+                    class="footer__download-button"
+                    :title="'Download the Article, ' + article.title + ', as a PDF.'"
+                    :href="article.downloadURL"
+                    target="_blank"
+
+                    tabindex="0"
+                >
+                    <span tabindex="-1">Download Article</span>
+                </a-->
             </footer>
         </article>
 
@@ -233,7 +244,6 @@ export default class TextArticle extends Vue {
     // TODO: make global for any component that needs to access images in '/assets/
     private getImageSource(fileName: string): string {
         const image = require.context('../assets/', false, /\.png$/);
-        console.log(image('./' + fileName + '.png'));
         return image('./' + fileName + '.png');
     }
 
@@ -405,6 +415,10 @@ export default class TextArticle extends Vue {
 
     /* ARTICLE CONTENT BELOW TITLES */
     .article__frame {
+        position: absolute;
+        // TODO: figure out how to center on entire page?
+        left: calc(50% - #{$lefterWidth});
+        transform: translateX(calc(-50% - #{$lefterWidth}));
         margin-top: calc(240px * 0.5);
 
         text-align: left;
@@ -563,16 +577,28 @@ export default class TextArticle extends Vue {
         opacity: 0;
     }
 
+    hr {
+        margin: $margin;
+    }
 
     /* STYLING FOR INSERTED HTML FROM DRUPAL */
 
-    h4 {
-        margin: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
-        font-size: 19px;
+    section {
+        margin-bottom: 4em;
     }
 
-    h5 {
-        margin: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
+    section /deep/ * {
+        font-size: 1.7em;
+    }
+
+    section /deep/ h2 {
+        padding: calc(-1 * #{$margin} / 4) 0 calc(#{$margin} / 4) 0;
+        font-size: 2.5em;
+        line-height: 1.5em;
+    }
+
+    section /deep/ h3 {
+        padding: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
 
         font-weight: bold;
         text-transform: uppercase;
@@ -581,9 +607,9 @@ export default class TextArticle extends Vue {
         text-align: center;
     }
 
-    h6 {
+    section /deep/ h4 {
         width: calc(#{$pageWidth} / 2);
-        margin: 25px auto;
+        padding: 25px auto;
 
         outline: 4px #000;
 
@@ -592,30 +618,52 @@ export default class TextArticle extends Vue {
         line-height: 125%;
     }
 
-    p {
-        margin-bottom: 6px;
+    section /deep/ h1 span:before,
+    section /deep/ h2 span:before,
+    section /deep/ h3 span:before,
+    section /deep/ h4 span:before,
+    section /deep/ h5 span:before,
+    section /deep/ h6 span:before {
+        content: ' ';
+        display: block;
+    }
+
+    section /deep/ h1 span,
+    section /deep/ h2 span,
+    section /deep/ h3 span,
+    section /deep/ h4 span,
+    section /deep/ h5 span,
+    section /deep/ h6 span {
+        line-height: 0.8em;
+        font-size: 0.8em;
+        margin-left: 1em;
+    }
+
+    section /deep/ p {
+        padding-bottom: 6px;
 
         text-align: justify;
-        font-size: 17px;
         line-height: 150%;
         text-indent: 50px;
     }
 
-    hr {
-        margin: $margin;
-    }
-
-    blockquote {
-        margin: calc(#{$margin} / 2.5) calc(#{$margin} / 1.5);
+    section /deep/ blockquote {
+        padding: calc(#{$margin} / 2.5) calc(#{$margin} / 1.5);
         font-weight: lighter;
+        border-left: 3px solid rgba(0, 0, 0, 0.08);
     }
 
-    blockquote p {
+    section /deep/ blockquote p {
         text-indent: 0;
+        font-size: 1em;
     }
 
-    blockquote strong {
+    section /deep/ blockquote strong {
         font-weight: normal;
-        font-size: calc(#{$fontSize} - 2px);
+        font-size: 1.2em;
+    }
+
+    .article__biblio /deep/ p {
+        font-size: 1.3em;
     }
 </style>

@@ -7,14 +7,14 @@
     >
         <h1 class="title-card__title">
             {{ title }}
+            <br>
+            <span class="title-card__subtitle">
+                {{ subtitle }}
+            </span>
         </h1>
-        <h2 class="title-card__subtitle">
-            {{ subtitle }}
-        </h2>
-        <address>
-            <h3 class="title-card__author">
-                {{ author }}
-            </h3>
+
+        <address class="title-card__author">
+            {{ author }}
         </address>
     </div >
 </template>
@@ -82,8 +82,15 @@
         font-style: normal;
     }
 
+    .title-card__title {
+        font-size: 3em;
+        line-height: 1.5em;
+    }
+
     .title-card__subtitle {
-        margin-left: 30px;
+        margin-left: 1.5em;
+        font-size: 0.8em;
+        line-height: 0.8em;
 
         text-align: left;
     }
@@ -91,6 +98,7 @@
     .title-card__author {
         margin-top: 15px;
 
+        font-size: 1.8em;
         font-style: italic;
         text-align: left;
     }
