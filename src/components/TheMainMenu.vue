@@ -283,6 +283,10 @@ export default class TheMainMenu extends Vue {
         position: relative;
         overflow: hidden;
 
+        background: white;
+        border-top: $borderWidth solid white;
+        border-bottom: $borderWidth solid white;
+
         transition: width 0.3s ease;
     }
 
@@ -350,7 +354,7 @@ export default class TheMainMenu extends Vue {
         top: 0;
         height: 100%;
         width: 100%;
-        left: $lefterWidth !important;
+        left: $navBarWidth !important;
         outline: $border;
         // width: calc(100% - calc(#{$lefterWidth} * 2));
         z-index: -1 !important;
@@ -389,10 +393,10 @@ export default class TheMainMenu extends Vue {
 
     .fly-out-slide-leave-to {
         z-index: 4;
-        transform: translateX(-$lefterWidth);
+        transform: translateX(-$navBarWidth);
     }
 
     .fly-out-slide-enter {
-        transform: translateX(-$lefterWidth);
+        transform: translateX(-$navBarWidth);
     }
 </style>
