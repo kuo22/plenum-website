@@ -181,10 +181,6 @@ export default class App extends Vue {
         overflow-y: scroll;
     }
 
-    .content-section > * {
-        //width: calc(100% - #{$lefterWidth} * 4.5);
-    }
-
     .content-section::-webkit-scrollbar {
         width: 0;
         position: fixed;

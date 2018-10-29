@@ -15,6 +15,7 @@
             >
                 <header
                     class="article__info article__info--headroom"
+                    role="presentation"
 
                     @mouseover="headerHovered = true"
                     @mouseleave="headerHovered = false"
@@ -31,9 +32,9 @@
             </vue-headroom>
         </transition>
 
-        <div class="article__header">
-            <div
-                class="article__info article__info--embedded"
+        <article>
+            <header
+                class="article__info article__header article__info--embedded"
                 :class="{ 'article__info--embedded--hidden': hideArticleContents }"
             >
                 <transition name="header-title-fade">
@@ -47,78 +48,69 @@
                             :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
                     ></text-article-title-card>
                 </transition>
-            </div>
-        </div>
+            </header>
 
-        <div
-            id="article-frame"
-            class="article__frame"
-        >
             <div
-                v-if="article"
-                v-view="onEarlyScroll"
-                class="article__page"
-                :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: 'transparent'}"
+                id="article-frame"
+                class="article__frame"
             >
-                <!-- TODO: render article page with 'loading background' while article is loading -->
-                <div class="article__abstract">
-                    <h4 id="article__abstract-title">ABSTRACT</h4>
-                    <p>
-                        {{ article.abstract }}
-                    </p>
-                </div>
-
-                <hr>
-
-                <div class="article__body">
-                    <section
-                        v-for="section in article.body"
-                        v-html="section.processed"
-                    >
+                <div
+                    v-if="article"
+                    v-view="onEarlyScroll"
+                    class="article__page"
+                    :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : {background: 'transparent'}"
+                >
+                    <!-- TODO: render article page with 'loading background' while article is loading -->
+                    <section class="article__abstract">
+                        <h4 id="article__abstract-title">ABSTRACT</h4>
+                        <p>
+                            {{ article.abstract }}
+                        </p>
                     </section>
 
+                    <hr>
+
+                    <div class="article__body">
+                        <section
+                            v-for="section in article.body"
+                            v-html="section.processed"
+                        >
+                        </section>
+
+                    </div>
+
+                    <hr v-view="onPresenceOfBiblio">
+
+                    <section
+                        class="article__biblio"
+                    >
+                        <h4>BIBLIOGRAPHY</h4>
+
+                        <p v-html="article.references.processed"></p>
+                    </section>
                 </div>
+            </div>
 
-                <hr v-view="onPresenceOfBiblio">
+            <footer
+                v-if="article"
+                class="footer"
+                role="contentinfo"
 
+                @mouseover="footerHovered = true"
+                @mouseleave="footerHovered = false"
+            >
                 <div
-                    class="article__biblio"
+                    v-if="article.copyright"
+                    class="footer__copyright"
                 >
-                    <h4>BIBLIOGRAPHY</h4>
-
-                    <p v-html="article.refs"></p>
+                    <p>
+                        Copyright &#169; {{ authorCopyrightFormat }}
+                        <br>
+                        All rights reserved.
+                    </p>
                 </div>
-            </div>
-        </div>
-
-        <footer
-            v-if="article"
-            class="footer"
-            @mouseover="footerHovered = true"
-            @mouseleave="footerHovered = false"
-        >
-            <div
-                v-if="article.copyright"
-                class="footer__copyright"
-            >
-                <p>
-                    Copyright &#169; {{ authorCopyrightFormat }}
-                    <br>
-                    All rights reserved.
-                </p>
-            </div>
-
-            <a
-                class="footer__download-button"
-                :title="'Download the Article, ' + article.title + ', as a PDF.'"
-                :href="article.downloadURL"
-                target="_blank"
-
-                tabindex="0"
-            >
-                <span tabindex="-1">Download Article</span>
-            </a>
-        </footer>
+            </footer>
+        </article>
 
         <!-- :allVisible="isNavExposed"-->
         <!--text-article-navigation
@@ -318,10 +310,10 @@ export default class TextArticle extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import "../styles/_settings";
+    
     $pageWidth: 50vw;
     $margin: calc(#{$pageWidth} / 8.5);
-    $lefterWidth: 240px;
-    $borderWidth: 3px;
     $activeMenuWidth: 20px;
     $fontSize: 17px;
 
@@ -333,14 +325,14 @@ export default class TextArticle extends Vue {
     .article__header {
         position: relative;
         width: 100%;
-        height: $lefterWidth;
+        height: $navBarWidth;
     }
 
     .article__info {
         position: fixed;
         top: 0;
-        left: calc(#{$lefterWidth} + 3px);
-        height: $lefterWidth;
+        left: calc(#{$navBarWidth} + 3px);
+        height: $navBarWidth;
         margin-left: 30px;
 
         z-index: 2;
@@ -442,9 +434,10 @@ export default class TextArticle extends Vue {
 
     .footer {
         position: fixed;
+        left: 0;
         bottom: 0;
-        width: calc(100% - calc(#{$lefterWidth}));
-        height: 6vh;
+        width: $navBarWidth * 1.5;
+        height: $footerHeight;
         z-index: 4;
     }
 

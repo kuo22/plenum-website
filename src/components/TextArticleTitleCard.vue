@@ -11,9 +11,11 @@
         <h2 class="title-card__subtitle">
             {{ subtitle }}
         </h2>
-        <h3 class="title-card__author">
-            {{ author }}
-        </h3>
+        <address>
+            <h3 class="title-card__author">
+                {{ author }}
+            </h3>
+        </address>
     </div >
 </template>
 
