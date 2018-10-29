@@ -61,14 +61,17 @@
                     :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : null"
                 >
                     <!-- TODO: render article page with 'loading background' while article is loading -->
-                    <section class="article__abstract">
+                    <section
+                        v-if="article.abstract"
+                        class="article__abstract"
+                    >
                         <h2 id="article__abstract-title">ABSTRACT</h2>
                         <p>
                             {{ article.abstract }}
                         </p>
                     </section>
 
-                    <hr>
+                    <hr v-if="article.abstract">
 
                     <div class="article__body">
                         <section
@@ -79,9 +82,13 @@
 
                     </div>
 
-                    <hr v-view="onPresenceOfBiblio">
+                    <hr
+                        v-if="article.references"
+                        v-view="onPresenceOfBiblio"
+                    >
 
                     <section
+                        v-if="article.references"
                         class="article__biblio"
                     >
                         <h2>BIBLIOGRAPHY</h2>
@@ -588,6 +595,10 @@ export default class TextArticle extends Vue {
 
     section {
         margin-bottom: 4em;
+    }
+
+    .article__body section:last-of-type {
+        margin-bottom: 0;
     }
 
     section /deep/ * {
