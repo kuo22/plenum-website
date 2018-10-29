@@ -1,13 +1,13 @@
 <template>
     <ul
         class="main-menu"
-        :class="navHovered ? 'main-menu--expanded' : null"
+        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen, 'main-menu--active': anyMenuIsOpen}"
         role="menubar"
         aria-label="Plenum Main Navigation"
         :aria-expanded="(navHovered || focusedIndex !== -1).toString()"
 
         @mouseover="handleNavHoverEvent()"
-        @mouseleave="navHovered = true"
+        @mouseleave="navHovered = false"
     >
         <li
             v-for="(menu, index) in menuItems"
@@ -107,6 +107,7 @@
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import MainMenuFlyOut from '@/components/MainMenuFlyOut';
 import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' error
+import { mapGetters } from 'vuex';
 
 
 @Component({
@@ -114,6 +115,11 @@ import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' erro
     components: {
         MainMenuFlyOut,
     },
+    computed: {
+        ...mapGetters({
+            "anyMenuIsOpen": 'menuTree/anyMenuIsOpen'
+        })
+    }
 })
 
 // Main navigation
@@ -127,7 +133,7 @@ export default class TheMainMenu extends Vue {
     constructor() {
         super();
         this.focusedIndex = -1;
-        this.navHovered = true; // false
+        this.navHovered = false;
     }
 
     // The procedure to open an article
@@ -292,9 +298,12 @@ export default class TheMainMenu extends Vue {
 
     .main-menu--expanded {
         width: $menuItemWidth;
-        overflow: visible;
 
         transition: width 0.3s ease;
+    }
+
+    .main-menu--active {
+        overflow: visible;
     }
 
     .main-menu__menu-item {
