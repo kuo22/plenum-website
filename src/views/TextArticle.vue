@@ -653,6 +653,15 @@ export default class TextArticle extends Vue {
         border-left: 3px solid rgba(0, 0, 0, 0.08);
     }
 
+    // TODO: change 'section /deep/ *' to not have to force 1em to two deep tags
+    section /deep/ a {
+        font-size: 1em;
+    }
+
+    section /deep/ em {
+        font-size: 1em;
+    }
+
     section /deep/ blockquote p {
         text-indent: 0;
         font-size: 1em;
