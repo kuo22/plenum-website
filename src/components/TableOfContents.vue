@@ -180,14 +180,14 @@ export default class TableOfContents extends Vue {
     .table-of-contents__title {
         padding: 10px;
 
-        font-size: 2.1em;
+        font-size: 2.35em;
         line-height: 1em;
     }
 
     .table-of-contents__author {
         text-align: right;
         font-style: italic;
-        font-size: 1.4em;
-        line-height: 1.4em;
+        font-size: 1.75em;
+        line-height: 1.5em;
     }
 </style>

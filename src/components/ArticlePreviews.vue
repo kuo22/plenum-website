@@ -101,21 +101,21 @@ export default class ArticlePreviews extends Vue {
     }
 
     .article-preview-card__abstract-title {
-        margin-top: 2em;
-        margin-bottom: 2em;
+        margin-top: 1.2em;
+        margin-bottom: 1em;
 
-        font-size: 1.2em;
-        line-height: 1.2em;
+        font-size: 2em;
+        line-height: 2em;
         text-align: center;
     }
 
     .article-preview-card__abstract {
-        height: 68%;
+        height: 68%; // TODO: use flex box to automatically fill rest of
         overflow-x: hidden;
 
         text-indent: 3em;
-        font-size: 1.1em;
-        line-height: 1.3em;
+        font-size: 1.7em;
+        line-height: 1.5em;
         text-align: justify;
     }
 

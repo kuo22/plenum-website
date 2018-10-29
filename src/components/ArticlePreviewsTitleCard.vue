@@ -39,18 +39,21 @@ export default class ArticlePreviewsTitleCard extends Vue {
 <style lang="scss" scoped>
     .title {
         font-weight: lighter;
-        line-height: 1em;
+        font-size: 2.1em;
+        line-height: 1.8em;
     }
 
     .subtitle {
         font-weight: lighter;
-        text-indent: 2em;
-        font-size: 1.3em;
+        padding-left: 2em;
+        font-size: 1.9em;
+        line-height: 1.4em;
     }
 
     .author {
         margin-top: 3px;
 
+        font-size: 1.5em;
         font-weight: lighter;
         font-style: italic;
     }

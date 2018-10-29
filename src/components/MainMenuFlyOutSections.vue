@@ -206,22 +206,29 @@ export default class MainMenuFlyOutSections extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $lefterWidth: 240px;
-    $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
+    @import '../styles/_settings';
+
+    $preview-width: calc(100vw - (#{$navBarWidth} * 2) - 3px);
     $preview-height: 90vh;
+    $menuItemFontSize: calc(#{$flyoutFontSize} - 0.25em);
+
+    .collection-group-menu {
+        //padding-top: 0.25em;
+    }
 
     .collection-group-menu__menu-item {
-        height: 2.5em;
-        line-height: 45px; // TODO: use responsive unit
+        font-size: 1.75em;
+        height: $flyoutFontSize;
     }
 
     .collection-group-menu__menu-item a {
+        height: $flyoutFontSize;
         text-decoration: none;
         outline: none;
     }
 
-    .collection-group-menu__menu-item a:hover {
-        //text-decoration: underline;
+    .collection-group-menu__menu-item a span {
+        font-size: $menuItemFontSize;
     }
 
     .collection-group-menu__menu-item[role=menuitem] * {

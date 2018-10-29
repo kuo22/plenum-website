@@ -76,6 +76,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
     @import '../styles/_settings';
 
     // TODO: figure out where this 30px gap between menu elements is coming from
+    // CUZ I LIKE IT :)
     $preview-width: calc(100vw - (#{$navBarWidth} * 2) - (30px * 2) - 3px);
     $preview-height: calc(90vh - #{$footerHeight});
 

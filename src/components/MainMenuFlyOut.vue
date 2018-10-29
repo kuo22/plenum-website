@@ -11,7 +11,6 @@
             <li
                 v-for="(section, index) in menu.submenu"
                 :key="index"
-                :title="section.title + ' Content Menu Bar'"
 
                 class="fly-out-menu__menu-item"
                 :aria-labelledby="section.title"
@@ -249,8 +248,9 @@ export default class MainMenuFlyOut extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
+    
     $viewAllSubMenus: true;
-    $lefterWidth: 240px;
     $focusPadding: 10px;
 
     .fly-out-menu {
@@ -273,10 +273,11 @@ export default class MainMenuFlyOut extends Vue {
         display: block;
 
         text-align: left;
-        font-size: 1.6em;
+        font-size: $flyoutFontSize;
     }
 
     .fly-out-menu__section-title {
+        font-size: 1em;
         width: calc(100% - #{$focusPadding});
         padding: 0 0 0 $focusPadding;
     }
@@ -287,7 +288,7 @@ export default class MainMenuFlyOut extends Vue {
         }
 
         #about {
-            left: $lefterWidth;
+            left: $navBarWidth;
         }
 
         #publications {
