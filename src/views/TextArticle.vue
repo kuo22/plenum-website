@@ -121,14 +121,14 @@
         </footer>
 
         <!-- :allVisible="isNavExposed"-->
-        <text-article-navigation
+        <!--text-article-navigation
                 v-if="article"
                 :allVisible="isNavExposed"
                 :previousArticle="article"
                 :nextArticle="article"
                 @navArrowHovered="navArrowHovered = true"
                 @navArrowUnhovered="navArrowHovered = false"
-        ></text-article-navigation>
+        ></text-article-navigation-->
     </main>
 </template>
 

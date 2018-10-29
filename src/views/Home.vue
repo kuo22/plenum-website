@@ -51,19 +51,4 @@ export default class Home extends Vue {
 
 <style lang="scss" scoped>
     @import '../styles/basic-page';
-
-    .content-container::-webkit-scrollbar {
-        width: 0;
-        position: fixed;
-        right: 0;
-    }
-
-    .content-container::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    }
-
-    .content-container::-webkit-scrollbar-thumb {
-        background-color: darkgrey;
-        outline: 1px solid slategrey;
-    }
 </style>

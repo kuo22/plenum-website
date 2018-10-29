@@ -82,7 +82,6 @@ export default class TheNavBar extends Vue {
         position: relative;
         top: 0;
         left: 0;
-        height: 100vh;
         z-index: 5;
     }
 

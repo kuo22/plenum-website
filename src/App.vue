@@ -143,7 +143,6 @@ export default class App extends Vue {
         top: 0;
         left: 0;
         width: $lefterWidth;
-        height: 100%;
         z-index: 4;
     }
 
@@ -171,15 +170,39 @@ export default class App extends Vue {
     .content-section {
         position: absolute;
         width: calc(100% - #{$lefterWidth} * 4.5);
+        padding-left: calc(#{$lefterWidth} * 1.5);
+        padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
         height: 100vh;
-        left: calc(#{$lefterWidth} * 1.5);
+        // left: calc(#{$lefterWidth} * 1.5);
         top: 0;
+        left: 0;
 
         overflow-x: hidden;
+        overflow-y: scroll;
+    }
+
+    .content-section > * {
+        //width: calc(100% - #{$lefterWidth} * 4.5);
+    }
+
+    .content-section::-webkit-scrollbar {
+        width: 0;
+        position: fixed;
+        right: 0;
+    }
+
+    .content-section::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    }
+
+    .content-section::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 1px solid slategrey;
     }
 
     .content-section__overlay {
         position: fixed;
+        left: 0;
         z-index: 4;
         background: rgba(0, 0, 0, 0.02);
         pointer-events: none;
