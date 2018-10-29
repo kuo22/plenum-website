@@ -8,9 +8,9 @@
         <h1 class="title-card__title">
             {{ title }}
             <br>
-            <span class="title-card__subtitle">
+            <div class="title-card__subtitle">
                 {{ subtitle }}
-            </span>
+            </div>
         </h1>
 
         <address class="title-card__author">
@@ -88,9 +88,10 @@
     }
 
     .title-card__subtitle {
+        width: 90%;
         margin-left: 1.5em;
         font-size: 0.8em;
-        line-height: 0.8em;
+        line-height: 1.3em;
 
         text-align: left;
     }

@@ -322,7 +322,7 @@ export default class TextArticle extends Vue {
 <style lang="scss" scoped>
     @import "../styles/_settings";
     
-    $pageWidth: 50vw;
+    $pageWidth: 60vw;
     $margin: calc(#{$pageWidth} / 8.5);
     $activeMenuWidth: 20px;
     $fontSize: 17px;
@@ -426,6 +426,7 @@ export default class TextArticle extends Vue {
 
     .article__page {
         width: calc(#{$pageWidth} - 10vw);
+        max-width: 850px;
         padding: 5vw;
         margin: 0 auto $margin auto;
 
@@ -438,11 +439,10 @@ export default class TextArticle extends Vue {
         margin: $margin 0 0 0;
     }
 
-    .article__biblio p p {
+    .article__biblio /deep/ > p > p {
         padding: 0 0 0 50px;
 
         text-indent: -50px;
-        font-size: calc(#{$fontSize} - 3px);
         text-align: left;
     }
 
@@ -484,7 +484,8 @@ export default class TextArticle extends Vue {
         transform: translateY(-50%);
         margin: 0;
 
-        font-size: 12px;
+        font-size: 1em;
+        line-height: 1.4em;
         text-align: left;
         text-indent: 0;
     }
@@ -579,6 +580,8 @@ export default class TextArticle extends Vue {
 
     hr {
         margin: $margin;
+        border-width: 2px;
+        border-color: #fafafa;
     }
 
     /* STYLING FOR INSERTED HTML FROM DRUPAL */
@@ -598,7 +601,9 @@ export default class TextArticle extends Vue {
     }
 
     section /deep/ h3 {
+        width: 70%;
         padding: calc(#{$fontSize} * 4) 0 calc(#{$fontSize} * 2) 0;
+        margin: auto;
 
         font-weight: bold;
         text-transform: uppercase;
@@ -607,36 +612,56 @@ export default class TextArticle extends Vue {
         text-align: center;
     }
 
+    section /deep/ h2 + h3 {
+        padding-top: 0;
+    }
+
     section /deep/ h4 {
-        width: calc(#{$pageWidth} / 2);
-        padding: 25px auto;
+        //width: calc(#{$pageWidth} / 2);
+        text-indent: -30px;
+        padding: 25px;
 
         outline: 4px #000;
 
-        font-size: 25px;
+        font-size: 2em;
         text-indent: 0;
         line-height: 125%;
     }
 
+    section /deep/ h3 + h4 {
+        padding-top: 0;
+    }
+
     section /deep/ h1 span:before,
     section /deep/ h2 span:before,
-    section /deep/ h3 span:before,
     section /deep/ h4 span:before,
     section /deep/ h5 span:before,
     section /deep/ h6 span:before {
         content: ' ';
         display: block;
+        white-space: pre;
     }
+
+    section /deep/ h3 span:before {
+        content: '';
+        display: block;
+    }
+
 
     section /deep/ h1 span,
     section /deep/ h2 span,
-    section /deep/ h3 span,
     section /deep/ h4 span,
     section /deep/ h5 span,
     section /deep/ h6 span {
         line-height: 0.8em;
         font-size: 0.8em;
         margin-left: 1em;
+    }
+
+    section /deep/ h3 span {
+        font-size: 1em;
+        line-height: 1em;
+        font-weight: normal;
     }
 
     section /deep/ p {
@@ -647,6 +672,11 @@ export default class TextArticle extends Vue {
         text-indent: 50px;
     }
 
+    .article__biblio /deep/ p {
+        font-size: 1.3em;
+        text-align: left;
+    }
+
     section /deep/ blockquote {
         padding: calc(#{$margin} / 2.5) calc(#{$margin} / 1.5);
         font-weight: lighter;
@@ -654,12 +684,20 @@ export default class TextArticle extends Vue {
     }
 
     // TODO: change 'section /deep/ *' to not have to force 1em to two deep tags
-    section /deep/ a {
+    section /deep/ a,
+    section /deep/ em,
+    section /deep/ ol {
         font-size: 1em;
     }
 
-    section /deep/ em {
-        font-size: 1em;
+    section /deep/ ol {
+        padding: 1em 0 1em 5em;
+
+    }
+
+    section /deep/ ol li {
+        list-style-type: decimal;
+        line-height: 1.3em;
     }
 
     section /deep/ blockquote p {
@@ -667,12 +705,14 @@ export default class TextArticle extends Vue {
         font-size: 1em;
     }
 
+    section /deep/ blockquote p span {
+        font-size: 1em;
+        font-style: italic;
+        padding: 2em;
+    }
+
     section /deep/ blockquote strong {
         font-weight: normal;
         font-size: 1.2em;
-    }
-
-    .article__biblio /deep/ p {
-        font-size: 1.3em;
     }
 </style>
