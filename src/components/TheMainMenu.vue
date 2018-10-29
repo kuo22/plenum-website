@@ -354,7 +354,7 @@ export default class TheMainMenu extends Vue {
         top: 0;
         height: 100%;
         width: 100%;
-        left: $navBarWidth !important;
+        left: $navBarWidth;
         outline: $border;
         // width: calc(100% - calc(#{$lefterWidth} * 2));
         z-index: -1 !important;
@@ -370,19 +370,23 @@ export default class TheMainMenu extends Vue {
 
     /* Submenu Transition Animation */
     .fly-out-slide-enter {
+        opacity: 0;
         z-index: 4;
     }
 
     .fly-out-slide-enter-active {
-        transition: all .4s ease;
+        transition: all .1s ease;
         z-index: 4;
     }
 
     .fly-out-slide-enter-to {
+        opacity: 1;
+
         z-index: 4;
     }
 
     .fly-out-slide-leave {
+        opacity: 1;
         z-index: 4;
     }
 
@@ -392,11 +396,12 @@ export default class TheMainMenu extends Vue {
     }
 
     .fly-out-slide-leave-to {
+        opacity: 0;
         z-index: 4;
-        transform: translateX(-$navBarWidth);
+        //transform: translateX(-$navBarWidth);
     }
 
     .fly-out-slide-enter {
-        transform: translateX(-$navBarWidth);
+       //transform: translateX(-$navBarWidth);
     }
 </style>

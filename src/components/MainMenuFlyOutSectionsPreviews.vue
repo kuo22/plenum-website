@@ -73,15 +73,17 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $lefterWidth: 240px;
-    $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
-    $preview-height: 90vh;
+    @import '../styles/_settings';
+
+    // TODO: figure out where this 30px gap between menu elements is coming from
+    $preview-width: calc(100vw - (#{$navBarWidth} * 2) - (30px * 2) - 3px);
+    $preview-height: calc(90vh - #{$footerHeight});
 
     .collection-preview {
         display: inline-block;
-        position: absolute;
-        left: calc(#{$lefterWidth} + 3px); // + outline width
-        top: calc(100vh - #{$preview-height});
+        position: fixed;
+        left: calc(#{$navBarWidth} * 2 + 30px + 3px); // + outline width
+        top: calc((100vh - #{$preview-height}) / 2);
         width: $preview-width;
         height: $preview-height;
         float: right;
