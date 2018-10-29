@@ -13,6 +13,7 @@
             role="none"
         >
             <router-link
+                v-if="menuLink.articles"
                 :to="'/' + parentMenu.title.toLowerCase() +
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
@@ -27,10 +28,10 @@
 
                 @mouseover.native="menuLink.hovered = true"
                 @mouseleave.native="menuLink.hovered = false"
-                @click.native="handleLinkActivation(parentMenu, menuTitle, menuLink, false)"
-                @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
-                @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
-                @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @click.native="handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, false)"
+                @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
                 @keydown.esc.prevent.native="exitMenu(menuTitle)"
                 @keydown.left.prevent.native="exitMenu(menuTitle)"
                 @keydown.down.prevent.native="moveDown"
@@ -48,6 +49,40 @@
                 </span>
 
             </router-link>
+            <router-link
+                v-else
+                :to="'/' + parentMenu.title.toLowerCase() +
+                     '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
+
+                :tabindex="index === focusedIndex ? '0' : '-1'"
+
+                role="menuitem"
+                aria-haspopup="false"
+
+                v-focus="index === focusedIndex"
+
+                @mouseover.native="menuLink.hovered = true"
+                @mouseleave.native="menuLink.hovered = false"
+                @click.native="handleLinkActivation()"
+                @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.esc.prevent.native="exitMenu(menuTitle)"
+                @keydown.left.prevent.native="exitMenu(menuTitle)"
+                @keydown.down.prevent.native="moveDown"
+                @keydown.up.prevent.native="moveUp"
+                @keydown.home.prevent.native="focusedIndex = 0"
+                @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+                @focus.prevent.native="focusOnMenuItem(index)"
+            >
+                <span
+                        class="collection-group-menu__menu-item-content menu-button-content"
+                        :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
+                        tabindex="-1"
+                >
+                    {{ menuLink.title }}&nbsp;
+                </span>
+            </router-link>
 
             <!-- TODO: Add title bar that includes basic info about the issue (title, editors, published date, download all button?) -->
             <!-- div class="collection-title-bar">
@@ -57,6 +92,7 @@
             <transition name="preview-fade">
                 <main-menu-fly-out-sections-previews
                     v-show="isPreviewVisible(index)"
+                    v-if="menuLink.articles"
 
                     :sectionMenuItem="menuLink"
                     :parentMenu="parentMenu"
@@ -96,8 +132,8 @@ export default class MainMenuFlyOutSections extends Vue {
         this.focusedIndex = -1;
     }
 
-    @Emit('handleLinkActivation')
-    public handleLinkActivation(mainMenuParent: Object,
+    @Emit('handleCollectionLinkActivation')
+    public handleCollectionLinkActivation(mainMenuParent: Object,
                                sectionTitle: string,
                                submenuLink: Object): void {
         this.collectionActivated(submenuLink);
@@ -113,6 +149,11 @@ export default class MainMenuFlyOutSections extends Vue {
 
     @Emit('collectionActivated')
     public collectionActivated(submenuLink: any): void {}
+
+    // TODO: decouple link activation to accomodate non-collections/non-articles for page links in menu
+    private handleLinkActivation(): void {
+        this.openArticle();
+    }
 
     // Returns whether or not the collection preview should be visible
     // parameter(s) needed:
