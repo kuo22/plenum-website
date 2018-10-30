@@ -98,8 +98,12 @@ export default class App extends Vue {
     // Returns the app to the state that was before the menu session
     private revertMenuSession(): void {
         let visitCount = this.$store.getters['routerNav/getVisitCount'];
+        // If menu session didn't include clicked publication links
         if (visitCount > 0) {
             this.$router.go(visitCount * -1);
+            this.$store.dispatch('routerNav/resetVisitCount');
+        } else if (this.$route.path.includes('publications')) { // if menu session began open b/c first visit to site was to collection
+            this.$router.push('/');
             this.$store.dispatch('routerNav/resetVisitCount');
         }
         this.$store.dispatch('menuTree/closeMenuExpansions');
