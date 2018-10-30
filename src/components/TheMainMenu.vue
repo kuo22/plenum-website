@@ -1,7 +1,7 @@
 <template>
     <ul
         class="main-menu"
-        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen, 'main-menu--active': anyMenuIsOpen}"
+        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen || focusedIndex > -1, 'main-menu--active': anyMenuIsOpen}"
         role="menubar"
         aria-label="Plenum Main Navigation"
         :aria-expanded="(navHovered || focusedIndex !== -1).toString()"
@@ -47,7 +47,7 @@
                 @keydown.down.prevent="moveDown"
                 @keydown.home.prevent="focusedIndex = 0"
                 @keydown.end.prevent="focusedIndex = menuItems.length - 1"
-                @keydown.tab="focusedIndex = 0"
+                @keydown.tab="focusedIndex = -1"
                 @keydown.alphabet="focusByLetter($event.key, index)"
                 @focus="focusedIndex = index"
             >
@@ -78,6 +78,7 @@
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
+                 @keydown.tab.native="focusedIndex = -1"
                  @focus.native="focusedIndex = index"
             >
                 <span
@@ -286,15 +287,18 @@ export default class TheMainMenu extends Vue {
     @import "../styles/_settings";
 
     $menuItemHeight: 45px;
-    $menuItemWidth: 210px;
+    $menuItemWidth: calc(210px + #{$borderWidth} * 2);
 
     .main-menu {
         width: $menuItemHeight;
-        left: calc(50% - 45px / 2);
+        // Minus border width to accommodate left-outline while maintaining centered position when not open
+        left: calc((50% - 45px / 2) - #{$borderWidth});
+
         position: relative;
         overflow: hidden;
 
         background: white;
+        padding: 3px 0;
         border-top: $borderWidth solid white;
         border-bottom: $borderWidth solid white;
 
@@ -312,6 +316,10 @@ export default class TheMainMenu extends Vue {
     }
 
     .main-menu__menu-item {
+        position: unset;
+        // TODO: fix bug where menu shifts right when left outline is shown with below line uncommented
+        //transform: translateX($borderWidth);
+        //left: 3px;
         width: calc(#{$lefterWidth} * 2 - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
@@ -333,27 +341,21 @@ export default class TheMainMenu extends Vue {
 
     .main-menu__menu-item a[role=menuitem],
     .main-menu__menu-item a[role=link] {
-        height: $menuItemHeight;
-
         cursor: pointer;
-
-        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
-        text-align: right;
     }
 
     .main-menu__menu-item a[role=menuitem] span,
     .main-menu__menu-item a[role=link] span {
+        height: $menuItemHeight;
+
+        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
+        text-align: right;
         font-size: 2em;
         font-weight: bold;
     }
 
     .main-menu__menu-item--disabled a span {
         color: grey;
-    }
-
-    .main-menu__menu-item a[role=menuitem]:focus,
-    .main-menu__menu-item a[role=link]:focus {
-        outline: none;
     }
 
     .main-menu__menu-item-content,

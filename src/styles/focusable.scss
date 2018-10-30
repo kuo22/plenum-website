@@ -13,17 +13,18 @@ Naming replacements:
 @import '_settings';
 
 .focusable {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
+  //display: inline-block;
+  //width: 100%;
+  //height: 100%;
 }
 
 .focusable:focus,
-.focusable .focusable__content:focus {
+.focusable__content:focus {
   outline: none;
 }
 
 .focusable > .focusable__content {
+  display: block;
   height: 100%;
   width: 100%;
   transition: outline 75ms ease-out;
