@@ -171,6 +171,7 @@ export default class TableOfContents extends Vue {
 
     .table-of-contents__menu-item--hovered {
         border-left: 3px solid black;
+        background: rgba(0, 0, 0, 0.03);
     }
 
     .table-of-contents__menu-item--focused {

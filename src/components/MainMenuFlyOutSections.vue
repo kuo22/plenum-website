@@ -278,19 +278,17 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     .collection-group-menu__menu-item-content {
+        // Adds a 2px padding to the menu item to accommodate a black border upon activation
         border-right: 2px solid transparent;
-    }
-
-    .collection-group-menu__menu-item-content:hover {
-        border-right: 2px solid black;
     }
 
     .collection-group-menu__menu-item-content--active {
         border-right: 2px solid black;
     }
 
-    .collection-group-menu__menu-item-content:active {
-        border-right: 2px solid transparent;
+    .collection-group-menu__menu-item-content:hover,
+    .collection-group-menu__menu-item-content--active {
+        background: rgba(0, 0, 0, 0.05);
     }
 
     .collection-title-bar {
