@@ -256,6 +256,9 @@ export default class MainMenuFlyOut extends Vue {
     .fly-out-menu {
         width: 100%;
 
+        -webkit-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        -moz-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
         font-weight: bold;
         text-align: right;
     }

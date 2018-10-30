@@ -36,15 +36,8 @@
         @Prop({ default: false }) private hideTitleCard!: boolean;
         //@Prop() private focused!: boolean;
 
-        private $route: Route;
-
         constructor() {
             super();
-        }
-
-        // When view is mounted, retrieve article
-        public created() {
-            // Filler
         }
     }
 </script>
