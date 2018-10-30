@@ -3,7 +3,7 @@
         class="navbar"
     >
         <div class="grid-frame">
-            <div class="navbar__logo-frame ">
+            <div class="navbar__logo-frame">
                 <svg
                     class="navbar__logo" version="1.1" xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 53.033 53.032" enable-background="new 0 0 53.033 53.032" xml:space="preserve">
@@ -12,9 +12,12 @@
                         title="Return to Home"
                         tabindex="0"
 
+                        class="focusable"
+
                         @click.native="logoClicked"
                     >
-                        <rect x="11.517" y="11.016" transform="matrix(0.7071 0.7071 -0.7071 0.7071 26.5161 -10.984)" fill="transparent" stroke="#000000" stroke-width="7" stroke-miterlimit="10" width="30" height="31"/>
+                        <!-- rect class="navbar__logo__logo-shape focusable__content"  transform="matrix(0.7071 0.7071 -0.7071 0.7071 26.5161 -10.984)" fill="transparent" stroke="#000000" stroke-width="7" stroke-miterlimit="10" width="30" height="31"/-->
+                        <rect class="navbar__logo__logo-shape focusable__content" tabindex="-1" x="11.517" y="11.016"></rect>
                     </router-link>
                 </svg>
             </div>
@@ -90,8 +93,21 @@ export default class TheNavBar extends Vue {
         height: 120px;
     }
 
+    .navbar__logo__logo-shape {
+        transform: matrix(0.7071, 0.7071, -0.7071, 0.7071, 26.5161, -10.984);
+        fill: transparent;
+        stroke: #000000;
+        stroke-width: 7px;
+        stroke-miterlimit: 10;
+        width: 30px !important;
+        height: 31px !important;
+
+        transition: transform 0.5s ease;
+    }
+
     .navbar__logo {
         width: 75px;
+        height: 100px;
         transform: translateY(-50%);
         top: 50%;
         position: relative;
@@ -99,6 +115,13 @@ export default class TheNavBar extends Vue {
 
     .navbar__logo a {
         outline: none;
+    }
+
+    .focusable:focus > .focusable__content {
+        transform: translateY(0px);
+        outline: 0 solid transparent;
+
+        transition: transform 0.5s ease;
     }
 
     .navbar__main-menu {
