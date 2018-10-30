@@ -113,6 +113,7 @@ export default class App extends Vue {
 
 <style lang="scss">
     @import 'styles/_settings';
+    @import 'styles/focusable';
 
     * {
         margin: 0;

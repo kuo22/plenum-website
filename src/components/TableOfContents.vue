@@ -9,14 +9,13 @@
             <li
                 v-for="(article, index) in parentCollection.articles"
                 :key="index"
-                class="menu-button"
                 role="none"
             >
                 <router-link
                     :to=getUrl(article)
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
 
-                    class="table-of-contents__menu-item"
+                    class="table-of-contents__menu-item focusable"
                     :class="{
                                 'table-of-contents__menu-item--hovered': article.previewVisible,
                                 'table-of-contents__menu-item--focused': focusedIndex !== -1
@@ -45,7 +44,7 @@
                     @blur.native="article.previewVisible = false"
                 >
                     <p
-                        class="table-of-contents__title menu-button-content"
+                        class="table-of-contents__title focusable__content"
                         tabindex="-1"
                     >
                         {{ article.title }}

@@ -9,7 +9,7 @@
             v-for="(menuLink, index) in menuItems"
             :key="index"
 
-            class="collection-group-menu__menu-item menu-button"
+            class="collection-group-menu__menu-item"
             role="none"
         >
             <router-link
@@ -18,6 +18,8 @@
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
                 :id="menuTitle.replace(' ', '') + '-section-menu-item-' + index"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -41,7 +43,7 @@
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
-                    class="collection-group-menu__menu-item-content menu-button-content"
+                    class="collection-group-menu__menu-item-content focusable__content"
                     :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
                     tabindex="-1"
                 >
@@ -55,6 +57,8 @@
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
                 :tabindex="index === focusedIndex ? '0' : '-1'"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="false"
@@ -76,7 +80,7 @@
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
-                        class="collection-group-menu__menu-item-content menu-button-content"
+                        class="collection-group-menu__menu-item-content focusable__content"
                         :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
                         tabindex="-1"
                 >

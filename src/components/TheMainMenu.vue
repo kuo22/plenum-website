@@ -14,7 +14,7 @@
             :id="menu.title.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             :key="index"
 
-            class="main-menu__menu-item menu-button"
+            class="main-menu__menu-item"
             :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
             :style="changeBackground(menu)"
 
@@ -27,6 +27,8 @@
                 v-if="menu.submenu && Object.getOwnPropertyNames(menu.submenu).length > 1"
                 :id="'main-menu-item-' + index"
                 :key="'link-to-' + menu.title.replace(' ', '-')"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -50,7 +52,7 @@
                 @focus="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
                 ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
                     {{ menu.title }}&nbsp;
@@ -61,6 +63,8 @@
                  :to="'/' + menu.title.toLowerCase()"
                  :id="'main-menu-item-' + index"
                  :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
+
+                 class="focusable"
 
                  v-focus="index === focusedIndex"
 
@@ -77,7 +81,7 @@
                  @focus.native="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
                 >
                     {{ menu.title }}&nbsp;
@@ -280,6 +284,7 @@ export default class TheMainMenu extends Vue {
 
 <style lang="scss" scoped>
     @import "../styles/_settings";
+
     $menuItemHeight: 45px;
     $menuItemWidth: 210px;
 
