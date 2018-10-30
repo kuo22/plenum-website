@@ -46,6 +46,67 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
         commit('activateMainMenuItem', menuItem);
     },
 
+    activateSubmenuPreviewByTitle({ commit, state, dispatch }, pubTitle) {
+        // let pub = state.main.reduce((pub: any, mainMenuItem: any) => {
+        //     if (!mainMenuItem.submenu) {
+        //         return pub;
+        //     } else {
+        //         let tempPub = mainMenuItem.submenu.reduce((potPub, section) => {
+        //             if (section.submenu) {
+        //                 let pub = section.submenu.find(pub => pub.title === pubTitle);
+        //                 if (pub) {
+        //                     return pub;
+        //                 } else {
+        //                     return potPub;
+        //                 }
+        //             }
+        //         }, {});
+        //         if (tempPub === undefined || !tempPub.title) {
+        //             return pub;
+        //         } else {
+        //             return tempPub;
+        //         }
+        //     }
+        // }, {});
+        let menuContext = state.main.reduce((pub: any, mainMenuItem: any) => {
+            if (!mainMenuItem.submenu) {
+                return pub;
+            } else {
+                let tempPub = mainMenuItem.submenu.reduce((potPub, section) => {
+                    if (section.submenu) {
+                        let pub = section.submenu.find(pub => pub.title === pubTitle);
+                        if (pub) {
+                            return pub;
+                        } else {
+                            return potPub;
+                        }
+                    }
+                }, {});
+                if (tempPub === undefined || !tempPub.title) {
+                    return pub;
+                } else {
+                    return {
+                        pub: tempPub,
+                        mainMenuItem: mainMenuItem
+                    };
+                }
+            }
+        }, {});
+        if (menuContext) {
+            dispatch(
+                'openMainMenuItem',
+                menuContext.mainMenuItem
+            ).then(res => {
+                dispatch(
+                    'activateSubmenuPreview',
+                    menuContext.pub
+                );
+            });
+        } else {
+            console.error('Cannot find issue: ' + pubTitle);
+        }
+    },
+
     // Deactivates current preview, and turns on requested preview
     activateSubmenuPreview({ commit, state }, newActivation) {
         let menuTree = [...state.main];

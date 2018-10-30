@@ -143,7 +143,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
 import APIService from '@/API';
@@ -159,11 +159,6 @@ import TextArticleTitleCard from '../components/TextArticleTitleCard';
 })
 
 export default class TextArticle extends Vue {
-    // TODO: clean up footer and header css
-    // TODO: consider creating a footer (and maybe header) component?
-
-    @Prop() private mainTitleOffScreen: boolean;
-
     // Children props
     private navArrowHovered: boolean;
 

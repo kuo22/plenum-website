@@ -4,6 +4,8 @@ import RouterMode from 'vue-router';
 import Home from '@/views/Home';
 import TableOfContents from '@/views/TableOfContents';
 import TextArticle from '@/views/TextArticle';
+import Publication from '@/views/Publication';
+
 // TODO: These aren't views... move them to the components folder
 
 Vue.use(Router);
@@ -30,7 +32,7 @@ export default new Router({
 
             path: '/publications/:publication',
             name: 'publication-table-of-contents',
-            component: TableOfContents,
+            component: Publication,
         },
         {
             // TODO: find way to change component based on parameter/path
