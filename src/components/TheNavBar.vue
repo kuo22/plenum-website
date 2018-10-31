@@ -89,8 +89,8 @@ export default class TheNavBar extends Vue {
     }
 
     .navbar__logo-frame {
-        width: 120px;
-        height: 120px;
+        width: $headerHeight;
+        height: $headerHeight;
     }
 
     .navbar__logo__logo-shape {

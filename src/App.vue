@@ -19,6 +19,13 @@
 
         </span>
 
+        <header class="site-header">
+            <div class="site-header__title-container">
+                <img class="site-header__title" src="@/assets/plenum-title.svg">
+                <img class="site-header__subtitle" src="@/assets/plenum-subtitle.svg">
+            </div>
+        </header>
+
         <transition
             name="component-fade"
             mode="out-in"
@@ -153,7 +160,7 @@ export default class App extends Vue {
 
     .grid-frame {
         width: $lefterWidth;
-        height: $lefterWidth * 2;
+        height: calc(#{$lefterWidth} * 2 + 80px); // Arbitrary 80px to avoid overlap with title on home...
 
         background: white;
 
@@ -175,9 +182,10 @@ export default class App extends Vue {
     .content-section {
         position: absolute;
         width: calc(100% - #{$lefterWidth} * 4.5);
+        padding-top: $headerHeight;
         padding-left: calc(#{$lefterWidth} * 1.5);
         padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
-        height: 100vh;
+        height: calc(100vh - #{$headerHeight});
         // left: calc(#{$lefterWidth} * 1.5);
         top: 0;
         left: 0;
@@ -224,6 +232,38 @@ export default class App extends Vue {
         width: 100%;
         height: $footerHeight;
         background: transparent;
+    }
+
+    .site-header {
+        width: calc(100vw - #{$headerHeight});
+        height: $headerHeight;
+        position: absolute;
+        top: 0;
+        left: $lefterWidth;
+    }
+
+    .site-header__title-container {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        vertical-align: middle;
+    }
+
+    .site-header__title {
+        display: inline-block;
+        left: 0;
+        width: 6em;
+
+        margin-right: 1em;
+        vertical-align: middle;
+    }
+
+    .site-header__subtitle {
+        display: inline-block;
+        width: 20em;
+        left: 0;
+        vertical-align: middle;
     }
 
     .component-fade-enter-active, .component-fade-leave-active {
