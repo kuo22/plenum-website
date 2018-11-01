@@ -20,7 +20,8 @@
         </span>
 
         <vue-headroom
-
+            :disabled="this.$route.path.includes('content')"
+            :class="{'site-headroom--hidden': this.$route.path.includes('content')}"
             :speed="350"
             :z-index="9"
         >
@@ -40,8 +41,8 @@
             mode="out-in"
         >
             <router-view
+                ref="mainView"
                 class="content-section"
-                @scroll.native="handleViewScrollEvent"
                 @click.native="revertMenuSession"
                 @focus.native="revertMenuSession"
             >
@@ -97,7 +98,7 @@ export default class App extends Vue {
     }
 
     private get currentViewEl() {
-        return () => this.$refs.home.$el;
+        return () => this.$refs.mainView.$el;
     }
 
     private handleViewScrollEvent(e) {
@@ -202,8 +203,8 @@ export default class App extends Vue {
     }
 
     .content-section {
-        position: absolute;
-        width: calc(100% - #{$lefterWidth} * 4.5);
+        //position: absolute;
+        width: calc(100vw - #{$lefterWidth} * 2);
         padding-top: $headerHeight;
         padding-left: calc(#{$lefterWidth} * 1.5);
         // padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
@@ -254,6 +255,10 @@ export default class App extends Vue {
         width: 100%;
         height: $footerHeight;
         background: transparent;
+    }
+
+    .site-headroom--hidden {
+        display: none;
     }
 
     .headroom {

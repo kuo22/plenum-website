@@ -46,6 +46,7 @@
     .title-card__container {
         position: relative;
         left: 0;
+        width: fit-content;
         max-width: 50vw;
         padding: 20px;
         z-index: 0;
@@ -81,7 +82,6 @@
     }
 
     .title-card__subtitle {
-        width: 90%;
         margin-left: 1.5em;
         font-size: 0.8em;
         line-height: 1.3em;
