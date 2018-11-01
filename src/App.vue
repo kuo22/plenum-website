@@ -19,12 +19,21 @@
 
         </span>
 
-        <header class="site-header">
-            <div class="site-header__title-container">
-                <img class="site-header__title" src="@/assets/plenum-title.svg">
-                <img class="site-header__subtitle" src="@/assets/plenum-subtitle.svg">
-            </div>
-        </header>
+        <vue-headroom
+
+            :speed="350"
+            :z-index="9"
+        >
+            <header class="site-header">
+                <div
+                    class="site-header__title-container"
+                    :class="{'site-header__title-container--hidden': !isAtPageTop}"
+                >
+                    <img class="site-header__title" src="@/assets/plenum-title.svg">
+                    <img class="site-header__subtitle" src="@/assets/plenum-subtitle.svg">
+                </div>
+            </header>
+        </vue-headroom>
 
         <transition
             name="component-fade"
@@ -32,6 +41,7 @@
         >
             <router-view
                 class="content-section"
+                @scroll.native="handleViewScrollEvent"
                 @click.native="revertMenuSession"
                 @focus.native="revertMenuSession"
             >
@@ -63,11 +73,14 @@ import TheSiteFooter from './components/TheSiteFooter';
 export default class App extends Vue {
     @Action('menuTree/createMenu') private createMenu;
 
+    private isAtPageTop!: boolean;
+
     private menuLoading: boolean; // Menu loading state
 
     constructor() {
         super();
         this.menuLoading = true;
+        this.isAtPageTop = true;
         // this.menuOpen = false; // TODO: Initialize to open for when collection URL is requested
     }
 
@@ -81,6 +94,15 @@ export default class App extends Vue {
                 // TODO: Handle loading error
                 console.error(err);
             });
+    }
+
+    private get currentViewEl() {
+        return () => this.$refs.home.$el;
+    }
+
+    private handleViewScrollEvent(e) {
+        console.log(this.$refs);
+        console.log(window);
     }
 
     // Process to handle logo click event
@@ -155,7 +177,7 @@ export default class App extends Vue {
         top: 0;
         left: 0;
         width: $lefterWidth;
-        z-index: 4;
+        z-index: 10;
     }
 
     .grid-frame {
@@ -234,12 +256,23 @@ export default class App extends Vue {
         background: transparent;
     }
 
+    .headroom {
+        width: 100vw;
+        height: $headerHeight;
+    }
+
+    .headroom--not-top.headroom--pinned {
+        border-bottom: 3px solid black;
+    }
+
     .site-header {
         width: calc(100vw - #{$headerHeight});
         height: $headerHeight;
         position: absolute;
         top: 0;
         left: $lefterWidth;
+
+        background: white;
     }
 
     .site-header__title-container {

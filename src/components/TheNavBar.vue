@@ -83,9 +83,6 @@ export default class TheNavBar extends Vue {
 
     .navbar {
         position: relative;
-        top: 0;
-        left: 0;
-        z-index: 5;
     }
 
     .navbar__logo-frame {

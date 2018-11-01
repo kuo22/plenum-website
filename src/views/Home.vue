@@ -1,5 +1,5 @@
 <template>
-    <main class="content-container">
+    <main ref="home" class="content-container">
         <article
                 v-for="page in pages"
                 class="basic-page"
