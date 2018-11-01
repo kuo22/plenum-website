@@ -82,7 +82,7 @@ export default class TheNavBar extends Vue {
     @import '../styles/_settings';
 
     .navbar {
-        position: relative;
+        //position: relative;
     }
 
     .navbar__logo-frame {

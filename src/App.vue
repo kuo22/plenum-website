@@ -160,8 +160,8 @@ export default class App extends Vue {
     }
 
     #app {
-        position: fixed;
-        width: 99vw; // 100vw adds a scroll bar to the bottom of page
+        position: absolute;
+        width: $appWidth; // 100vw adds a scroll bar to the bottom of page
         height: 100vh;
 
         color: #2c3e50;
@@ -173,7 +173,7 @@ export default class App extends Vue {
     }
 
     .lefter {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: $lefterWidth;
@@ -206,8 +206,8 @@ export default class App extends Vue {
         width: calc(100% - #{$lefterWidth} * 4.5);
         padding-top: $headerHeight;
         padding-left: calc(#{$lefterWidth} * 1.5);
-        padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
-        height: calc(100vh - #{$headerHeight});
+        // padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
+        // height: calc(100vh - #{$headerHeight});
         // left: calc(#{$lefterWidth} * 1.5);
         top: 0;
         left: 0;
@@ -257,7 +257,7 @@ export default class App extends Vue {
     }
 
     .headroom {
-        width: 100vw;
+        width: $appWidth;
         height: $headerHeight;
     }
 
