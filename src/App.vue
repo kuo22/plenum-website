@@ -31,7 +31,11 @@
                     :class="{'site-header__title-container--hidden': !isAtPageTop}"
                 >
                     <img class="site-header__title" src="@/assets/plenum-title.svg">
-                    <img class="site-header__subtitle" src="@/assets/plenum-subtitle.svg">
+                    <img
+                        :class="{'site-header__subtitle--hidden': this.$route.path.includes('publications')}"
+                        class="site-header__subtitle"
+                        src="@/assets/plenum-subtitle.svg"
+                    >
                 </div>
             </header>
         </vue-headroom>
@@ -302,6 +306,14 @@ export default class App extends Vue {
         width: 20em;
         left: 0;
         vertical-align: middle;
+
+        opacity: 1;
+    }
+
+    .site-header__subtitle--hidden {
+        opacity: 0;
+
+        transition: opacity 0.3s ease;
     }
 
     .component-fade-enter-active, .component-fade-leave-active {

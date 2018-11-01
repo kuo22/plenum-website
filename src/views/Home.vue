@@ -13,7 +13,7 @@
                 v-html="section.processed"
             ></section>
         </article>
-        <hr>
+        <hr v-if="pages.length > 0">
     </main>
 </template>
 
