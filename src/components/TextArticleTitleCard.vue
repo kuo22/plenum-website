@@ -1,16 +1,14 @@
 <template>
     <div
         class="title-card__container"
-        :class="{
-            'title-card__container--hidden': hideTitleCard,
-        }"
+        :class="{'title-card__container--hidden': hidden}"
     >
         <h1 class="title-card__title">
             {{ title }}
             <br>
-            <div class="title-card__subtitle">
+            <span class="title-card__subtitle">
                 {{ subtitle }}
-            </div>
+            </span>
         </h1>
 
         <address class="title-card__author">
@@ -33,8 +31,7 @@
         @Prop() private title!: string;
         @Prop() private subtitle!: string;
         @Prop() private author!: string;
-        @Prop({ default: false }) private hideTitleCard!: boolean;
-        //@Prop() private focused!: boolean;
+        @Prop({ default: false }) private hidden!: boolean;
 
         constructor() {
             super();
@@ -44,6 +41,7 @@
 
 <style lang="scss" scoped>
     @import '../styles/_settings';
+
     .title-card__container {
         position: relative;
         left: 0;
