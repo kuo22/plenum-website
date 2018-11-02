@@ -6,46 +6,20 @@
         <transition appear>
             <the-nav-bar
                 class="lefter"
-                @logoClicked="handleLogoClick"
+                @logoLinkActivated="handleLogoLinkActivation"
                 @revertMenuSession="revertMenuSession"
                 @openContent="handleOpenContentEvent"
             ></the-nav-bar>
         </transition>
 
-        <span
-            class="content-section content-section__overlay"
-        >
-            <!--            :class="this.$store.getters['menuTree/anyMenuIsOpen'] ? 'content-section__overlay--dimmed' : null"-->
+        <the-site-header></the-site-header>
 
-        </span>
-
-        <vue-headroom
-            :disabled="this.$route.path.includes('content')"
-            :class="{'site-headroom--hidden': this.$route.path.includes('content')}"
-            :speed="350"
-            :z-index="9"
-        >
-            <header class="site-header">
-                <div
-                    class="site-header__title-container"
-                    :class="{'site-header__title-container--hidden': !isAtPageTop}"
-                >
-                    <img class="site-header__title" src="@/assets/plenum-title.svg">
-                    <img
-                        :class="{'site-header__subtitle--hidden': this.$route.path.includes('publications')}"
-                        class="site-header__subtitle"
-                        src="@/assets/plenum-subtitle.svg"
-                    >
-                </div>
-            </header>
-        </vue-headroom>
 
         <transition
             name="component-fade"
             mode="out-in"
         >
             <router-view
-                ref="mainView"
                 class="content-section"
                 @click.native="revertMenuSession"
                 @focus.native="revertMenuSession"
@@ -63,30 +37,25 @@ import {Action} from 'vuex-class';
 import TheNavBar from '@/components/TheNavBar';
 import Home from '@/views/Home';
 import TheSiteFooter from './components/TheSiteFooter';
+import TheSiteHeader from './components/TheSiteHeader';
 
 @Component({
     components: {
+        TheSiteHeader,
         TheSiteFooter,
         TheNavBar,
         Home
-    },
-    computed: {
-
     }
 })
 
 export default class App extends Vue {
-    @Action('menuTree/createMenu') private createMenu;
-
-    private isAtPageTop!: boolean;
+    @Action('menuTree/createMenu') private createMenu; // Action to initialize main menu via Vuex Store
 
     private menuLoading: boolean; // Menu loading state
 
     constructor() {
         super();
         this.menuLoading = true;
-        this.isAtPageTop = true;
-        // this.menuOpen = false; // TODO: Initialize to open for when collection URL is requested
     }
 
     // When the app is created, create the app's main navigation menu
@@ -101,17 +70,9 @@ export default class App extends Vue {
             });
     }
 
-    private get currentViewEl() {
-        return () => this.$refs.mainView.$el;
-    }
-
-    private handleViewScrollEvent(e) {
-        console.log(this.$refs);
-        console.log(window);
-    }
-
     // Process to handle logo click event
-    private handleLogoClick(): void {
+    // Goes
+    private handleLogoLinkActivation(): void {
         this.$router.push('/');
         let visitCount = this.$store.getters['routerNav/getVisitCount'];
         if (visitCount > 0) {
@@ -158,9 +119,6 @@ export default class App extends Vue {
         margin-block-start: 0;
         margin-block-end: 0;
         font-size: 12px;
-    }
-
-    a {
         text-decoration: none;
     }
 
@@ -185,72 +143,13 @@ export default class App extends Vue {
         z-index: 10;
     }
 
-    .grid-frame {
-        width: $lefterWidth;
-        height: calc(#{$lefterWidth} * 2 + 80px); // Arbitrary 80px to avoid overlap with title on home...
-
-        background: white;
-
-        text-align: center;
-    }
-
-    .before-appear {
-        opacity: 0;
-    }
-
-    .appear {
-        transition: opacity 0.3s ease-in;
-    }
-
-    .after-appear {
-        opacity: 1;
-    }
-
     .content-section {
-        //position: absolute;
-        width: calc(100vw - #{$lefterWidth} * 2);
-        padding-top: $headerHeight;
-        padding-left: calc(#{$lefterWidth} * 1.5);
-        // padding-right: calc(100% - (100% - #{$lefterWidth} * 6.75));
-        // height: calc(100vh - #{$headerHeight});
-        // left: calc(#{$lefterWidth} * 1.5);
         top: 0;
         left: 0;
+        width: calc(#{$appWidth} - #{$lefterWidth} * 1.5);
+        padding: $headerHeight 0 0 calc(#{$lefterWidth} * 1.5);
 
         overflow-x: hidden;
-        overflow-y: scroll;
-    }
-
-    .content-section::-webkit-scrollbar {
-        width: 0;
-        position: fixed;
-        right: 0;
-    }
-
-    .content-section::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    }
-
-    .content-section::-webkit-scrollbar-thumb {
-        background-color: darkgrey;
-        outline: 1px solid slategrey;
-    }
-
-    .content-section__overlay {
-        position: fixed;
-        left: 0;
-        z-index: 4;
-        background: rgba(0, 0, 0, 0.02);
-        pointer-events: none;
-        opacity: 0;
-
-        transition: opacity 0.3s ease;
-    }
-
-    .content-section__overlay--dimmed {
-        opacity: 1;
-
-        transition: opacity 0.3s ease;
     }
 
     .site-footer {
@@ -261,60 +160,7 @@ export default class App extends Vue {
         background: transparent;
     }
 
-    .site-headroom--hidden {
-        display: none;
-    }
 
-    .headroom {
-        width: $appWidth;
-        height: $headerHeight;
-    }
-
-    .headroom--not-top.headroom--pinned {
-        border-bottom: 3px solid black;
-    }
-
-    .site-header {
-        width: calc(100vw - #{$headerHeight});
-        height: $headerHeight;
-        position: absolute;
-        top: 0;
-        left: $lefterWidth;
-
-        background: white;
-    }
-
-    .site-header__title-container {
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        vertical-align: middle;
-    }
-
-    .site-header__title {
-        display: inline-block;
-        left: 0;
-        width: 6em;
-
-        margin-right: 1em;
-        vertical-align: middle;
-    }
-
-    .site-header__subtitle {
-        display: inline-block;
-        width: 20em;
-        left: 0;
-        vertical-align: middle;
-
-        opacity: 1;
-    }
-
-    .site-header__subtitle--hidden {
-        opacity: 0;
-
-        transition: opacity 0.3s ease;
-    }
 
     .component-fade-enter-active, .component-fade-leave-active {
         transition: opacity .3s ease;

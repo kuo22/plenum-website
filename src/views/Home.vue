@@ -1,8 +1,8 @@
 <template>
     <main ref="home" class="content-container">
         <article
-                v-for="page in pages"
-                class="basic-page"
+            v-for="page in pages"
+            class="basic-page"
         >
             <h1 class="basic-page__title">
                 {{page.title}}
