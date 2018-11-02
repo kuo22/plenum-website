@@ -71,7 +71,7 @@ export default class TheSiteHeader extends Vue {
 
         padding-right: calc(#{$lefterWidth / 2});
 
-        background: white;
+        background: $bgColor;
     }
 
     .site-header__title-container {

@@ -105,12 +105,18 @@ export default class App extends Vue {
         text-decoration: none;
     }
 
+    body {
+        background: $bgColor;
+    }
+
     #app {
         position: absolute;
         width: $appWidth; // 100vw adds a scroll bar to the bottom of page
         height: 100vh;
 
         color: #2c3e50;
+
+        background: transparent;
 
         text-align: center;
         font-family: $sansSerifFont;
@@ -148,8 +154,7 @@ export default class App extends Vue {
     .component-fade-enter-active, .component-fade-leave-active {
         transition: opacity .3s ease;
     }
-    .component-fade-enter, .component-fade-leave-to
-        /* .component-fade-leave-active below version 2.1.8 */ {
+    .component-fade-enter, .component-fade-leave-to {
         opacity: 0;
     }
 </style>

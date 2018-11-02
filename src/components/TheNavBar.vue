@@ -66,8 +66,6 @@ export default class TheNavBar extends Vue {
 
     .navbar__main-menu {
         margin-top: $headingCardHeight;
-
-        background: white;
     }
 
     .navbar__about {

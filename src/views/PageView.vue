@@ -1,10 +1,10 @@
 <template>
     <main ref="home" class="content-container">
         <!-- TODO: use component associated with given content-type -->
-        <basic-page
-            v-if="page && Object.keys(page).length > 0"
-            :page="page"
-        ></basic-page>
+            <basic-page
+                v-if="page && Object.keys(page).length > 0"
+                :page="page"
+            ></basic-page>
         <hr
             v-if="page && Object.keys(page).length > 0"
         >
@@ -37,8 +37,7 @@ export default class PageView extends Vue {
 
     @Watch('$route.path')
     private onRouteChanged(newVal, oldVal) {
-        console.log('route changed');
-        this.page = {};
+        this.page = undefined;
         this.getPage();
     }
 

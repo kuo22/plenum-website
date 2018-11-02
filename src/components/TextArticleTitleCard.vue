@@ -43,6 +43,7 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
     .title-card__container {
         position: relative;
         left: 0;
@@ -51,7 +52,7 @@
         padding: 20px;
         z-index: 0;
 
-        background: white;
+        background: $bgColor;
 
         text-align: left;
 

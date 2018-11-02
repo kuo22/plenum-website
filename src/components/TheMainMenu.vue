@@ -15,8 +15,8 @@
             :key="index"
 
             class="main-menu__menu-item"
-            :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
-            :style="changeBackground(menu)"
+            :class="{'main-menu__menu-item--disabled': menu.disabled, 'main-menu__menu-item--active-hovered': menu.hovered || menu.expanded}"
+            :style="{background: menu.color}"
 
             @mouseenter="handleMenuItemHoverEvent($event, menu)"
             @mouseleave="handleMenuItemHoverEvent($event, menu)"
@@ -214,26 +214,6 @@ export default class TheMainMenu extends Vue {
         this.$store.dispatch('routerNav/pageVisited');
     }
 
-    /*****************/
-    /* CSS FUNCTIONS */
-    /*****************/
-
-    // Changes the provided menu item background to transparent if the menu item is being hovered over or is active
-    // parameter(s) needed:
-    //      menuItem = menu item to be changed
-    private changeBackground(menuItem): {} {
-        //if (!menuItem.disabled) {
-            if (menuItem.hovered || menuItem.expanded) {
-                return {background: 'white'};
-            } else {
-                return {background: menuItem.color};
-            }
-        // } else {
-        //      Grayscale version of HCL(..., 25, 90)
-        //     return {background: 'rgb(226, 226, 226)'};
-        // }
-    }
-
     /*********************************/
     /* KEYBOARD NAVIGATION FUNCTIONS */
     /*********************************/
@@ -297,10 +277,10 @@ export default class TheMainMenu extends Vue {
         position: relative;
         overflow: hidden;
 
-        background: white;
+        background: $bgColor;
         padding: 3px 0;
-        border-top: $borderWidth solid white;
-        border-bottom: $borderWidth solid white;
+        border-top: $borderWidth solid $bgColor;
+        border-bottom: $borderWidth solid $bgColor;
 
         transition: width 0.3s ease;
     }
@@ -318,8 +298,6 @@ export default class TheMainMenu extends Vue {
     .main-menu__menu-item {
         position: unset;
         // TODO: fix bug where menu shifts right when left outline is shown with below line uncommented
-        //transform: translateX($borderWidth);
-        //left: 3px;
         width: calc(#{$lefterWidth} * 2 - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
@@ -352,6 +330,10 @@ export default class TheMainMenu extends Vue {
         text-align: right;
         font-size: 2em;
         font-weight: bold;
+    }
+
+    .main-menu__menu-item--active-hovered {
+        background: $bgColor !important;
     }
 
     .main-menu__menu-item--disabled a span {
