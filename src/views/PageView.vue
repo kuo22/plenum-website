@@ -41,6 +41,7 @@ export default class PageView extends Vue {
         const pageTitle = pathParts[1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
         const menuTree = this.$store.getters['menuTree/menuTree'];
+        console.log(menuTree);
         // this.page = this.$store.getters['menuTree/'];
         // this.$store.dispatch('pages/initFrontPage')
         //     .then(response => {
