@@ -16,7 +16,6 @@ import BasicPage from '../components/content-types/BasicPage';
 @Component({
     components: {
         BasicPage
-
     },
 })
 

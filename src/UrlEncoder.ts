@@ -1,9 +1,7 @@
-import axios, {AxiosStatic} from 'axios';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
 
 class UrlEncoder extends Vue {
-
 
     constructor() {
         super();

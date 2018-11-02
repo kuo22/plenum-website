@@ -23,7 +23,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 })
 
 // Description of Vue component
-export default class ComponentTitle extends Vue {
+export default class BasicPage extends Vue {
     @Prop() page!: any;
 
     constructor() {

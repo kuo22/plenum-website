@@ -60,14 +60,14 @@ export default class App extends Vue {
 
     // When the app is created, create the app's main navigation menu
     public async created() {
-        await this.createMenu()
-            .then(() => {
-                this.menuLoading = false;
-            })
-            .catch((err) => {
-                // TODO: Handle loading error
-                console.error(err);
-            });
+        // await this.createMenu()
+        //     .then(() => {
+        //         this.menuLoading = false;
+        //     })
+        //     .catch((err) => {
+        //         // TODO: Handle loading error
+        //         console.error(err);
+        //     });
     }
 
     // Process to handle logo click event
