@@ -1,6 +1,6 @@
 module.exports = {
     lintOnSave: false,
-    baseUrl: process.env.NODE_ENV === 'production'
-        ? '/plenum/'
-        : '/'
+    baseUrl: process.env.NODE_ENV === "production"
+        ? "/plenum/"
+        : "/"
 };
