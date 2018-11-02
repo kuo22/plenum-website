@@ -27,13 +27,13 @@ export default new Router({
             component: TextArticle,
         },
         {
-            path: '/about/:theme',
+            path: '/about/:page',
             name: 'about',
             component: PageView,
         },
         // TODO: reformat to properly decouple, this hard-coding has to be temporary
         {
-            path: '/contribute/:theme',
+            path: '/contribute/:page',
             name: 'contribute',
             component: PageView
         },
