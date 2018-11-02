@@ -4,6 +4,7 @@ import Home from '@/views/Home';
 import TextArticle from '@/views/TextArticle';
 import Publication from '@/views/Publication';
 import PageView from '@/views/PageView';
+import NotFoundView from '@/views/NotFoundView';
 
 Vue.use(Router);
 
@@ -42,6 +43,10 @@ export default new Router({
             name: 'join us',
             component: PageView
         },
+        {
+            path: '*',
+            component: NotFoundView
+        }
     ],
     // Scroll behavior moving between URLs
     // If new URL visit -> start at top of page
