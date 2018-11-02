@@ -1,6 +1,6 @@
 <template>
     <main ref="home" class="content-container">
-        <!-- TODO: use component associated with given data-type -->
+        <!-- TODO: use component associated with given content-type -->
         <basic-page
             v-for="page in pages"
             :page="page"

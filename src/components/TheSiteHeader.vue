@@ -14,18 +14,16 @@
             :speed="350"
             :z-index="9"
     >
-
-
-    <header class="site-header">
-        <div class="site-header__title-container">
-            <img class="site-header__title" src="@/assets/plenum-title.svg">
-            <img
-                :class="{'site-header__subtitle--hidden': this.$route.path.includes('publications')}"
-                class="site-header__subtitle"
-                src="@/assets/plenum-subtitle.svg"
-            >
-        </div>
-    </header>
+        <header class="site-header">
+            <div class="site-header__title-container">
+                <img class="site-header__title" src="@/assets/plenum-title.svg">
+                <img
+                    :class="{'site-header__subtitle--hidden': this.$route.path.includes('publications')}"
+                    class="site-header__subtitle"
+                    src="@/assets/plenum-subtitle.svg"
+                >
+            </div>
+        </header>
     </vue-headroom>
 </template>
 
@@ -47,7 +45,6 @@ export default class TheSiteHeader extends Vue {
     }
 }
 
-
 </script>
 
 <style lang="scss" scoped>
@@ -67,11 +64,12 @@ export default class TheSiteHeader extends Vue {
     }
 
     .site-header {
+        position: absolute;
         width: calc(#{$appWidth} - #{$headerHeight} - #{$rightPageNavWidth});
         height: $headerHeight;
-        position: absolute;
-        top: 0;
         left: $lefterWidth;
+
+        padding-right: calc(#{$lefterWidth / 2});
 
         background: white;
     }
@@ -81,25 +79,20 @@ export default class TheSiteHeader extends Vue {
         left: 0;
         top: 50%;
         transform: translateY(-50%);
+    }
 
+    .site-header__title-container > * {
+        display: inline-block;
         vertical-align: middle;
     }
 
     .site-header__title {
-        display: inline-block;
-        left: 0;
         width: 6em;
         margin-right: 1em;
-
-        vertical-align: middle;
     }
 
     .site-header__subtitle {
-        display: inline-block;
         width: 20em;
-        left: 0;
-
-        vertical-align: middle;
 
         opacity: 1;
     }
