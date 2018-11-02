@@ -3,6 +3,11 @@
         id="app"
         @keydown.tab="revertMenuSession"
     >
+        <div
+            v-show="$route.path.includes('publications')"
+            class="app__overlay"
+            @click="handleMenuBackgroundClickEvent"
+        ></div>
         <transition appear>
             <the-nav-bar
                 class="lefter"
@@ -53,8 +58,11 @@ export default class App extends Vue {
         super();
     }
 
+    private handleMenuBackgroundClickEvent(): void {
+        this.revertMenuSession();
+    }
+
     // Process to handle logo click event
-    // Goes
     private handleLogoLinkActivation(): void {
         this.$router.push('/');
         let visitCount = this.$store.getters['routerNav/getVisitCount'];
@@ -122,6 +130,11 @@ export default class App extends Vue {
         font-family: $sansSerifFont;
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
+    }
+
+    .app__overlay {
+        width: 100%;
+        height: 100%;
     }
 
     .lefter {
