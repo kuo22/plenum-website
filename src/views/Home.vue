@@ -1,27 +1,21 @@
 <template>
     <main ref="home" class="content-container">
-        <article
+        <!-- TODO: use component associated with given data-type -->
+        <basic-page
             v-for="page in pages"
-            class="basic-page"
-        >
-            <h1 class="basic-page__title">
-                {{page.title}}
-            </h1>
-            <section
-                class="basic-page__section"
-                v-for="section in page.body"
-                v-html="section.processed"
-            ></section>
-        </article>
+            :page="page"
+        ></basic-page>
         <hr v-if="pages.length > 0">
     </main>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import BasicPage from '../components/content-types/BasicPage';
 
 @Component({
     components: {
+        BasicPage
 
     },
 })
@@ -50,5 +44,5 @@ export default class Home extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    @import '../styles/basic-page';
+
 </style>
