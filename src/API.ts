@@ -38,6 +38,16 @@ class API extends Vue {
         }).then(response => response.data);
     }
 
+    public fetchPageByNode(node: string): Promise<any> {
+        return this.fetcher({
+            url: this.drupalAPIPath + node,
+            params: {
+                _format: 'json'
+            },
+            timeout: 10000
+        }).then(response => response.data);
+    }
+
     // Fetches the navigation hierarchy from the Drupal API
     // and returns a promise for the data
     public fetchMenuTree(): Promise<any> {

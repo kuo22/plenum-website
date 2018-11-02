@@ -2,15 +2,17 @@
     <main ref="home" class="content-container">
         <!-- TODO: use component associated with given content-type -->
         <basic-page
-            v-if="Object.keys(page).length > 0"
+            v-if="page && Object.keys(page).length > 0"
             :page="page"
         ></basic-page>
-        <hr v-if="Object.keys(page).length > 0">
+        <hr
+            v-if="page && Object.keys(page).length > 0"
+        >
     </main>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import BasicPage from '../components/content-types/BasicPage';
 
 @Component({
@@ -33,20 +35,36 @@ export default class PageView extends Vue {
         this.getPage();
     }
 
+    @Watch('$route.path')
+    private onRouteChanged(newVal, oldVal) {
+        console.log('route changed');
+        this.page = {};
+        this.getPage();
+    }
+
     // TODO: universalize 'Publication' method of waiting for menutree to load
     // Put delay in router? For first visit, don't load any views until menu tree is ready?
     private getPage(): void {
         let pathParts = this.$route.path.slice(1).split('/');
-        const theme = pathParts[0].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        // TODO: separate processing of single path URLs and of twice-nested URLs
+        const section = pathParts[0].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         const pageTitle = pathParts[1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
+        console.log(section, pageTitle);
+
         const menuTree = this.$store.getters['menuTree/menuTree'];
-        console.log(menuTree);
-        // this.page = this.$store.getters['menuTree/'];
-        // this.$store.dispatch('pages/initFrontPage')
-        //     .then(response => {
-        //         this.pages = this.$store.getters['pages/getFrontPage'];
-        //     })
+        let menuPage = menuTree.find(mainMenuItem => mainMenuItem.title.toLowerCase() === section.toLowerCase()).submenu.find(page => page.title.toLowerCase() === pageTitle.toLowerCase());
+
+        let pages = this.$store.getters['pages/getPages'];
+        if (!pages.some(page => page.node === parseInt(menuPage.node))) {
+            this.$store.dispatch('pages/getPage', menuPage.node)
+                .then(res => {
+                    pages = this.$store.getters['pages/getPages'];
+                    this.page = pages.find(page => page.node === parseInt(menuPage.node));
+                });
+        } else {
+            this.page = pages.find(page => page.node === parseInt(menuPage.node));
+        }
     }
 }
 </script>

@@ -34,7 +34,17 @@ const router = new Router({
             path: '/about/:theme',
             name: 'about',
             component: PageView,
-        }
+        },
+        {
+            path: '/:section/:theme',
+            name: 'anything?',
+            component: PageView
+        },
+        {
+            path: '/:page',
+            name: 'anything-2?',
+            component: PageView
+        },
     ],
 });
 

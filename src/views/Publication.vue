@@ -25,6 +25,7 @@ export default class Publication extends Vue {
         this.openTableOfContents();
     }
 
+    // TODO: globalize URL decoding/ encoding
     private openTableOfContents() {
         const pubParam: string = this.$route.params.publication;
         const pubTitle = pubParam

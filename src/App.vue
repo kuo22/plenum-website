@@ -33,7 +33,6 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {Action} from 'vuex-class';
 import TheNavBar from '@/components/TheNavBar';
 import Home from '@/views/Home';
 import TheSiteFooter from './components/TheSiteFooter';
@@ -49,25 +48,9 @@ import TheSiteHeader from './components/TheSiteHeader';
 })
 
 export default class App extends Vue {
-    @Action('menuTree/createMenu') private createMenu; // Action to initialize main menu via Vuex Store
-
-    private menuLoading: boolean; // Menu loading state
 
     constructor() {
         super();
-        this.menuLoading = true;
-    }
-
-    // When the app is created, create the app's main navigation menu
-    public async created() {
-        // await this.createMenu()
-        //     .then(() => {
-        //         this.menuLoading = false;
-        //     })
-        //     .catch((err) => {
-        //         // TODO: Handle loading error
-        //         console.error(err);
-        //     });
     }
 
     // Process to handle logo click event
