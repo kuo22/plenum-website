@@ -43,4 +43,14 @@ export default new Router({
             component: PageView
         },
     ],
+    // Scroll behavior moving between URLs
+    // If new URL visit -> start at top of page
+    // If moving forward/backward through page history -> start at previous scroll position
+    scrollBehavior (to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition
+        } else {
+            return { x: 0, y: 0 }
+        }
+    }
 });
