@@ -32,8 +32,6 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-import p5 from 'p5';
-import {error} from 'util';
 
 @Component({
     components: {
@@ -85,5 +83,9 @@ export default class TheLogo extends Vue {
         outline: 0 solid transparent;
 
         transition: transform 0.5s ease;
+    }
+
+    .logo .focusable:hover > .focusable__content {
+        fill: #000000;
     }
 </style>

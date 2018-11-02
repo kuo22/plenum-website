@@ -16,7 +16,13 @@
     >
         <header class="site-header">
             <div class="site-header__title-container">
-                <img class="site-header__title" src="@/assets/plenum-title.svg">
+                <router-link
+                    to="/"
+                    title="Return to Home"
+                    tabindex="-1"
+                >
+                    <img class="site-header__title" src="@/assets/plenum-title.svg">
+                </router-link>
                 <img
                     :class="{'site-header__subtitle--hidden': this.$route.path.includes('publications')}"
                     class="site-header__subtitle"
@@ -79,6 +85,10 @@ export default class TheSiteHeader extends Vue {
         left: 0;
         top: 50%;
         transform: translateY(-50%);
+    }
+
+    .site-header__title-container a:focus {
+        outline: none;
     }
 
     .site-header__title-container > * {
