@@ -25,9 +25,6 @@
                 <header
                     class="header header--headroom"
                     role="presentation"
-
-                    @mouseover="headerHovered = true"
-                    @mouseleave="headerHovered = false"
                 >
                     <text-article-title-card
                         v-if="article"
@@ -35,7 +32,7 @@
                         :title="article.title"
                         :subtitle="article.subtitle"
                         :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
-                        :hideTitleCard="isAtPageTop || scrollSessionFromTop"
+                        :hidden="isAtPageTop || scrollSessionFromTop"
                     ></text-article-title-card>
                 </header>
             </vue-headroom>
@@ -44,71 +41,62 @@
         <article>
             <header
                 class="header header--embedded"
-                :class="{ 'header--embedded--hidden': hideArticleContents }"
+                :class="{ 'header--embedded--hidden': !(this.isAtPageTop || this.hideHeadroom) }"
             >
-                <transition name="header-title-fade">
-                    <text-article-title-card
-                            v-if="article"
-                            class="header-container header-container--embedded"
+                <text-article-title-card
+                    v-if="article"
+                    class="header-container header-container--embedded"
 
-                            :title="article.title"
-                            :subtitle="article.subtitle"
-                            :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
-                    ></text-article-title-card>
-                </transition>
+                    :title="article.title"
+                    :subtitle="article.subtitle"
+                    :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                ></text-article-title-card>
             </header>
 
-                <div
-                    v-view="onEarlyScroll"
-                    class="article__page"
-                    :style="articleLoading ? {background: 'url(' + getImageSource('loading-background-tile') + ')', 'background-size': '28px 30px'} : null"
+            <div
+                v-view="handleArticlePageInView"
+                class="article__page"
+            >
+                <section
+                    v-if="article.abstract"
+                    class="article__abstract"
                 >
-                    <!-- TODO: render article page with 'loading background' while article is loading -->
+                    <h2 id="article__abstract-title">ABSTRACT</h2>
+                    <p>
+                        {{ article.abstract }}
+                    </p>
+                </section>
+
+                <hr v-if="article.abstract" class="section-divider">
+
+                <div class="article__body">
                     <section
-                        v-if="article.abstract"
-                        class="article__abstract"
-                    >
-                        <h2 id="article__abstract-title">ABSTRACT</h2>
-                        <p>
-                            {{ article.abstract }}
-                        </p>
-                    </section>
-
-                    <hr class="section-divider" v-if="article.abstract">
-
-                    <div class="article__body">
-                        <section
-                            v-for="section in article.body"
-                            v-html="section.processed"
-                        >
-                        </section>
-
-                    </div>
-
-                    <hr
-                        v-if="article.references"
-                        v-view="onPresenceOfBiblio"
-
-                        class="section-divider"
-                    >
-
-                    <section
-                        v-if="article.references"
-                        class="article__biblio"
-                    >
-                        <h2>BIBLIOGRAPHY</h2>
-
-                        <p v-html="article.references.processed"></p>
-                    </section>
+                        v-for="section in article.body"
+                        v-html="section.processed"
+                    ></section>
                 </div>
+
+                <hr
+                    v-if="article.references"
+                    v-view="handleBiblioInView"
+
+                    class="section-divider"
+                >
+
+                <section
+                    v-if="article.references"
+                    class="article__biblio"
+                >
+                    <h2>BIBLIOGRAPHY</h2>
+
+                    <p v-html="article.references.processed"></p>
+                </section>
+            </div>
 
             <footer
                 v-if="article"
                 class="footer"
                 role="contentinfo"
-
-                @mouseover="footerHovered = true"
-                @mouseleave="footerHovered = false"
             >
                 <div
                     v-if="article.copyright"
@@ -120,29 +108,8 @@
                         All rights reserved.
                     </p>
                 </div>
-
-                <!--a
-                    class="footer__download-button"
-                    :title="'Download the Article, ' + article.title + ', as a PDF.'"
-                    :href="article.downloadURL"
-                    target="_blank"
-
-                    tabindex="0"
-                >
-                    <span tabindex="-1">Download Article</span>
-                </a-->
             </footer>
         </article>
-
-        <!-- :allVisible="isNavExposed"-->
-        <!--text-article-navigation
-                v-if="article"
-                :allVisible="isNavExposed"
-                :previousArticle="article"
-                :nextArticle="article"
-                @navArrowHovered="navArrowHovered = true"
-                @navArrowUnhovered="navArrowHovered = false"
-        ></text-article-navigation-->
     </main>
 </template>
 
@@ -162,21 +129,14 @@ import TextArticleTitleCard from '../components/TextArticleTitleCard';
     },
 })
 
+// Text Article, Drupal Content Type, Component
 export default class TextArticle extends Vue {
-    // Internal data
     private articleLoading: boolean;
     private article: any;
     private articleError: boolean;
 
-    private issue: any;
-    private issuePosition: number; // index of current article within issue
-
-    private headerHovered: boolean;
-    private footerHovered: boolean;
-
     private isAtPageTop: boolean;
-    private inStartThreshold: boolean;
-    private isNearPageBottom: boolean;
+    private isBiblioInView: boolean;
 
     private lastPercentCenter: number;
     private maxPercentCenter: number;
@@ -197,15 +157,8 @@ export default class TextArticle extends Vue {
         };
         this.articleError = false;
 
-        this.issue = null;
-        this.issuePosition = -1;
-
-        this.headerHovered = false;
-        this.footerHovered = false;
-
-        this.isAtPageTop = true;
-        this.inStartThreshold = true;
-        this.isNearPageBottom = false;
+        this.isAtPageTop = true; // Scroll position is at the top of the page (pos: 0)
+        this.isBiblioInView = false; // Bibliography is in the viewport
 
         this.lastPercentCenter = -1;
         this.maxPercentCenter = this.lastPercentCenter;
@@ -224,6 +177,8 @@ export default class TextArticle extends Vue {
         this.fetchArticle();
     }
 
+    // Returns the author(s) of the article in a format depending on the number of author
+    // e.g. 'McClung J.' for a single author or 'Deremer, E. et al.' for multiple authors
     private get authorCopyrightFormat(): string {
         let singleAuthor = (typeof this.article.author === 'string') ? this.article.author : this.article.author[0];
         singleAuthor = singleAuthor.split(' ').reverse().join(', ');
@@ -232,24 +187,17 @@ export default class TextArticle extends Vue {
         return singleAuthor;
     }
 
-    //
-    get hideArticleContents() {
-        return !(this.isAtPageTop || this.hideHeadroom);
-    }
-
-    get isNavExposed() {
-        // this.isAtPageTop || this.hideHeadroom ||
-        return this.isNearPageBottom;
-    }
-
     // TODO: make global for any component that needs to access images in '/assets/
+    // Returns the post-compilation relative path of the provided image
+    // Currently hard-coded to .png
     private getImageSource(fileName: string): string {
         const image = require.context('../assets/', false, /\.png$/);
         return image('./' + fileName + '.png');
     }
 
-    //
-    private onEarlyScroll(e): void {
+    // Sets variables to control the visibility of the headroom
+    // Sorry for bad description...
+    private handleArticlePageInView(e): void {
         // If at top of page
         if (e.percentCenter === this.maxPercentCenter) {
             this.isAtPageTop = true;
@@ -276,18 +224,20 @@ export default class TextArticle extends Vue {
         }
     }
 
-    //
-    private onPresenceOfBiblio(e): void {
+    // When bibliography is in view, set the data to be representative
+    private handleBiblioInView(e): void {
         if (e.percentTop > 0.5) {
             if (e.type === 'enter') {
-                this.isNearPageBottom = true;
+                this.isBiblioInView = true;
             } else if (e.type === 'exit') {
-                this.isNearPageBottom = false;
+                this.isBiblioInView = false;
             }
         }
     }
 
-    //
+    // Gets article data depending on the URL
+    // If the article data doesn't exist in the store, fetch the article via the API
+    // and then store the article in the store
     private async fetchArticle() {
         this.articleError = this.article = null;
         this.articleLoading = true;
@@ -298,8 +248,6 @@ export default class TextArticle extends Vue {
         let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
         if (temp !== undefined && temp.length > 0) {
             this.article = temp;
-            //this.issue = ;
-            //this.issuePosition = ;
 
             this.articleLoading = false;
             this.articleError = false;
@@ -325,9 +273,7 @@ export default class TextArticle extends Vue {
     @import "../styles/drupal-content";
     
     $pageWidth: 60vw;
-    $margin: calc(#{$pageWidth} / 8.5);
-    $activeMenuWidth: 20px;
-    $fontSize: 17px;
+    $pageMargin: calc(#{$pageWidth} / 8.5);
 
     .article-view {
         padding-top: 0;
@@ -335,7 +281,7 @@ export default class TextArticle extends Vue {
     }
 
     .section-divider {
-        margin: $margin;
+        margin: $pageMargin;
         border-width: 2px;
         border-color: #fafafa;
     }
@@ -388,8 +334,8 @@ export default class TextArticle extends Vue {
         max-width: 850px;
 
         padding: 5vw;
-        margin: $headerHeight auto $margin auto;
-        //margin: 0 auto $margin auto;
+        margin: $headerHeight auto $pageMargin auto;
+        //margin: 0 auto $pageMargin auto;
 
         background: #fafafa;
 
@@ -399,7 +345,7 @@ export default class TextArticle extends Vue {
     }
 
     .article__biblio {
-        margin: $margin 0 0 0;
+        margin: $pageMargin 0 0 0;
     }
 
     // TODO: move to drupal-content SCSS file?
@@ -473,13 +419,13 @@ export default class TextArticle extends Vue {
         line-height: 5vh; // Same as parent
     }
 
+    /*******************/
     /* HEADROOM STATES */
+    /*******************/
 
     .article-headroom {
-        //height: 240px;
     }
     .article-headroom--not-top.article-headroom--pinned {
-        //box-shadow: 8px 8px 10px 2px #00000029;
     }
     .article-headroom--unpinned {
     }
@@ -496,9 +442,14 @@ export default class TextArticle extends Vue {
         display: none;
     }
 
+    /***************/
     /* TRANSITIONS */
+    /***************/
 
-    .header-slide-enter {
+    /* HEADER-SLIDE */
+
+    .header-slide-enter,
+    .header-slide-leave-to {
         transform: translateY(calc(-1 * 100%));
     }
     .header-slide-enter-active {
@@ -507,39 +458,21 @@ export default class TextArticle extends Vue {
     .header-slide-leave-active {
         transition: all 0.3s ease;
     }
-    .header-slide-leave-to {
-        transform: translateY(calc(-1 * 100%));
-    }
 
-    .footer-slide-enter {
-        transform: translate3d(0px, calc(100% + 3px), 0px);
-    }
-    .footer-slide-enter-active {
-        transition: all 250ms;
-    }
-    .footer-slide-leave-active {
-        transition: all 250ms;
-    }
-    .footer-slide-leave-to {
-        transform: translate3d(0px, calc(100% + 3px), 0px);
-    }
+    /* HEADER-TITLE-FADE */
 
-    .header-title-fade-enter {
+    .header-title-fade-enter,
+    .header-title-fade-leave-to {
         opacity: 0;
     }
     .header-title-fade-enter-active {
         transition: opacity 150ms ease;
     }
-    .header-title-fade-enter-to {
-        opacity: 1;
-    }
+    .header-title-fade-enter-to,
     .header-title-fade-leave {
         opacity: 1;
     }
     .header-title-fade-leave-active {
         transition: opacity 250ms ease;
-    }
-    .header-title-fade-leave-to {
-        opacity: 0;
     }
 </style>
