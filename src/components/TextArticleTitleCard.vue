@@ -1,9 +1,7 @@
 <template>
     <div
         class="title-card__container"
-        :class="{
-            'title-card__container--hidden': hideTitleCard,
-        }"
+        :class="{'title-card__container--hidden': hidden}"
     >
         <h1 class="title-card__title">
             {{ title }}
@@ -33,31 +31,26 @@
         @Prop() private title!: string;
         @Prop() private subtitle!: string;
         @Prop() private author!: string;
-        @Prop({ default: false }) private hideTitleCard!: boolean;
-        //@Prop() private focused!: boolean;
-
-        private $route: Route;
+        @Prop({ default: false }) private hidden!: boolean;
 
         constructor() {
             super();
-        }
-
-        // When view is mounted, retrieve article
-        public created() {
-            // Filler
         }
     }
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
+
     .title-card__container {
         position: relative;
         left: 0;
+        width: fit-content;
         max-width: 50vw;
         padding: 20px;
         z-index: 0;
 
-        background: white;
+        background: $bgColor;
 
         text-align: left;
 
@@ -90,7 +83,7 @@
     .title-card__subtitle {
         margin-left: 1.5em;
         font-size: 0.8em;
-        line-height: 0.8em;
+        line-height: 1.3em;
 
         text-align: left;
     }

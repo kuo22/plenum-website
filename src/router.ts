@@ -1,14 +1,17 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import RouterMode from 'vue-router';
 import Home from '@/views/Home';
-import TableOfContents from '@/views/TableOfContents';
 import TextArticle from '@/views/TextArticle';
-// TODO: These aren't views... move them to the components folder
+import Publication from '@/views/Publication';
+import PageView from '@/views/PageView';
+import NotFoundView from '@/views/NotFoundView';
+
+import vueConfig from '../vue.config.js';
 
 Vue.use(Router);
 
 export default new Router({
+    base: vueConfig.baseUrl,
     mode: 'history',
     routes: [
         {
@@ -17,27 +20,45 @@ export default new Router({
             component: Home,
         },
         {
-            path: '/pubs/:id/toc',
-            name: 'table-of-contents',
-            component: TableOfContents,
-        },
-        {
-            path: '/pubs/:id/:article_id',
-            name: 'text-article',
-            component: TextArticle,
-        },
-        {
 
             path: '/publications/:publication',
             name: 'publication-table-of-contents',
-            component: TableOfContents,
+            component: Publication,
         },
         {
-            // TODO: find way to change component based on parameter/path
             path: '/content/:content_type/:id',
             name: 'publication-article',
             component: TextArticle,
         },
+        {
+            path: '/about/:page',
+            name: 'about',
+            component: PageView,
+        },
+        // TODO: reformat to properly decouple, this hard-coding has to be temporary
+        {
+            path: '/contribute/:page',
+            name: 'contribute',
+            component: PageView
+        },
+        {
+            path: '/join-us',
+            name: 'join us',
+            component: PageView
+        },
+        {
+            path: '*',
+            component: NotFoundView
+        }
     ],
-
+    // Scroll behavior moving between URLs
+    // If new URL visit -> start at top of page
+    // If moving forward/backward through page history -> start at previous scroll position
+    scrollBehavior (to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition
+        } else {
+            return { x: 0, y: 0 }
+        }
+    }
 });

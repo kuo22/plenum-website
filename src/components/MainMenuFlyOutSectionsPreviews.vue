@@ -89,6 +89,9 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
         height: $preview-height;
         float: right;
         background: white;
+        -webkit-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        -moz-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
         z-index: 2;
         outline: 3px solid black;
     }

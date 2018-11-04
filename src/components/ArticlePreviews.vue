@@ -4,8 +4,8 @@
     >
         <!-- TODO: move above :class declaration to parent -->
         <div
-            v-for="(article, index) in articles"
-            v-show="isArticlePreviewVisibe(article, index)"
+            v-for="(article, index) in articles.filter(article => article.abstract)"
+            v-show="isArticlePreviewVisible(article, index)"
             :key="index"
             class="article-preview-card"
         >
@@ -40,28 +40,23 @@ import {Article} from '../types/types';
 export default class ArticlePreviews extends Vue {
     @Prop({ type: Array, default: () => []}) private articles!: Array<Object>; // DEP: Array<Article>[]
 
-    @Prop(Object) private parentCollection!: Object; // DEP: SubmenuLink
+    @Prop(Object) private parentCollection!: any; // DEP: SubmenuLink
 
     constructor() { super(); }
 
     // Computed: Returns whether or not any article's preview is visible
     get isAnyArticlePreviewActive() {
-        let articleActiveFlag: boolean = false;
-        for (let i = 0; i < this.articles.length; i++) {
-            if (this.articles[i].previewVisible || (document.getElementById(
-                    this.parentCollection.title.replace(' ', '') + '-entry-' + i) === document.activeElement)) {
-                articleActiveFlag = true;
-            }
-        }
-
-        return articleActiveFlag;
+        return this.articles.some((article: any, index) => {
+            let articleId = this.parentCollection.title.replace(' ', '') + '-entry-' + index;
+            return article.abstract && (article.previewVisible || document.activeElement === document.getElementById(articleId));
+        });
     }
 
     // Returns whether or not the article should be visible
     // parameter(s) needed:
     //      article = the article that might be visible
     //      index   = the index of the same article in the table of contents
-    private isArticlePreviewVisibe(article: Article, index: number): boolean {
+    private isArticlePreviewVisible(article: Article, index: number): boolean {
         return article.previewVisible || (document.getElementById(
             this.parentCollection.title.replace(' ', '') + '-entry-' + index) === document.activeElement
         );

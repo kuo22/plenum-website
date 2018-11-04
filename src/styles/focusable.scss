@@ -1,0 +1,39 @@
+/*
+Structure:
+.focusable - usually a <a>
+  .focusable__content - usually a <span>
+
+Naming replacements:
+.menu-button a -> .focusable
+.menu-button-content -> .focusable__content
+ */
+
+// IMPORTANT: every .focusable_content element should have tabindex=-1 to work
+
+@import '_settings';
+
+.focusable {
+  //display: inline-block;
+  //width: 100%;
+  //height: 100%;
+}
+
+.focusable:focus,
+.focusable__content:focus {
+  outline: none;
+}
+
+.focusable > .focusable__content {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transition: outline 75ms ease-out;
+  //transform: translateY(-2px); // Help vertically center span within container?
+
+  text-decoration: none;
+
+}
+
+.focusable:focus > .focusable__content {
+  outline: $border;
+}

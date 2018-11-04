@@ -1,18 +1,17 @@
 {
   "name": "plenum-website",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "stage": "vue-cli-service build --mode staging"
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "fullpage.js": "^2.9.7",
     "hsluv": "0.0.3",
-    "p5": "^0.7.1",
     "vue": "^2.5.17",
     "vue-check-view": "^0.2.3",
     "vue-class-component": "^6.0.0",
@@ -43,9 +42,7 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "gitHooks": {
-
-  },
+  "gitHooks": {},
   "lint-staged": {
     "*.ts": [
       "vue-cli-service lint",

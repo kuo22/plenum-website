@@ -1,7 +1,7 @@
 <template>
     <ul
         class="main-menu"
-        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen, 'main-menu--active': anyMenuIsOpen}"
+        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen || focusedIndex > -1, 'main-menu--active': anyMenuIsOpen}"
         role="menubar"
         aria-label="Plenum Main Navigation"
         :aria-expanded="(navHovered || focusedIndex !== -1).toString()"
@@ -14,9 +14,9 @@
             :id="menu.title.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             :key="index"
 
-            class="main-menu__menu-item menu-button"
-            :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
-            :style="changeBackground(menu)"
+            class="main-menu__menu-item"
+            :class="{'main-menu__menu-item--disabled': menu.disabled, 'main-menu__menu-item--active-hovered': menu.hovered || menu.expanded}"
+            :style="{background: menu.color}"
 
             @mouseenter="handleMenuItemHoverEvent($event, menu)"
             @mouseleave="handleMenuItemHoverEvent($event, menu)"
@@ -27,6 +27,8 @@
                 v-if="menu.submenu && Object.getOwnPropertyNames(menu.submenu).length > 1"
                 :id="'main-menu-item-' + index"
                 :key="'link-to-' + menu.title.replace(' ', '-')"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -45,12 +47,12 @@
                 @keydown.down.prevent="moveDown"
                 @keydown.home.prevent="focusedIndex = 0"
                 @keydown.end.prevent="focusedIndex = menuItems.length - 1"
-                @keydown.tab="focusedIndex = 0"
+                @keydown.tab="focusedIndex = -1"
                 @keydown.alphabet="focusByLetter($event.key, index)"
                 @focus="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
                 ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
                     {{ menu.title }}&nbsp;
@@ -58,9 +60,11 @@
             </a>
             <router-link
                  v-else
-                 :to="'/' + menu.title.toLowerCase()"
+                 :to="'/' + menu.title.toLowerCase().replace(' ', '-')"
                  :id="'main-menu-item-' + index"
                  :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
+
+                 class="focusable"
 
                  v-focus="index === focusedIndex"
 
@@ -74,10 +78,11 @@
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
+                 @keydown.tab.native="focusedIndex = -1"
                  @focus.native="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
                 >
                     {{ menu.title }}&nbsp;
@@ -209,26 +214,6 @@ export default class TheMainMenu extends Vue {
         this.$store.dispatch('routerNav/pageVisited');
     }
 
-    /*****************/
-    /* CSS FUNCTIONS */
-    /*****************/
-
-    // Changes the provided menu item background to transparent if the menu item is being hovered over or is active
-    // parameter(s) needed:
-    //      menuItem = menu item to be changed
-    private changeBackground(menuItem): {} {
-        //if (!menuItem.disabled) {
-            if (menuItem.hovered || menuItem.expanded) {
-                return {background: 'white'};
-            } else {
-                return {background: menuItem.color};
-            }
-        // } else {
-        //      Grayscale version of HCL(..., 25, 90)
-        //     return {background: 'rgb(226, 226, 226)'};
-        // }
-    }
-
     /*********************************/
     /* KEYBOARD NAVIGATION FUNCTIONS */
     /*********************************/
@@ -280,18 +265,22 @@ export default class TheMainMenu extends Vue {
 
 <style lang="scss" scoped>
     @import "../styles/_settings";
+
     $menuItemHeight: 45px;
-    $menuItemWidth: 210px;
+    $menuItemWidth: calc(210px + #{$borderWidth} * 2);
 
     .main-menu {
         width: $menuItemHeight;
-        left: calc(50% - 45px / 2);
+        // Minus border width to accommodate left-outline while maintaining centered position when not open
+        left: calc((50% - 45px / 2) - #{$borderWidth});
+
         position: relative;
         overflow: hidden;
 
-        background: white;
-        border-top: $borderWidth solid white;
-        border-bottom: $borderWidth solid white;
+        background: $bgColor;
+        padding: 3px 0;
+        border-top: $borderWidth solid $bgColor;
+        border-bottom: $borderWidth solid $bgColor;
 
         transition: width 0.3s ease;
     }
@@ -307,6 +296,8 @@ export default class TheMainMenu extends Vue {
     }
 
     .main-menu__menu-item {
+        position: unset;
+        // TODO: fix bug where menu shifts right when left outline is shown with below line uncommented
         width: calc(#{$lefterWidth} * 2 - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
@@ -328,27 +319,25 @@ export default class TheMainMenu extends Vue {
 
     .main-menu__menu-item a[role=menuitem],
     .main-menu__menu-item a[role=link] {
-        height: $menuItemHeight;
-
         cursor: pointer;
-
-        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
-        text-align: right;
     }
 
     .main-menu__menu-item a[role=menuitem] span,
     .main-menu__menu-item a[role=link] span {
+        height: $menuItemHeight;
+
+        line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
+        text-align: right;
         font-size: 2em;
         font-weight: bold;
     }
 
-    .main-menu__menu-item--disabled a span {
-        color: grey;
+    .main-menu__menu-item--active-hovered {
+        background: $bgColor !important;
     }
 
-    .main-menu__menu-item a[role=menuitem]:focus,
-    .main-menu__menu-item a[role=link]:focus {
-        outline: none;
+    .main-menu__menu-item--disabled a span {
+        color: grey;
     }
 
     .main-menu__menu-item-content,

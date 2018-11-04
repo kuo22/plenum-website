@@ -3,9 +3,12 @@ $sansSerifFont: 'Avenir', 'Open Sans', sans-serif;
 $serifFont: 'Amiri', serif;
 
 // Site Structure
-$lefterWidth: 120px;
+$appWidth: 98vw;
+$headerHeight: 120px;
 $footerHeight: 50px;
-
+$lefterWidth: 120px;
+$rightPageNavWidth: 360px;
+$headingCardHeight: 240px;
 
 $borderWidth: 3px;
 $border: $borderWidth solid black;
@@ -14,3 +17,6 @@ $navBarWidth: 240px;
 $buttonTextCenterAdjustment: 3px;
 
 $flyoutFontSize: 1.75em;
+
+// Color
+$bgColor: #fefefe;

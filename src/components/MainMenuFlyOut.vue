@@ -19,6 +19,8 @@
                     :v-if="menu.submenu"
                    :id="menu.title + '-fly-out-menu-item-' + index"
 
+                    class="focusable"
+
                    role="menuitem"
                    aria-haspopup="true"
                    aria-expanded="true"
@@ -39,7 +41,7 @@
                    @focus="focusedIndex = index"
                 >
                     <span
-                        class="fly-out-menu__section-title menu-button-content"
+                        class="fly-out-menu__section-title focusable__content"
                         tabindex="-1"
                     >
                         {{ section.title }}
@@ -61,12 +63,12 @@
             <li
                 :title="menu.title + ' Content Menu Bar'"
 
-                class="fly-out-menu__menu-item"
+                class="fly-out-menu__menu-item focusable"
                 :aria-labelledby="menu.title"
             >
                 <a>
                     <span
-                        class="fly-out-menu__section-title menu-button-content"
+                        class="fly-out-menu__section-title focusable__content"
                         tabindex="-1"
                     >
                         {{ menu.title }}
@@ -256,6 +258,9 @@ export default class MainMenuFlyOut extends Vue {
     .fly-out-menu {
         width: 100%;
 
+        -webkit-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        -moz-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
         font-weight: bold;
         text-align: right;
     }

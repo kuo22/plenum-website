@@ -9,18 +9,16 @@
             <li
                 v-for="(article, index) in parentCollection.articles"
                 :key="index"
-                class="menu-button"
+
+                class="table-of-contents__menu-item"
+
                 role="none"
             >
                 <router-link
                     :to=getUrl(article)
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
 
-                    class="table-of-contents__menu-item"
-                    :class="{
-                                'table-of-contents__menu-item--hovered': article.previewVisible,
-                                'table-of-contents__menu-item--focused': focusedIndex !== -1
-                            }"
+                    class="focusable"
 
                     role="menuitem"
                     :tabindex="index === focusedIndex ? '0' : '-1'"
@@ -44,13 +42,22 @@
                     @focus.native="focusedIndex = index; article.previewVisible = true;"
                     @blur.native="article.previewVisible = false"
                 >
-                    <p
-                        class="table-of-contents__title menu-button-content"
+                    <div
+                        class="table-of-contents__menu-item__content focusable__content"
+                        :class="{
+                            'table-of-contents__menu-item__content--hovered': article.previewVisible,
+                            'table-of-contents__menu-item__content--focused': focusedIndex !== -1
+                        }"
+
                         tabindex="-1"
                     >
-                        {{ article.title }}
-                    </p>
-                    <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
+                        <p
+                            class="table-of-contents__title"
+                        >
+                            {{ article.title }}
+                        </p>
+                        <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
+                    </div>
                 </router-link>
             </li>
         </ul>
@@ -163,17 +170,20 @@ export default class TableOfContents extends Vue {
         height: auto;
         padding-bottom: 1em;
 
-        border-left: 3px solid transparent;
-
         font-family: 'Amiri', serif;
         font-weight: lighter;
     }
 
-    .table-of-contents__menu-item--hovered {
-        border-left: 3px solid black;
+    .table-of-contents__menu-item__content {
+        border-left: 3px solid transparent;
     }
 
-    .table-of-contents__menu-item--focused {
+    .table-of-contents__menu-item__content--hovered {
+        border-left: 3px solid black;
+        background: rgba(0, 0, 0, 0.03);
+    }
+
+    .table-of-contents__menu-item__content--focused {
         border-left: 3px solid transparent;
     }
 

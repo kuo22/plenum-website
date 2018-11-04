@@ -2,6 +2,7 @@
 
 .basic-page {
   text-align: left;
+  width: calc(100% - #{$rightPageNavWidth});
 }
 
 .basic-page:last-of-type {

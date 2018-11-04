@@ -21,6 +21,23 @@ Vue.config.keyCodes = {
 Vue.use(checkView);
 Vue.use(headroom);
 
+// Initialize the app's store upon first visit to site
+router.beforeEach((to, from, next) => {
+    if (!store.getters['getAppReady']) {
+        store.dispatch('initApp').then(response => {
+            next();
+        });
+    } else {
+        next();
+    }
+});
+
+router.afterEach((to, from) => {
+    if (window.document.title !== process.env.VUE_APP_TITLE) {
+        window.document.title = process.env.VUE_APP_TITLE;
+    }
+});
+
 new Vue({
     router,
     store,

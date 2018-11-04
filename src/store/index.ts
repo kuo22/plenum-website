@@ -8,10 +8,10 @@ import {PagesModule} from '@/store/modules/pages/_store';
 Vue.use(Vuex);
 
 export interface RootState {
-
+    appReady: boolean;
 }
 
-export default new Vuex.Store<RootState>({
+let store = new Vuex.Store<RootState>({
     strict: false,
     //strict: process.env.NODE_ENV !== 'production',
     modules: {
@@ -21,15 +21,27 @@ export default new Vuex.Store<RootState>({
         pages: PagesModule
     },
     state: {
-
+        appReady: false
     },
     getters: {
-
+        getAppReady: (state) => {
+            return state.appReady;
+        }
     },
     mutations: { // For synchronous transactions
-
+        setAppReady(state) {
+            state.appReady = true;
+        }
     },
     actions: { // For asynchronous transactions
-
+        async initApp({ commit }) {
+            return this.dispatch('menuTree/createMenu')
+                .then(response => {
+                    commit('setAppReady');
+                    return response;
+                });
+        }
     },
 });
+
+export default store;
