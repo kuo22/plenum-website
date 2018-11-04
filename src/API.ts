@@ -2,7 +2,6 @@ import {Article, Author} from '@/types/types';
 import axios, {AxiosStatic} from 'axios';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
-import {error} from 'util';
 
 const namespace: string = 'menuTree';
 
@@ -10,10 +9,8 @@ class API extends Vue {
     @Action('setMenuTree', { namespace }) public setMenuTree: any;
 
     // Content Management System URL path
-    private port: string = '8888';
-    private hostname: string = 'http://localhost:' + this.port;
-    private CMSPath: string = this.hostname + '/plenum-drupal-dev/drupal-8.5.3';
     private fetcher: AxiosStatic;
+    private hostname: string = process.env.VUE_APP_DRUPAL_HOSTNAME;
 
     private jsonAPIPath: string = 'jsonapi/node/';
     private drupalAPIPath: string = 'node/';
@@ -24,7 +21,8 @@ class API extends Vue {
     constructor() {
         super();
 
-        axios.defaults.baseURL = this.CMSPath;
+        axios.defaults.baseURL = this.hostname;
+        axios.defaults.withCredentials = true;
         this.fetcher = axios;
     }
 
@@ -278,7 +276,7 @@ class API extends Vue {
             if (response !== undefined &&
                 Object.keys(response.data.data).length > 0 &&
                 'url' in response.data.data.attributes) {
-                return this.hostname + response.data.data.attributes.url + '';
+                    return this.hostname + response.data.data.attributes.url + '';
             } else {
                 return '';
             }
