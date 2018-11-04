@@ -32,6 +32,12 @@ router.beforeEach((to, from, next) => {
     }
 });
 
+router.afterEach((to, from) => {
+    if (window.document.title !== process.env.VUE_APP_TITLE) {
+        window.document.title = process.env.VUE_APP_TITLE;
+    }
+});
+
 new Vue({
     router,
     store,

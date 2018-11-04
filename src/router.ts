@@ -6,9 +6,12 @@ import Publication from '@/views/Publication';
 import PageView from '@/views/PageView';
 import NotFoundView from '@/views/NotFoundView';
 
+import vueConfig from '../vue.config.js';
+
 Vue.use(Router);
 
 export default new Router({
+    base: vueConfig.baseUrl,
     mode: 'history',
     routes: [
         {
