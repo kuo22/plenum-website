@@ -34,10 +34,14 @@ export default class Home extends Vue {
     }
 
     private initFrontPage(): void {
+        if (this.$store.getters['pages/getFrontPage'].length === 0) {
         this.$store.dispatch('pages/initFrontPage')
             .then(response => {
                 this.pages = this.$store.getters['pages/getFrontPage'];
             })
+        } else {
+            this.pages = this.$store.getters['pages/getFrontPage'];
+        }
     }
 }
 </script>
