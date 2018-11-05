@@ -22,10 +22,10 @@
                     tabindex="-1"
                     class="logo__rect focusable__content"
 
-                    width="23px"
-                    height="23px"
-                    x="14"
-                    y="14">
+                    width="17px"
+                    height="17px"
+                    x="17"
+                    y="17">
                 </rect>
             </router-link>
         </svg>
@@ -75,15 +75,15 @@ export default class TheLogo extends Vue {
         transform: matrix(0.7071, 0.7071, -0.7071, 0.7071, 26.5161, -10.984);
         fill: transparent;
         stroke: #000000;
-        stroke-width: 7px;
+        stroke-width: 4px;
         stroke-miterlimit: 10;
 
         transition: transform 0.5s ease;
     }
 
     .focusable > .focusable__content {
-        width: 23px; // Chrome sizing
-        height: 23px; // Chrome sizing
+        width: 17px; // Chrome sizing | Must reflect width in SVG rect
+        height: 17px; // Chrome sizing | Must reflect width in SVG rect
     }
 
     // Override 'focusable' styles
