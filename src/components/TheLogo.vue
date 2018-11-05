@@ -5,8 +5,8 @@
 
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 53.033 53.032"
-            enable-background="new 0 0 53.033 53.032"
+            viewBox="0 0 53 53"
+            enable-background="new 0 0 53 53"
             xml:space="preserve">
             <router-link
                 to="/"
@@ -22,8 +22,10 @@
                     tabindex="-1"
                     class="logo__rect focusable__content"
 
-                    x="11.517"
-                    y="11.016">
+                    width="23px"
+                    height="23px"
+                    x="14"
+                    y="14">
                 </rect>
             </router-link>
         </svg>
@@ -54,11 +56,15 @@ export default class TheLogo extends Vue {
     @import '../styles/_settings';
 
     .logo {
-        width: 75px;
-        height: 100px;
-        transform: translateY(-50%);
-        top: 50%;
         position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+
+        //padding: 20px;
+
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
     }
 
     .logo .focusable {
@@ -71,10 +77,13 @@ export default class TheLogo extends Vue {
         stroke: #000000;
         stroke-width: 7px;
         stroke-miterlimit: 10;
-        width: 30px !important;
-        height: 31px !important;
 
         transition: transform 0.5s ease;
+    }
+
+    .focusable > .focusable__content {
+        width: 23px; // Chrome sizing
+        height: 23px; // Chrome sizing
     }
 
     // Override 'focusable' styles

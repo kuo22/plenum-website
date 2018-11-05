@@ -102,6 +102,8 @@ export default class TheSiteHeader extends Vue {
     }
 
     .site-header__subtitle {
+        position: relative;
+        top: -0.2em;
         width: 20em;
 
         opacity: 1;
