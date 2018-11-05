@@ -2,6 +2,7 @@
     <div>
         <svg
             class="logo"
+            :class="{'rotating': !getAppReady}"
 
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
@@ -34,11 +35,17 @@
 
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+import { mapGetters } from 'vuex';
 
 @Component({
     components: {
 
     },
+    computed: {
+        ...mapGetters({
+            getAppReady: 'getAppReady',
+        })
+    }
 })
 
 // The main logo for the site
@@ -96,5 +103,44 @@ export default class TheLogo extends Vue {
 
     .logo .focusable:hover > .focusable__content {
         fill: #000000;
+    }
+
+
+
+    @-webkit-keyframes rotating /* Safari and Chrome */ {
+        from {
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        to {
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+    @keyframes rotating {
+        from {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        to {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+    .rotating {
+        position: static;
+        -webkit-animation: rotating 2s linear infinite;
+        -moz-animation: rotating 2s linear infinite;
+        -ms-animation: rotating 2s linear infinite;
+        -o-animation: rotating 2s linear infinite;
+        animation: rotating 2s linear infinite;
     }
 </style>
