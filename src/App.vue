@@ -19,10 +19,10 @@
 
         <the-site-header></the-site-header>
 
-
         <transition
             name="component-fade"
             mode="out-in"
+            v-if="!$route.path.includes('publications')"
         >
             <router-view
                 class="content-section"

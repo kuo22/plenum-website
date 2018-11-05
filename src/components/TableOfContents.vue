@@ -91,13 +91,20 @@ export default class TableOfContents extends Vue {
     @Emit('articleSelected')
     public articleSelected(routerLinkLocation: string, keyboardEvent?: boolean = true): void {
         this.resetFocus();
-        // TODO: reset hover states of table of content links
-        // this.resetHovers();
+        this.resetVisibilities();
     }
 
     @Emit('exitMenu')
     public exitMenu(parentMenu: any): void {
         // Filler
+    }
+
+    // Turns the visibility of the requested article's preview abstract to 'off'
+    private resetVisibilities(): void {
+        this.parentCollection.articles.forEach(article => {
+            if (article.previewVisible === true)
+            article.previewVisible = false;
+        })
     }
 
     // Constructs a URL from the provided article in the form of:
