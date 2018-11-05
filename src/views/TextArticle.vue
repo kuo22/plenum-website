@@ -311,6 +311,10 @@ export default class TextArticle extends Vue {
         visibility: hidden;
     }
 
+    .article-headroom {
+        height: calc(#{$navBarWidth} + 60px);
+    }
+
     .header--headroom {
         left: calc(#{$lefterWidth} * 1.5) !important;
     }

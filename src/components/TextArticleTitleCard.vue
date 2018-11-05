@@ -46,7 +46,7 @@
         position: relative;
         left: 0;
         width: fit-content;
-        max-width: 50vw;
+        max-width: 60vw;
         padding: 20px;
         z-index: 0;
 
@@ -81,9 +81,11 @@
     }
 
     .title-card__subtitle {
+        display: block;
+
         margin-left: 1.5em;
         font-size: 0.8em;
-        line-height: 1.3em;
+        line-height: 1.2em;
 
         text-align: left;
     }
