@@ -3,7 +3,7 @@ import {MenuTreeState} from '@/types/storeTypes';
 import {MainMenuItem} from '@/classes/MainMenuItem';
 
 export const mutations: MutationTree<MenuTreeState> = {
-    menusLoaded(state, payload: Array<Object>) {
+    initMenus(state, payload: Array<Object>) {
         state.main = payload;
         state.error = false;
     },

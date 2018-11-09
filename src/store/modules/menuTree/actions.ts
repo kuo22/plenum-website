@@ -6,24 +6,62 @@ import api from '../../../lib/api';
 import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
 import {RootState} from '@/store';
 
+function createHardCodedMenu() {
+    const aboutMainMenu = {
+        title: "About",
+        alt: "About sections",
+        weight: -49,
+        hovered: false,
+        expanded: false,
+        path: '/about',
+        depth: 1
+    };
+
+    const publicationsMainMenu = {
+        title: "Publications",
+        alt: "Publications",
+        weight: -48,
+        hovered: false,
+        expanded: false,
+        path: '/publications',
+        submenu: {},
+        depth: 1
+    };
+
+    const contributeMainMenu = {
+        title: "Contribute",
+        alt: "Contribute",
+        weight: -47,
+        hovered: false,
+        expanded: false,
+        path: '/contribute',
+        submenu: {},
+        depth: 1
+    };
+
+    const joinUsMainMenu = {
+        title: "Join Us",
+        alt: "Join us",
+        weight: -46,
+        hovered: false,
+        expanded: false,
+        path: '/join-us',
+        depth: 1
+    };
+
+    let menu: Array<any> = [aboutMainMenu, publicationsMainMenu, contributeMainMenu, joinUsMainMenu];
+    let menuColors = getPerceptuallyUniformColors(27, menu.length);
+    return menu.map((menuItem, i) => {
+        menuItem.color = menuColors[i];
+        return menuItem;
+    });
+}
+
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Create the app's navigation menus via API data
     async createMenu({ commit, dispatch }): Promise<any> {
-        return api.fetchMenuTree()
-            .then(dirtyMenuTreeData => dirtyMenuTreeData.map(processMenuData))
-            .then(menuTreeData => fillMissingDataInMenuTree(menuTreeData, 1, dispatch))
-            .then(minimalMenuTree => {
-                let menuColors = getPerceptuallyUniformColors(27, minimalMenuTree.length);
-                minimalMenuTree.map((mainMenuItem, i) => mainMenuItem.color =  menuColors[i]);
-
-                commit('menusLoaded', minimalMenuTree);
-
-                return minimalMenuTree;
-            }).catch((err) => {
-                // TODO: handle error
-                console.error(err);
-            });
+        return commit('initMenus', createHardCodedMenu());
     },
 
     closeMenuExpansions({ commit, getters }) {
