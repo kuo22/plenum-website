@@ -1,13 +1,10 @@
 <template>
     <main ref="home" class="content-container">
         <!-- TODO: use component associated with given content-type -->
-            <basic-page
-                v-if="page && Object.keys(page).length > 0"
-                :page="page"
-            ></basic-page>
-        <hr
+        <basic-page
             v-if="page && Object.keys(page).length > 0"
-        >
+            :page="page"
+        ></basic-page>
     </main>
 </template>
 

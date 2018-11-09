@@ -6,7 +6,7 @@
 }
 
 .basic-page:last-of-type {
-  margin-bottom: 50px;
+  margin-bottom: $footerHeight;
 }
 
 .basic-page__title {
@@ -16,6 +16,10 @@
   font-weight: bold;
 
   font-size: 6em;
+}
+
+.basic-page__divider {
+  margin: 3em auto 0 auto;
 }
 
 .basic-page__section {

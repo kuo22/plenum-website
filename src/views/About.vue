@@ -5,7 +5,6 @@
             v-for="page in pages"
             :page="page"
         ></basic-page>
-        <hr v-if="pages.length > 0">
     </main>
 </template>
 
