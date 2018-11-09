@@ -117,7 +117,7 @@
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import APIService from '@/API';
+import APIService from '@/lib/api';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
 import TextArticleTitleCard from '../components/TextArticleTitleCard';
 
@@ -236,7 +236,7 @@ export default class TextArticle extends Vue {
     }
 
     // Gets article data depending on the URL
-    // If the article data doesn't exist in the store, fetch the article via the API
+    // If the article data doesn't exist in the store, fetch the article via the Api
     // and then store the article in the store
     private async fetchArticle() {
         this.articleError = this.article = null;

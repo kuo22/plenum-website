@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 
-import APIService from '../../../API';
+import api from '../../../lib/api';
 import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
 import {RootState} from '@/store';
 
@@ -10,7 +10,7 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Create the app's navigation menus via API data
     async createMenu({ commit, dispatch }): Promise<any> {
-        return APIService.fetchMenuTree()
+        return api.fetchMenuTree()
             .then(dirtyMenuTreeData => dirtyMenuTreeData.map(processMenuData))
             .then(menuTreeData => fillMissingDataInMenuTree(menuTreeData, 1, dispatch))
             .then(minimalMenuTree => {
@@ -183,7 +183,7 @@ async function fillMissingDataInMenuTree(menuTree, depth, dispatch): Promise<any
         item.depth = depth;
 
         if (item.node && item.depth == 3) { // CURRENT MENU ITEM IS A CONTENT COLLECTION (MENUBAR AND BUTTON)
-            let collectionData = await APIService.fetchCollectionMenuData(item.uuid);
+            let collectionData = await api.fetchCollectionMenuData(item.uuid);
 
             if (collectionData[collectionData.length - 1].type.startsWith('file')) {
                 // TODO: make sure to reference drupal hostname and port in production

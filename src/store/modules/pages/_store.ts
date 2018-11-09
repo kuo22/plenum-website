@@ -1,7 +1,7 @@
 import {Module} from "vuex";
 
 import {RootState} from "@/store";
-import APIService from '@/API';
+import APIService from '@/lib/api';
 
 interface PagesState {
     pages: Array<any>;
