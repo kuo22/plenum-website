@@ -75,12 +75,12 @@
                     </span>
                 </a>
                 <main-menu-fly-out-sections
-                        :menuTitle="menu.title"
-                        :menuItems="menu.submenu"
-                        :parentMenu="menu"
-                        @toggleOpen="toggleOpen"
-                        @openArticle="openArticle"
-                        @collectionActivated="collectionActivated"
+                    :menuTitle="menu.title"
+                    :menuItems="menu.submenu"
+                    :parentMenu="menu"
+                    @toggleOpen="toggleOpen"
+                    @openArticle="openArticle"
+                    @collectionActivated="collectionActivated"
                 >
                 </main-menu-fly-out-sections>
             </li>

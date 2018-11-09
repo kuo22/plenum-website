@@ -24,10 +24,7 @@ function createHardCodedMenu() {
         hovered: false,
         expanded: false,
         path: '/publications',
-        submenu: api.findMostRecentCollectionsForMenu(5).then(cols => {
-            console.log(cols);
-            return cols
-        }),
+        submenu: [],
         depth: 1
     };
 
@@ -64,7 +61,24 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Create the app's navigation menus via API data
     async createMenu({ commit, dispatch }): Promise<any> {
-        return commit('initMenus', createHardCodedMenu());
+        commit('apiDataPending', createHardCodedMenu()); // API MENU DATA PENDING
+        api.findMostRecentCollectionsForMenu(5)
+            .then(collections => {
+                collections.forEach(collection => {
+                    collection.expanded = false;
+                    collection.hovered = false;
+                    collection.articles.forEach(article => {
+                        article.previewVisible = false;
+                        article.authors = article.authors.split(';').map(author => {
+                            return author.split(',').reverse().join(' ');
+                        });
+                    })
+                });
+                commit('apiDataSuccess', collections);
+            })
+            .catch(error => {
+                commit('apiDataFailure', error);
+            })
     },
 
     closeMenuExpansions({ commit, getters }) {

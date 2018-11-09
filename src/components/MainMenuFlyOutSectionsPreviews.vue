@@ -10,7 +10,7 @@
                     :alt="sectionMenuItem.title + ' Cover Image'"
                     class="collection-preview__cover-image"
                     :class="{ 'collection-preview__cover-image--active': sectionMenuItem.expanded }"
-                    :src="sectionMenuItem.imageURL"
+                    :src="baseUrl + sectionMenuItem.cover_image.field_image.url"
                 >
             </div>
         </div>
@@ -57,8 +57,12 @@ import TableOfContents from '@/components/TableOfContents';
 export default class MainMenuFlyOutSectionsPreviews extends Vue {
     @Prop(Object) private sectionMenuItem!: Object; // The menu item link of the collection this previews shows
     @Prop(Object) private parentMenu!: Object;  // The parent fly out menu of this previews
+    private baseUrl: string;
 
-    constructor() { super(); }
+    constructor() {
+        super();
+        this.baseUrl = process.env.VUE_APP_CONTENTA_BASE ? process.env.VUE_APP_CONTENTA_BASE : 'http://localhost:8888';
+    }
 
     @Emit('toggleOpen')
     public toggleOpen(mainMenuItem: any): void {}

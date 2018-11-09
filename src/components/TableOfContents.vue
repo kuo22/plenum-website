@@ -54,9 +54,9 @@
                         <p
                             class="table-of-contents__title"
                         >
-                            {{ article.title }}
+                            {{ article.content_title }}
                         </p>
-                        <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
+                        <p class="table-of-contents__author">{{ article.authors.join(' | ') }}</p>
                     </div>
                 </router-link>
             </li>
@@ -66,7 +66,6 @@
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { mixin as focusMixin } from 'vue-focus';
-import {MainMenuItem} from '../classes/MainMenuItem';
 
 @Component({
     mixins: [focusMixin],

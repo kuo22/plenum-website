@@ -54,7 +54,7 @@
                 <span
                     class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
-                ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
+                >
                     {{ menu.title }}&nbsp;
                 </span>
             </a>
@@ -89,7 +89,10 @@
                 </span>
             </router-link>
 
-            <transition name="fly-out-slide">
+            <transition
+                v-if="menu.submenu && menu.submenu.length > 0"
+                name="fly-out-slide"
+            >
                 <main-menu-fly-out
                     v-show="menu.expanded"
                     class="fly-out"
