@@ -72,13 +72,20 @@ class Api extends Vue {
     }
 
     public fetchFrontPage(): Promise<any> {
-        return this.fetcher({
-            url: 'frontpage',
-            params: {
-                _format: 'api_json'
-            },
-            timeout: 10000
-        }).then(response => response.data);
+        const query = {
+            filter: {
+                promote: 1
+            }
+        };
+        return jsonApi.get('pages', query);
+
+        // return this.fetcher({
+        //     url: 'frontpage',
+        //     params: {
+        //         _format: 'api_json'
+        //     },
+        //     timeout: 10000
+        // }).then(response => response.data);
     }
 
     public fetchPageByNode(node: string): Promise<any> {

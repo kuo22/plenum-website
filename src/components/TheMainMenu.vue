@@ -60,7 +60,7 @@
             </a>
             <router-link
                  v-else
-                 :to="'/' + menu.title.toLowerCase().replace(' ', '-')"
+                 :to="menu.path"
                  :id="'main-menu-item-' + index"
                  :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
 
