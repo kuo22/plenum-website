@@ -71,7 +71,7 @@
 
                 <div class="article__body">
                     <section
-                        v-for="section in article.article_section"
+                        v-for="section in article.article_section || article.body"
                         v-html="section.processed"
                     ></section>
                 </div>
