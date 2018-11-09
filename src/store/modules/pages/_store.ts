@@ -16,6 +16,12 @@ export const PagesModule: Module<PagesState, RootState>  = {
         getFrontPage: (state) => {
             return state.pages.filter(page => page.promote);
         },
+        getAboutPage: (state) => {
+            return state.pages.filter(page => page.title.startsWith('About'));
+        },
+        getContributePage: (state) => {
+            return state.pages.filter(page => page.title.includes('Submission'));
+        },
         getPages: (state) => {
             return state.pages;
         }
@@ -31,11 +37,33 @@ export const PagesModule: Module<PagesState, RootState>  = {
         // TODO: universalize initialization to prepare for promotion of all content types
         initFrontPage({ commit }) {
             return api.fetchFrontPage()
-                .then(frontPages => {
-                    frontPages.forEach(page => {
+                .then(pages => {
+                    pages.forEach(page => {
                         commit('addPage', page);
                     });
                 });
         },
+        initAboutPage({ commit }) {
+            return api.fetchAboutPage()
+                .then(pages => {
+                    pages.forEach(page => {
+                        commit('addPage', page);
+                    });
+                });
+        },
+        initContributePage({ commit }) {
+            return api.fetchContributePage()
+                .then(pages => {
+                    pages.forEach(page => {
+                        commit('addPage', page);
+                    });
+                });
+        },
+        fetchPage({ commit }, uuid: string) {
+            return api.findPageByUUID(uuid)
+                .then(page => {
+                    commit('addPage', page);
+                });
+        }
     }
 };

@@ -5,6 +5,8 @@ import TextArticle from '@/views/TextArticle';
 import Publication from '@/views/Publication';
 import PageView from '@/views/PageView';
 import NotFoundView from '@/views/NotFoundView';
+import About from '@/views/About';
+import Contribute from '@/views/Contribute';
 
 import vueConfig from '../vue.config.js';
 
@@ -31,15 +33,15 @@ export default new Router({
             component: TextArticle,
         },
         {
-            path: '/about/:page',
+            path: '/about',
             name: 'about',
-            component: PageView,
+            component: About,
         },
         // TODO: reformat to properly decouple, this hard-coding has to be temporary
         {
-            path: '/contribute/:page',
+            path: '/contribute',
             name: 'contribute',
-            component: PageView
+            component: Contribute
         },
         {
             path: '/join-us',

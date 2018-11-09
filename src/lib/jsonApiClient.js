@@ -16,7 +16,14 @@ axios.interceptors.response.use(response => {
 
 export default {
     get: (uri, params = null) => {
-        const query = params ? '?' + qs.stringify(params, { encode: false }) : '';
+        let query;
+        if (params && typeof params === 'object') {
+            query = '?' + qs.stringify(params, {encode: false});
+        } else if (params) {
+            query = '?' + params;
+        } else {
+            query = '';
+        }
         const url = 'http://localhost:8888/contenta/web/api/' + uri + query;
         return axios.get(url);
     },

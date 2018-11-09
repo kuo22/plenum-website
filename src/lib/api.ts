@@ -3,6 +3,8 @@ import axios, {AxiosStatic} from 'axios';
 import jsonApi from './jsonApiClient';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
+import qs from 'qs';
+
 
 const namespace: string = 'menuTree';
 
@@ -68,6 +70,7 @@ class Api extends Vue {
 
             }
         };
+
         return jsonApi.get('pages/' + uuid, query);
     }
 
@@ -86,6 +89,28 @@ class Api extends Vue {
         //     },
         //     timeout: 10000
         // }).then(response => response.data);
+    }
+
+    public fetchAboutPage() {
+        const query = this.buildConditionalFilter('about', 'title', 'STARTS_WITH', 'About')
+        return jsonApi.get('pages', query);
+    }
+
+    public fetchContributePage() {
+        const query = this.buildConditionalFilter('contribute', 'title', 'CONTAINS', 'Submission')
+        return jsonApi.get('pages', query);
+    }
+
+    // JSON API Filtering
+    // Find operators -> https://www.drupal.org/docs/8/modules/json-api/filtering
+    private buildConditionalFilter(name, field, operator, value): string {
+        const filterParts = ['path', 'operator', 'value'];
+        const input = [field, operator, value];
+        let filter = [];
+        for (let i = 0; i < filterParts.length; i++) {
+            filter.push('filter[' + name + '][condition][' + filterParts[i] + ']=' + input[i]);
+        }
+        return filter.join('&');
     }
 
     public fetchPageByNode(node: string): Promise<any> {

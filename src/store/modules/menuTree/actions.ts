@@ -46,7 +46,8 @@ function createHardCodedMenu() {
         hovered: false,
         expanded: false,
         path: '/join-us',
-        depth: 1
+        depth: 1,
+        uuid: '43e759e0-324f-41be-a8a3-3ba61d09730a'
     };
 
     let menu: Array<any> = [aboutMainMenu, publicationsMainMenu, contributeMainMenu, joinUsMainMenu];
