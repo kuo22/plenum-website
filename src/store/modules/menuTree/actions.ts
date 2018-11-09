@@ -24,7 +24,10 @@ function createHardCodedMenu() {
         hovered: false,
         expanded: false,
         path: '/publications',
-        submenu: {},
+        submenu: api.findMostRecentCollectionsForMenu(5).then(cols => {
+            console.log(cols);
+            return cols
+        }),
         depth: 1
     };
 
@@ -35,7 +38,6 @@ function createHardCodedMenu() {
         hovered: false,
         expanded: false,
         path: '/contribute',
-        submenu: {},
         depth: 1
     };
 
