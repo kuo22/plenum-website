@@ -60,7 +60,7 @@ function createHardCodedMenu() {
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Create the app's navigation menus via API data
-    async createMenu({ commit, dispatch }): Promise<any> {
+    createMenu({ commit, dispatch }) {
         commit('apiDataPending', createHardCodedMenu()); // API MENU DATA PENDING
         api.findMostRecentCollectionsForMenu(5)
             .then(collections => {

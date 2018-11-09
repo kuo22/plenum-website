@@ -5,7 +5,7 @@ import {Article, Collection} from '@/types/types';
 
 interface IssuesState {
     issues: Array<Collection>; // Key is JSON API ID ("081b98ba-4ec8-429d-9152-2c231f45885a")
-    articles: Array<Object>;
+    articles: Array<any>;
 }
 
 export const IssuesStoreModule: Module<IssuesState, RootState>  = {
@@ -25,18 +25,6 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
         // TODO: return article with issue information?
         getArticleByUUID: (state) => (uuid: string) => {
             return state.articles.find((article: any) => article.uuid === uuid);
-        },
-        getArticleByNode: (state) => (nodeNum: number) => {
-            let issues = [...state.issues];
-            let issueCount = state.issues.length;
-            for (let i = 0; i < issueCount; i++) {
-                for (let j = 0; j < issues[i].articles.length; j++) {
-                    if (issues[i].articles[j].nodeNumber === nodeNum) {
-                        return [issues[i].articles[j], issues[i], j];
-                    }
-                }
-            }
-            return [];
         }
     },
     mutations: {
@@ -62,6 +50,7 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
         addArticle({ commit, state }, article: any) {
             // If article does not already exist in store
             if (!state.articles.find((storeArticle: any) => storeArticle.uuid === article.uuid)) {
+                article.active = false;
                 commit('addArticle', article);
             }
         }

@@ -33,8 +33,13 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to, from) => {
-    if (window.document.title !== process.env.VUE_APP_TITLE) {
-        window.document.title = process.env.VUE_APP_TITLE;
+    const name = to.name;
+    if (name.includes('article')) {
+        // Defer to TextArticle view
+    } else if (name.includes('publication')) {
+        window.document.title = process.env.VUE_APP_TITLE.toUpperCase() + " JOURNAL";
+    } else {
+        window.document.title = process.env.VUE_APP_TITLE.toUpperCase() + " | " + name.toUpperCase();
     }
 });
 

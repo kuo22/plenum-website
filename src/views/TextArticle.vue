@@ -117,7 +117,7 @@
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import APIService from '@/lib/api';
+import api from '@/lib/api';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
 import TextArticleTitleCard from '../components/TextArticleTitleCard';
 
@@ -248,16 +248,22 @@ export default class TextArticle extends Vue {
         let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
         if (temp !== undefined && temp.length > 0) {
             this.article = temp;
+            window.document.title = this.article.content_title;
 
             this.articleLoading = false;
             this.articleError = false;
         } else {
-            this.article = await APIService.fetchContentByUUID(uuid, contentType)
+            api.fetchContentByUUID(uuid, contentType)
                 .then(article => {
                     article.authors = article.authors.split(';').map(author => {
                         return author.trim().split(',').reverse().join(' ').trim();
                     });
-                    this.$store.dispatch('issues/addArticle', article);
+
+                    this.$store.dispatch('issues/addArticle', article)
+                        .then(res => {
+                            this.article = this.$store.getters['issues/getArticleByUUID'](uuid);
+                            window.document.title = this.article.content_title;
+                        });
                     this.articleLoading = false;
                     return article;
                 })

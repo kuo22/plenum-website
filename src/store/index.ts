@@ -34,12 +34,9 @@ let store = new Vuex.Store<RootState>({
         }
     },
     actions: { // For asynchronous transactions
-        async initApp({ commit }) {
-            return this.dispatch('menuTree/createMenu')
-                .then(response => {
-                    commit('setAppReady');
-                    return response;
-                });
+        initApp({ commit }) {
+            commit('setAppReady');
+            return this.dispatch('menuTree/createMenu');
         }
     },
 });
