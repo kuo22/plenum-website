@@ -29,9 +29,9 @@
                     <text-article-title-card
                         v-if="article"
                         class="header-container header-container--headroom"
-                        :title="article.title"
+                        :title="article.content_title"
                         :subtitle="article.subtitle"
-                        :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                        :author="(typeof article.authors === 'string') ? article.authors : article.authors.join(' | ')"
                         :hidden="isAtPageTop || scrollSessionFromTop"
                     ></text-article-title-card>
                 </header>
@@ -47,9 +47,9 @@
                     v-if="article"
                     class="header-container header-container--embedded"
 
-                    :title="article.title"
+                    :title="article.content_title"
                     :subtitle="article.subtitle"
-                    :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                    :author="(typeof article.authors === 'string') ? article.authors : article.authors.join(' | ')"
                 ></text-article-title-card>
             </header>
 
@@ -71,7 +71,7 @@
 
                 <div class="article__body">
                     <section
-                        v-for="section in article.body"
+                        v-for="section in article.article_section"
                         v-html="section.processed"
                     ></section>
                 </div>
@@ -180,10 +180,10 @@ export default class TextArticle extends Vue {
     // Returns the author(s) of the article in a format depending on the number of author
     // e.g. 'McClung J.' for a single author or 'Deremer, E. et al.' for multiple authors
     private get authorCopyrightFormat(): string {
-        let singleAuthor = (typeof this.article.author === 'string') ? this.article.author : this.article.author[0];
+        let singleAuthor = (typeof this.article.authors === 'string') ? this.article.authors : this.article.authors[0];
         singleAuthor = singleAuthor.split(' ').reverse().join(', ');
         singleAuthor = singleAuthor.substring(0, singleAuthor.indexOf(', ') + 3) + ".";
-        singleAuthor += (typeof this.article.author === 'string') ? "" : " et al.";
+        singleAuthor += (typeof this.article.authors === 'string') ? "" : " et al.";
         return singleAuthor;
     }
 
@@ -254,6 +254,9 @@ export default class TextArticle extends Vue {
         } else {
             this.article = await APIService.fetchContentByUUID(uuid, contentType)
                 .then(article => {
+                    article.authors = article.authors.split(';').map(author => {
+                        return author.trim().split(',').reverse().join(' ').trim();
+                    });
                     this.$store.dispatch('issues/addArticle', article);
                     this.articleLoading = false;
                     return article;

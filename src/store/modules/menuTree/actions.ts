@@ -70,7 +70,7 @@ export const actions: ActionTree<MenuTreeState, RootState> = {
                     collection.articles.forEach(article => {
                         article.previewVisible = false;
                         article.authors = article.authors.split(';').map(author => {
-                            return author.split(',').reverse().join(' ');
+                            return author.trim().split(',').reverse().join(' ').trim();
                         });
                     })
                 });

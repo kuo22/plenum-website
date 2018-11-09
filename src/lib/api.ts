@@ -93,6 +93,17 @@ class Api extends Vue {
         return jsonApi.get('pages', query);
     }
 
+    public fetchContentByUUID(uuid, contentType) {
+        switch(contentType) {
+            case 'articles':
+                return this.findArticleByUUID(uuid);
+            case 'articlesNonAcademic':
+                return this.findNonAcademicArticleByUUID(uuid);
+            case 'pages':
+                return this.findPageByUUID(uuid);
+        }
+    }
+
     // JSON API Filtering
     // Find operators -> https://www.drupal.org/docs/8/modules/json-api/filtering
     private buildConditionalFilter(name, field, operator, value): string {

@@ -109,7 +109,7 @@ export default class TableOfContents extends Vue {
     // Constructs a URL from the provided article in the form of:
     // /article/{{node}}|{{uuid}}
     private getUrl(article: any): string {
-        return "/content/" + article.type.substring(article.type.indexOf('--') + 2) +  "/" + article.uuid;
+        return "/content/" + article.type +  "/" + article.uuid;
     }
     // Radio toggles the visibility of the article preview amongst all articles of a collection
     // except for the article menu item with the provided index
