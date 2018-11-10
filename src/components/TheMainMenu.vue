@@ -281,9 +281,6 @@ export default class TheMainMenu extends Vue {
         overflow: hidden;
 
         background: $bgColor;
-        padding: 3px 0;
-        border-top: $borderWidth solid $bgColor;
-        border-bottom: $borderWidth solid $bgColor;
 
         transition: width 0.3s ease;
     }
