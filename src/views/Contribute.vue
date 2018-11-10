@@ -37,9 +37,11 @@ export default class Contribute extends Vue {
             this.$store.dispatch('pages/initContributePage')
                 .then(res => {
                     this.pages = this.$store.getters['pages/getContributePage'];
+                    this.$store.dispatch('setAppLoading', false);
                 });
         } else {
             this.pages = this.$store.getters['pages/getContributePage'];
+            this.$store.dispatch('setAppLoading', false);
         }
     }
 }

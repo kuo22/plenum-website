@@ -37,9 +37,11 @@ export default class About extends Vue {
             this.$store.dispatch('pages/initAboutPage')
                 .then(res => {
                     this.pages = this.$store.getters['pages/getAboutPage'];
+                    this.$store.dispatch('setAppLoading', false);
                 });
         } else {
             this.pages = this.$store.getters['pages/getAboutPage'];
+            this.$store.dispatch('setAppLoading', false);
         }
     }
 }

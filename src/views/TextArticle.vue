@@ -246,10 +246,12 @@ export default class TextArticle extends Vue {
         const contentType = this.$route.params.content_type;
 
         let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
-        if (temp !== undefined && temp.length > 0) {
+        console.log(temp);
+        if (temp !== undefined) {
             this.article = temp;
             window.document.title = this.article.content_title;
 
+            this.$store.dispatch('setAppLoading', false);
             this.articleLoading = false;
             this.articleError = false;
         } else {
@@ -264,6 +266,8 @@ export default class TextArticle extends Vue {
                             this.article = this.$store.getters['issues/getArticleByUUID'](uuid);
                             window.document.title = this.article.content_title;
                         });
+
+                    this.$store.dispatch('setAppLoading', false);
                     this.articleLoading = false;
                     return article;
                 })

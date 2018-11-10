@@ -37,9 +37,11 @@ export default class Home extends Vue {
             this.$store.dispatch('pages/initFrontPage')
                 .then(res => {
                     this.pages = this.$store.getters['pages/getFrontPage'];
+                    this.$store.dispatch('setAppLoading', false);
                 });
         } else {
             this.pages = this.$store.getters['pages/getFrontPage'];
+            this.$store.dispatch('setAppLoading', false);
         }
     }
 }
