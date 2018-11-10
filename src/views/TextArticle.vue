@@ -180,11 +180,13 @@ export default class TextArticle extends Vue {
     // Returns the author(s) of the article in a format depending on the number of author
     // e.g. 'McClung J.' for a single author or 'Deremer, E. et al.' for multiple authors
     private get authorCopyrightFormat(): string {
-        let singleAuthor = (typeof this.article.authors === 'string') ? this.article.authors : this.article.authors[0];
-        singleAuthor = singleAuthor.split(' ').reverse().join(', ');
-        singleAuthor = singleAuthor.substring(0, singleAuthor.indexOf(', ') + 3) + ".";
-        singleAuthor += (typeof this.article.authors === 'string') ? "" : " et al.";
-        return singleAuthor;
+        let firstAuthor = this.article.authors[0];
+        firstAuthor = firstAuthor.split(' ').reverse().join(', ');
+        firstAuthor = firstAuthor.substring(0, firstAuthor.indexOf(', ') + 3) + ".";
+        if (this.article.authors.length > 1) {
+            firstAuthor += (typeof this.article.authors === 'string') ? "" : " et al.";
+        }
+        return firstAuthor;
     }
 
     // TODO: make global for any component that needs to access images in '/assets/
