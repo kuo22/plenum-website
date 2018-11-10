@@ -9,6 +9,7 @@ Vue.use(Vuex);
 
 export interface RootState {
     appReady: boolean;
+    appLoading: boolean;
 }
 
 let store = new Vuex.Store<RootState>({
@@ -21,22 +22,32 @@ let store = new Vuex.Store<RootState>({
         pages: PagesModule
     },
     state: {
-        appReady: false
+        appReady: false,
+        appLoading: true,
     },
     getters: {
         getAppReady: (state) => {
             return state.appReady;
+        },
+        appLoading: (state) => {
+            return state.appLoading;
         }
     },
     mutations: { // For synchronous transactions
         setAppReady(state) {
             state.appReady = true;
+        },
+        setAppLoading(state, bool) {
+            state.appLoading = bool;
         }
     },
     actions: { // For asynchronous transactions
         initApp({ commit }) {
             commit('setAppReady');
             return this.dispatch('menuTree/createMenu');
+        },
+        setAppLoading({ commit }, bool) {
+            commit('setAppLoading', bool);
         }
     },
 });

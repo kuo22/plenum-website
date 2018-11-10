@@ -40,6 +40,7 @@ export const PagesModule: Module<PagesState, RootState>  = {
                 .then(pages => {
                     pages.forEach(page => {
                         commit('addPage', page);
+                        commit('setAppLoading', false, {root: true});
                     });
                 });
         },
@@ -48,6 +49,7 @@ export const PagesModule: Module<PagesState, RootState>  = {
                 .then(pages => {
                     pages.forEach(page => {
                         commit('addPage', page);
+                        commit('setAppLoading', false, {root: true});
                     });
                 });
         },
@@ -56,6 +58,7 @@ export const PagesModule: Module<PagesState, RootState>  = {
                 .then(pages => {
                     pages.forEach(page => {
                         commit('addPage', page);
+                        commit('setAppLoading', false, {root: true});
                     });
                 });
         },
@@ -63,6 +66,7 @@ export const PagesModule: Module<PagesState, RootState>  = {
             return api.findPageByUUID(uuid)
                 .then(page => {
                     commit('addPage', page);
+                    commit('setAppLoading', false, {root: true});
                 });
         }
     }

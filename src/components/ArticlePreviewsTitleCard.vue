@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="title">{{article.title}}</h1>
+        <h1 class="title">{{article.content_title}}</h1>
         <div
             v-if="article.subtitle"
             class="subtitle"

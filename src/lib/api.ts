@@ -1,6 +1,7 @@
 import jsonApi from './jsonApiClient';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
+import store from '@/store';
 
 
 const namespace: string = 'menuTree';
@@ -70,7 +71,6 @@ class Api extends Vue {
 
             }
         };
-
         return jsonApi.get('pages/' + uuid, query);
     }
 

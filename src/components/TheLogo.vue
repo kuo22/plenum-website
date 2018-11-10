@@ -2,12 +2,12 @@
     <div>
         <svg
             class="logo"
-            :class="{'rotating': !getAppReady}"
+            :class="{'rotating': appLoading}"
 
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 53 53"
-            enable-background="new 0 0 53 53"
+            viewBox="0 0 55 55"
+            enable-background="new 0 0 55 55"
             xml:space="preserve">
             <router-link
                 to="/"
@@ -25,8 +25,8 @@
 
                     width="17px"
                     height="17px"
-                    x="17"
-                    y="17">
+                    x="19"
+                    y="18">
                 </rect>
             </router-link>
         </svg>
@@ -43,7 +43,7 @@ import { mapGetters } from 'vuex';
     },
     computed: {
         ...mapGetters({
-            getAppReady: 'getAppReady',
+            appLoading: 'appLoading',
         })
     }
 })

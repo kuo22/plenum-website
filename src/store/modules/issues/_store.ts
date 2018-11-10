@@ -45,6 +45,7 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
     actions: {
         addIssue({ commit }, issue: Collection) {
             commit('addIssue', issue);
+            commit('setAppLoading', false, {root: true});
         },
 
         addArticle({ commit, state }, article: any) {
@@ -52,6 +53,7 @@ export const IssuesStoreModule: Module<IssuesState, RootState>  = {
             if (!state.articles.find((storeArticle: any) => storeArticle.uuid === article.uuid)) {
                 article.active = false;
                 commit('addArticle', article);
+                commit('setAppLoading', false, {root: true});
             }
         }
     }

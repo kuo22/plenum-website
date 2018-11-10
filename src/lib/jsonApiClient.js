@@ -6,6 +6,7 @@
 import jsonapiParse from 'jsonapi-parse';
 import axios from 'axios';
 import qs from 'qs';
+import store from "../store";
 
 axios.defaults.withCredentials = false;
 
@@ -25,6 +26,7 @@ export default {
             query = '';
         }
         const url = 'http://localhost:8888/contenta/web/api/' + uri + query;
+        store.dispatch('setAppLoading', true);
         return axios.get(url);
     },
 };
