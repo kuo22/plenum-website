@@ -47,8 +47,9 @@ export default class ArticlePreviews extends Vue {
     // Computed: Returns whether or not any article's preview is visible
     get isAnyArticlePreviewActive() {
         return this.articles.some((article: any, index) => {
-            let articleId = this.parentCollection.title.replace(' ', '') + '-entry-' + index;
-            return article.abstract && (article.previewVisible || document.activeElement === document.getElementById(articleId));
+            //let articleId = this.parentCollection.title.replace(' ', '') + '-entry-' + index;
+            //return article.abstract && (article.previewVisible || document.activeElement === document.getElementById(articleId));
+            return article.abstract && article.previewVisible;
         });
     }
 
@@ -66,7 +67,7 @@ export default class ArticlePreviews extends Vue {
 
 <style lang="scss" scoped>
     .article-previews--visible {
-        visibility: visible;
+        visibility: visible !important;
     }
 
     .article-preview-card {
