@@ -61,7 +61,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
 
     constructor() {
         super();
-        this.baseUrl = process.env.VUE_APP_CONTENTA_BASE ? process.env.VUE_APP_CONTENTA_BASE : 'http://localhost:8888';
+        this.baseUrl = process.env.NODE_ENV === "development" ? 'http://localhost:8888' : process.env.VUE_APP_CONTENTA_BASE;
     }
 
     @Emit('toggleOpen')
@@ -86,6 +86,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
 
     .collection-preview {
         display: inline-block;
+
         position: fixed;
         left: calc(#{$navBarWidth} * 2 + 30px + 3px); // + outline width
         top: calc((100vh - #{$preview-height}) / 2);
