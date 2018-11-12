@@ -1,13 +1,26 @@
 {
-  "name": "plenum-website",
+  "name": "@plenumUW/plenum-website",
   "version": "1.0.0",
+  "homepage": "https://github.com/PlenumUW/plenum-website",
+  "description": "A website application that presents the University of Washington's Plenum Journal of Undergraduate Geography",
+  "bugs": {
+    "url": "https://github.com/PlenumUW/plenum-website/issues",
+    "email": "plenum@uw.edu"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PlenumUW/plenum-website.git"
+  },
+  "license": "MIT",
+  "author": "Jackson Baker Ryan <jackryan@uw.edu> (http://jbr.fyi)",
+  "contributors": [],
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open",
+    "stage": "vue-cli-service build --mode staging",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test",
-    "lint": "vue-cli-service lint",
-    "stage": "vue-cli-service build --mode staging"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -54,5 +67,10 @@
       "vue-cli-service lint",
       "git add"
     ]
-  }
+  },
+  "keywords": [
+    "geography",
+    "journal",
+    "UW"
+  ]
 }
