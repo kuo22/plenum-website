@@ -5,6 +5,8 @@ import TextArticle from '@/views/TextArticle';
 import Publication from '@/views/Publication';
 import PageView from '@/views/PageView';
 import NotFoundView from '@/views/NotFoundView';
+import About from '@/views/About';
+import Contribute from '@/views/Contribute';
 
 import vueConfig from '../vue.config.js';
 
@@ -20,6 +22,11 @@ export default new Router({
             component: Home,
         },
         {
+            path: '/about',
+            name: 'about',
+            component: About,
+        },
+        {
 
             path: '/publications/:publication',
             name: 'publication-table-of-contents',
@@ -30,16 +37,11 @@ export default new Router({
             name: 'publication-article',
             component: TextArticle,
         },
-        {
-            path: '/about/:page',
-            name: 'about',
-            component: PageView,
-        },
         // TODO: reformat to properly decouple, this hard-coding has to be temporary
         {
-            path: '/contribute/:page',
+            path: '/contribute',
             name: 'contribute',
-            component: PageView
+            component: Contribute
         },
         {
             path: '/join-us',

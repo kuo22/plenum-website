@@ -100,17 +100,15 @@ export default class TheSiteFooter extends Vue {
         display: inline-block;
         font-weight: normal;
 
-        margin: 0 10px;
+        margin: 0 0.5em 0 0;
 
         vertical-align: middle;
     }
 
-    .uw-menu-item:first-child {
-        margin-left: 0;
-    }
-
     .uw-menu-item:last-child {
+        margin-left: 0.5em;
         margin-right: 0;
+        width: 3.5em;
     }
 
     .uw-menu-item a span {

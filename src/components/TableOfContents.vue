@@ -54,9 +54,9 @@
                         <p
                             class="table-of-contents__title"
                         >
-                            {{ article.title }}
+                            {{ article.content_title }}
                         </p>
-                        <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
+                        <p class="table-of-contents__author">{{ article.authors.join(' | ') }}</p>
                     </div>
                 </router-link>
             </li>
@@ -66,7 +66,6 @@
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { mixin as focusMixin } from 'vue-focus';
-import {MainMenuItem} from '../classes/MainMenuItem';
 
 @Component({
     mixins: [focusMixin],
@@ -91,8 +90,7 @@ export default class TableOfContents extends Vue {
     @Emit('articleSelected')
     public articleSelected(routerLinkLocation: string, keyboardEvent?: boolean = true): void {
         this.resetFocus();
-        // TODO: reset hover states of table of content links
-        // this.resetHovers();
+        this.resetVisibilities();
     }
 
     @Emit('exitMenu')
@@ -100,10 +98,18 @@ export default class TableOfContents extends Vue {
         // Filler
     }
 
+    // Turns the visibility of the requested article's preview abstract to 'off'
+    private resetVisibilities(): void {
+        this.parentCollection.articles.forEach(article => {
+            if (article.previewVisible === true)
+            article.previewVisible = false;
+        })
+    }
+
     // Constructs a URL from the provided article in the form of:
     // /article/{{node}}|{{uuid}}
     private getUrl(article: any): string {
-        return "/content/" + article.type.substring(article.type.indexOf('--') + 2) +  "/" + article.uuid;
+        return "/content/" + article.type +  "/" + article.uuid;
     }
     // Radio toggles the visibility of the article preview amongst all articles of a collection
     // except for the article menu item with the provided index

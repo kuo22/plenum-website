@@ -2,28 +2,83 @@ import { ActionTree } from 'vuex';
 
 import * as hsluv from '../../../../node_modules/hsluv/hsluv.js';
 
-import APIService from '../../../API';
+import api from '../../../lib/api';
 import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
 import {RootState} from '@/store';
+
+function createHardCodedMenu() {
+    const aboutMainMenu = {
+        title: "About",
+        alt: "About sections",
+        weight: -49,
+        hovered: false,
+        expanded: false,
+        path: '/about',
+        depth: 1
+    };
+
+    const publicationsMainMenu = {
+        title: "Publications",
+        alt: "Publications",
+        weight: -48,
+        hovered: false,
+        expanded: false,
+        path: '/publications',
+        submenu: [],
+        depth: 1
+    };
+
+    const contributeMainMenu = {
+        title: "Contribute",
+        alt: "Contribute",
+        weight: -47,
+        hovered: false,
+        expanded: false,
+        path: '/contribute',
+        depth: 1
+    };
+
+    const joinUsMainMenu = {
+        title: "Join Us",
+        alt: "Join us",
+        weight: -46,
+        hovered: false,
+        expanded: false,
+        path: '/join-us',
+        depth: 1,
+        uuid: '43e759e0-324f-41be-a8a3-3ba61d09730a'
+    };
+
+    let menu: Array<any> = [aboutMainMenu, publicationsMainMenu, contributeMainMenu, joinUsMainMenu];
+    let menuColors = getPerceptuallyUniformColors(27, menu.length);
+    return menu.map((menuItem, i) => {
+        menuItem.color = menuColors[i];
+        return menuItem;
+    });
+}
 
 export const actions: ActionTree<MenuTreeState, RootState> = {
 
     // Create the app's navigation menus via API data
-    async createMenu({ commit, dispatch }): Promise<any> {
-        return APIService.fetchMenuTree()
-            .then(dirtyMenuTreeData => dirtyMenuTreeData.map(processMenuData))
-            .then(menuTreeData => fillMissingDataInMenuTree(menuTreeData, 1, dispatch))
-            .then(minimalMenuTree => {
-                let menuColors = getPerceptuallyUniformColors(27, minimalMenuTree.length);
-                minimalMenuTree.map((mainMenuItem, i) => mainMenuItem.color =  menuColors[i]);
-
-                commit('menusLoaded', minimalMenuTree);
-
-                return minimalMenuTree;
-            }).catch((err) => {
-                // TODO: handle error
-                console.error(err);
-            });
+    createMenu({ commit, dispatch }) {
+        commit('apiDataPending', createHardCodedMenu()); // API MENU DATA PENDING
+        api.findMostRecentCollectionsForMenu(5)
+            .then(collections => {
+                collections.forEach(collection => {
+                    collection.expanded = false;
+                    collection.hovered = false;
+                    collection.articles.forEach(article => {
+                        article.previewVisible = false;
+                        article.authors = article.authors.split(';').map(author => {
+                            return author.trim().split(',').reverse().join(' ').trim();
+                        });
+                    })
+                });
+                commit('apiDataSuccess', collections);
+            })
+            .catch(error => {
+                commit('apiDataFailure', error);
+            })
     },
 
     closeMenuExpansions({ commit, getters }) {
@@ -183,7 +238,7 @@ async function fillMissingDataInMenuTree(menuTree, depth, dispatch): Promise<any
         item.depth = depth;
 
         if (item.node && item.depth == 3) { // CURRENT MENU ITEM IS A CONTENT COLLECTION (MENUBAR AND BUTTON)
-            let collectionData = await APIService.fetchCollectionMenuData(item.uuid);
+            let collectionData = await api.fetchCollectionMenuData(item.uuid);
 
             if (collectionData[collectionData.length - 1].type.startsWith('file')) {
                 // TODO: make sure to reference drupal hostname and port in production

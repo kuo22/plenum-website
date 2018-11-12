@@ -10,6 +10,7 @@
             v-for="section in page.body"
             v-html="section.processed"
         ></section>
+        <hr class="basic-page__divider">
     </article>
 </template>
 

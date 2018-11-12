@@ -93,7 +93,8 @@
 
             </div-->
             <!-- TODO move to article preview component? -->
-            <transition name="preview-fade">
+            <transition
+                    name="preview-fade">
                 <main-menu-fly-out-sections-previews
                     v-show="isPreviewVisible(index)"
                     v-if="menuLink.articles"
@@ -301,33 +302,12 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     /* APPEAR TRANSITION */
+    // TODO: convert to static style change, remove vue-transition
     .preview-fade-enter {
-        opacity: 0.75;
-        /*z-index: 3 !important;*/
-    }
-
-    .preview-fade-enter-active {
-        transition: opacity 200ms ease-in;
-        /*z-index: 3 !important;*/
-    }
-
-    .preview-fade-enter-to {
         opacity: 1;
-        //z-index: 2 !important;
     }
 
-    .preview-face-leave {
-        opacity: 1;
-        //z-index: 2 !important;
-    }
-
-    .preview-fade-leave-active {
-        transition: opacity 200ms ease-out;
-        //z-index: 2 !important;
-    }
-
-    .preview-fade-leave-to {
+    .preview-fade-leave {
         opacity: 0;
-        //z-index: 1 !important;
     }
 </style>

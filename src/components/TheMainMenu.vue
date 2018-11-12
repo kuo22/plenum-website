@@ -54,13 +54,13 @@
                 <span
                     class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
-                ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
+                >
                     {{ menu.title }}&nbsp;
                 </span>
             </a>
             <router-link
                  v-else
-                 :to="'/' + menu.title.toLowerCase().replace(' ', '-')"
+                 :to="menu.path"
                  :id="'main-menu-item-' + index"
                  :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
 
@@ -89,7 +89,10 @@
                 </span>
             </router-link>
 
-            <transition name="fly-out-slide">
+            <transition
+                v-if="menu.submenu && menu.submenu.length > 0"
+                name="fly-out-slide"
+            >
                 <main-menu-fly-out
                     v-show="menu.expanded"
                     class="fly-out"
@@ -278,9 +281,6 @@ export default class TheMainMenu extends Vue {
         overflow: hidden;
 
         background: $bgColor;
-        padding: 3px 0;
-        border-top: $borderWidth solid $bgColor;
-        border-bottom: $borderWidth solid $bgColor;
 
         transition: width 0.3s ease;
     }

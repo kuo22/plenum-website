@@ -29,9 +29,9 @@
                     <text-article-title-card
                         v-if="article"
                         class="header-container header-container--headroom"
-                        :title="article.title"
+                        :title="article.content_title"
                         :subtitle="article.subtitle"
-                        :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                        :author="(typeof article.authors === 'string') ? article.authors : article.authors.join(' | ')"
                         :hidden="isAtPageTop || scrollSessionFromTop"
                     ></text-article-title-card>
                 </header>
@@ -47,9 +47,9 @@
                     v-if="article"
                     class="header-container header-container--embedded"
 
-                    :title="article.title"
+                    :title="article.content_title"
                     :subtitle="article.subtitle"
-                    :author="(typeof article.author === 'string') ? article.author : article.author.join(' | ')"
+                    :author="(typeof article.authors === 'string') ? article.authors : article.authors.join(' | ')"
                 ></text-article-title-card>
             </header>
 
@@ -71,7 +71,7 @@
 
                 <div class="article__body">
                     <section
-                        v-for="section in article.body"
+                        v-for="section in article.article_section || article.body"
                         v-html="section.processed"
                     ></section>
                 </div>
@@ -117,7 +117,7 @@
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import headroom from 'vue-headroom';
 import { Route } from 'vue-router';
-import APIService from '@/API';
+import api from '@/lib/api';
 import TextArticleNavigation from '@/components/TextArticleNavigation';
 import TextArticleTitleCard from '../components/TextArticleTitleCard';
 
@@ -180,11 +180,13 @@ export default class TextArticle extends Vue {
     // Returns the author(s) of the article in a format depending on the number of author
     // e.g. 'McClung J.' for a single author or 'Deremer, E. et al.' for multiple authors
     private get authorCopyrightFormat(): string {
-        let singleAuthor = (typeof this.article.author === 'string') ? this.article.author : this.article.author[0];
-        singleAuthor = singleAuthor.split(' ').reverse().join(', ');
-        singleAuthor = singleAuthor.substring(0, singleAuthor.indexOf(', ') + 3) + ".";
-        singleAuthor += (typeof this.article.author === 'string') ? "" : " et al.";
-        return singleAuthor;
+        let firstAuthor = this.article.authors[0];
+        firstAuthor = firstAuthor.split(' ').reverse().join(', ');
+        firstAuthor = firstAuthor.substring(0, firstAuthor.indexOf(', ') + 3) + ".";
+        if (this.article.authors.length > 1) {
+            firstAuthor += (typeof this.article.authors === 'string') ? "" : " et al.";
+        }
+        return firstAuthor;
     }
 
     // TODO: make global for any component that needs to access images in '/assets/
@@ -236,7 +238,7 @@ export default class TextArticle extends Vue {
     }
 
     // Gets article data depending on the URL
-    // If the article data doesn't exist in the store, fetch the article via the API
+    // If the article data doesn't exist in the store, fetch the article via the Api
     // and then store the article in the store
     private async fetchArticle() {
         this.articleError = this.article = null;
@@ -246,15 +248,28 @@ export default class TextArticle extends Vue {
         const contentType = this.$route.params.content_type;
 
         let temp = this.$store.getters['issues/getArticleByUUID'](uuid);
-        if (temp !== undefined && temp.length > 0) {
+        console.log(temp);
+        if (temp !== undefined) {
             this.article = temp;
+            window.document.title = this.article.content_title;
 
+            this.$store.dispatch('setAppLoading', false);
             this.articleLoading = false;
             this.articleError = false;
         } else {
-            this.article = await APIService.fetchContentByUUID(uuid, contentType)
+            api.fetchContentByUUID(uuid, contentType)
                 .then(article => {
-                    this.$store.dispatch('issues/addArticle', article);
+                    article.authors = article.authors.split(';').map(author => {
+                        return author.trim().split(',').reverse().join(' ').trim();
+                    });
+
+                    this.$store.dispatch('issues/addArticle', article)
+                        .then(res => {
+                            this.article = this.$store.getters['issues/getArticleByUUID'](uuid);
+                            window.document.title = this.article.content_title;
+                        });
+
+                    this.$store.dispatch('setAppLoading', false);
                     this.articleLoading = false;
                     return article;
                 })
@@ -309,6 +324,10 @@ export default class TextArticle extends Vue {
 
     .header--embedded--hidden {
         visibility: hidden;
+    }
+
+    .article-headroom {
+        height: calc(#{$navBarWidth} + 60px);
     }
 
     .header--headroom {
