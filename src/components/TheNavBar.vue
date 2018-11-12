@@ -1,17 +1,9 @@
 <template>
-    <div
-        class="navbar"
-        @mouseover="isLogoAnimated = true"
-        @mouseout="isLogoAnimated = false"
-    >
-        <div class="navbar__logo-frame grid-frame">
-            <the-logo
-                :playLogo="isLogoAnimated"
-                :dimension="navBarWidth"
-                @logoClicked="logoClicked"
-            ></the-logo>
-        </div>
-
+    <div>
+        <the-logo
+            class="navbar__logo"
+            @logoLinkActivated="logoLinkActivated"
+        ></the-logo>
         <nav
             class="navbar__main-menu"
             role="navigation"
@@ -23,27 +15,19 @@
                 @openContent="openContent"
             ></the-main-menu>
         </nav>
-
-        <div class="navbar__about grid-frame">
-            <p>
-                Plenum is an online journal devoted to showcasing the highest quality scholarship in undergraduate
-                geography. It is managed, produced, and reviewed by undergraduate students from the Department
-                of Geography at the University of Washington.
-            </p>
-        </div>
     </div>
 </template>
 
 <script lang="ts">
 import {Component, Emit, Vue} from 'vue-property-decorator';
 import TheMainMenu from '@/components/TheMainMenu';
-import TheLogo from '@/components/TheLogo';
 import { mapGetters } from 'vuex';
+import TheLogo from './TheLogo';
 
 @Component({
     components: {
-        TheMainMenu,
-        TheLogo
+        TheLogo,
+        TheMainMenu
     },
     computed: {
         ...mapGetters({
@@ -54,12 +38,10 @@ import { mapGetters } from 'vuex';
 
 // The main navigation bar for the app
 export default class TheNavBar extends Vue {
-    private isLogoAnimated: boolean; // Animation state of the logo
     private navBarWidth: number = 240; // Width of the navigation bar
 
     constructor() {
         super();
-        this.isLogoAnimated = false;
     }
 
     @Emit('openContent')
@@ -69,37 +51,21 @@ export default class TheNavBar extends Vue {
     private revertMenuSession(): void {}
 
     // Emits logo click event to parent
-    @Emit('logoClicked')
-    private logoClicked(): void {}
+    @Emit('logoLinkActivated')
+    private logoLinkActivated(): void {}
 }
 </script>
 
 <style lang="scss" scoped>
-    $navBarWidth: 240px;
-    $border: 3px solid black;
-    $menuFont: 'Avenir', 'Open Sans', sans-serif;
+    @import '../styles/_settings';
 
-    .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: $navBarWidth;
-        z-index: 5;
-
-        background: white;
-    }
-
-    .navbar__logo-frame {
-        border-bottom: $border;
+    .navbar__logo {
+        width: $headerHeight;
+        height: $headerHeight;
     }
 
     .navbar__main-menu {
-        // (Full height) - (Two squares with navBarWidth dimension) - (Top and Bottom padding) - (Top-border width)
-        height: calc(100% - (#{$navBarWidth} * 2) - (15px * 2) - 3px);
-        padding: 15px 15px 0 15px;
-
-        background: white;
+        margin-top: $headingCardHeight;
     }
 
     .navbar__about {
@@ -107,17 +73,17 @@ export default class TheNavBar extends Vue {
         bottom: 0;
         left: 0;
         width: calc(#{$navBarWidth} - 30px);
+
         padding: 15px 15px 0 15px;
 
-        border-top: $border;
-
-        font-family: $menuFont;
+        font-family: $sansSerifFont;
         font-weight: bold;
     }
 
     .navbar__about p {
-        vertical-align: middle;
         margin: 1em 0;
+
+        vertical-align: middle;
         font-size: 15.41px; // TODO: make responsive
         text-align: left;
         line-height: 20px;

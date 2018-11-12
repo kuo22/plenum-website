@@ -65,7 +65,6 @@
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { Route } from 'vue-router';
-import { Article } from '@/types/types';
 import TextArticleTitleCard from '@/components/TextArticleTitleCard';
 
 @Component({
@@ -76,8 +75,8 @@ import TextArticleTitleCard from '@/components/TextArticleTitleCard';
 
 export default class TextArticleNavigation extends Vue {
     @Prop() private allVisible!: boolean;
-    @Prop() private previousArticle!: Article;
-    @Prop() private nextArticle!: Article;
+    @Prop() private previousArticle!: any;
+    @Prop() private nextArticle!: any;
 
     private navButtons: Array<{}>;
     private focusedIndex: number;
@@ -112,7 +111,7 @@ export default class TextArticleNavigation extends Vue {
 
     @Emit('navArrowHovered')
     private navArrowHovered(navButtonIndex: number): void {
-        console.log('hovered');
+        //console.log('hovered');
         this.navButtons[navButtonIndex].arrowHovered = true;
         // Filler
     }

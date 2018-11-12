@@ -11,7 +11,6 @@
             <li
                 v-for="(section, index) in menu.submenu"
                 :key="index"
-                :title="section.title + ' Content Menu Bar'"
 
                 class="fly-out-menu__menu-item"
                 :aria-labelledby="section.title"
@@ -19,6 +18,8 @@
                 <a
                     :v-if="menu.submenu"
                    :id="menu.title + '-fly-out-menu-item-' + index"
+
+                    class="focusable"
 
                    role="menuitem"
                    aria-haspopup="true"
@@ -40,7 +41,7 @@
                    @focus="focusedIndex = index"
                 >
                     <span
-                        class="fly-out-menu__section-title menu-button-content"
+                        class="fly-out-menu__section-title focusable__content"
                         tabindex="-1"
                     >
                         {{ section.title }}
@@ -62,24 +63,24 @@
             <li
                 :title="menu.title + ' Content Menu Bar'"
 
-                class="fly-out-menu__menu-item"
+                class="fly-out-menu__menu-item focusable"
                 :aria-labelledby="menu.title"
             >
                 <a>
                     <span
-                        class="fly-out-menu__section-title menu-button-content"
+                        class="fly-out-menu__section-title focusable__content"
                         tabindex="-1"
                     >
                         {{ menu.title }}
                     </span>
                 </a>
                 <main-menu-fly-out-sections
-                        :menuTitle="menu.title"
-                        :menuItems="menu.submenu"
-                        :parentMenu="menu"
-                        @toggleOpen="toggleOpen"
-                        @openArticle="openArticle"
-                        @collectionActivated="collectionActivated"
+                    :menuTitle="menu.title"
+                    :menuItems="menu.submenu"
+                    :parentMenu="menu"
+                    @toggleOpen="toggleOpen"
+                    @openArticle="openArticle"
+                    @collectionActivated="collectionActivated"
                 >
                 </main-menu-fly-out-sections>
             </li>
@@ -249,13 +250,17 @@ export default class MainMenuFlyOut extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
+    
     $viewAllSubMenus: true;
-    $lefterWidth: 240px;
     $focusPadding: 10px;
 
     .fly-out-menu {
         width: 100%;
 
+        -webkit-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        -moz-box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
+        box-shadow: -0.2em 0.2em 1em rgba(0, 0, 0, 0.18);
         font-weight: bold;
         text-align: right;
     }
@@ -273,10 +278,11 @@ export default class MainMenuFlyOut extends Vue {
         display: block;
 
         text-align: left;
-        font-size: 1.6em;
+        font-size: $flyoutFontSize;
     }
 
     .fly-out-menu__section-title {
+        font-size: 1em;
         width: calc(100% - #{$focusPadding});
         padding: 0 0 0 $focusPadding;
     }
@@ -287,7 +293,7 @@ export default class MainMenuFlyOut extends Vue {
         }
 
         #about {
-            left: $lefterWidth;
+            left: $navBarWidth;
         }
 
         #publications {

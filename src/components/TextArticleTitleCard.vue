@@ -1,26 +1,24 @@
 <template>
     <div
         class="title-card__container"
-        :class="{
-            'title-card__container--hidden': hideTitleCard,
-        }"
+        :class="{'title-card__container--hidden': hidden}"
     >
         <h1 class="title-card__title">
             {{ title }}
+            <br>
+            <span class="title-card__subtitle">
+                {{ subtitle }}
+            </span>
         </h1>
-        <h2 class="title-card__subtitle">
-            {{ subtitle }}
-        </h2>
-        <h3 class="title-card__author">
+
+        <address class="title-card__author">
             {{ author }}
-        </h3>
+        </address>
     </div >
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import { Route } from 'vue-router';
-    import { Article } from '@/types/types';
 
     @Component({
         components: {
@@ -31,31 +29,26 @@
         @Prop() private title!: string;
         @Prop() private subtitle!: string;
         @Prop() private author!: string;
-        @Prop({ default: false }) private hideTitleCard!: boolean;
-        //@Prop() private focused!: boolean;
-
-        private $route: Route;
+        @Prop({ default: false }) private hidden!: boolean;
 
         constructor() {
             super();
-        }
-
-        // When view is mounted, retrieve article
-        public created() {
-            // Filler
         }
     }
 </script>
 
 <style lang="scss" scoped>
+    @import '../styles/_settings';
+
     .title-card__container {
         position: relative;
         left: 0;
-        max-width: 50vw;
+        width: fit-content;
+        max-width: 60vw;
         padding: 20px;
         z-index: 0;
 
-        background: white;
+        background: $bgColor;
 
         text-align: left;
 
@@ -80,8 +73,17 @@
         font-style: normal;
     }
 
+    .title-card__title {
+        font-size: 3em;
+        line-height: 1.5em;
+    }
+
     .title-card__subtitle {
-        margin-left: 30px;
+        display: block;
+
+        margin-left: 1.5em;
+        font-size: 0.8em;
+        line-height: 1.2em;
 
         text-align: left;
     }
@@ -89,6 +91,7 @@
     .title-card__author {
         margin-top: 15px;
 
+        font-size: 1.8em;
         font-style: italic;
         text-align: left;
     }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="title">{{article.title}}</h1>
+        <h1 class="title">{{article.content_title}}</h1>
         <div
             v-if="article.subtitle"
             class="subtitle"
@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {Article} from '../types/types';
 
 @Component({
     components: {
@@ -22,7 +21,7 @@ import {Article} from '../types/types';
 
 // Submenu associated with a unique main menu entry
 export default class ArticlePreviewsTitleCard extends Vue {
-    @Prop() private article: Article;
+    @Prop() private article: any;
 
     constructor() {
         super();
@@ -39,18 +38,21 @@ export default class ArticlePreviewsTitleCard extends Vue {
 <style lang="scss" scoped>
     .title {
         font-weight: lighter;
-        line-height: 1em;
+        font-size: 2.1em;
+        line-height: 1.8em;
     }
 
     .subtitle {
         font-weight: lighter;
-        text-indent: 2em;
-        font-size: 1.3em;
+        padding-left: 2em;
+        font-size: 1.9em;
+        line-height: 1.4em;
     }
 
     .author {
         margin-top: 3px;
 
+        font-size: 1.5em;
         font-weight: lighter;
         font-style: italic;
     }

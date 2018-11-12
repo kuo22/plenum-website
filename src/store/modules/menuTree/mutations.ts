@@ -1,11 +1,22 @@
 import { MutationTree } from 'vuex';
-import {MenuTreeState} from '@/types/storeTypes';
-import {MainMenuItem} from '@/classes/MainMenuItem';
+import {MenuTreeState} from '@/store/modules/menuTree/menuTreeModule';
 
 export const mutations: MutationTree<MenuTreeState> = {
-    menusLoaded(state, payload: Array<Object>) {
-        state.main = payload;
-        state.error = false;
+    apiDataPending(state, hardCodedMenu: Array<Object>) {
+        state.main = hardCodedMenu;
+    },
+    apiDataSuccess(state, collectionsData: Object) {
+        state.loading = false;
+        state.main = state.main.map(menuItem => {
+            if (menuItem.title === 'Publications') {
+                menuItem.submenu = collectionsData;
+            }
+            return menuItem;
+        })
+    },
+    apiDataFailure(state, error) {
+        state.loading = false;
+        state.error = true;
     },
     updateMenuTree(state, menuTree: Array<Object>) {
         state.main = menuTree;

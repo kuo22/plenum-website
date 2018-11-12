@@ -18,7 +18,7 @@ import BasicPage from '../components/content-types/BasicPage';
     },
 })
 
-export default class Home extends Vue {
+export default class About extends Vue {
     private pages: Array<any>;
 
     constructor() {
@@ -29,18 +29,18 @@ export default class Home extends Vue {
 
     // When view is mounted, retrieve article
     private created() {
-        this.initFrontPage();
+        this.initAboutPage();
     }
 
-    private initFrontPage(): void {
-        if (this.$store.getters['pages/getFrontPage'].length === 0) {
-            this.$store.dispatch('pages/initFrontPage')
+    private initAboutPage(): void {
+        if (this.$store.getters['pages/getAboutPage'].length === 0) {
+            this.$store.dispatch('pages/initAboutPage')
                 .then(res => {
-                    this.pages = this.$store.getters['pages/getFrontPage'];
+                    this.pages = this.$store.getters['pages/getAboutPage'];
                     this.$store.dispatch('setAppLoading', false);
                 });
         } else {
-            this.pages = this.$store.getters['pages/getFrontPage'];
+            this.pages = this.$store.getters['pages/getAboutPage'];
             this.$store.dispatch('setAppLoading', false);
         }
     }

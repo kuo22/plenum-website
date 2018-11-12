@@ -9,18 +9,16 @@
             <li
                 v-for="(article, index) in parentCollection.articles"
                 :key="index"
-                class="menu-button"
+
+                class="table-of-contents__menu-item"
+
                 role="none"
             >
                 <router-link
                     :to=getUrl(article)
                     :id="parentCollection.title.replace(' ', '') + '-entry-' + index"
 
-                    class="table-of-contents__menu-item"
-                    :class="{
-                                'table-of-contents__menu-item--hovered': article.previewVisible,
-                                'table-of-contents__menu-item--focused': focusedIndex !== -1
-                            }"
+                    class="focusable"
 
                     role="menuitem"
                     :tabindex="index === focusedIndex ? '0' : '-1'"
@@ -44,13 +42,22 @@
                     @focus.native="focusedIndex = index; article.previewVisible = true;"
                     @blur.native="article.previewVisible = false"
                 >
-                    <p
-                        class="table-of-contents__title menu-button-content"
+                    <div
+                        class="table-of-contents__menu-item__content focusable__content"
+                        :class="{
+                            'table-of-contents__menu-item__content--hovered': article.previewVisible,
+                            'table-of-contents__menu-item__content--focused': focusedIndex !== -1
+                        }"
+
                         tabindex="-1"
                     >
-                        {{ article.title }}
-                    </p>
-                    <p class="table-of-contents__author">{{ article.author.join(' | ') }}</p>
+                        <p
+                            class="table-of-contents__title"
+                        >
+                            {{ article.content_title }}
+                        </p>
+                        <p class="table-of-contents__author">{{ article.authors.join(' | ') }}</p>
+                    </div>
                 </router-link>
             </li>
         </ul>
@@ -59,7 +66,6 @@
 <script lang="ts">
 import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 import { mixin as focusMixin } from 'vue-focus';
-import {MainMenuItem} from '../classes/MainMenuItem';
 
 @Component({
     mixins: [focusMixin],
@@ -84,8 +90,7 @@ export default class TableOfContents extends Vue {
     @Emit('articleSelected')
     public articleSelected(routerLinkLocation: string, keyboardEvent?: boolean = true): void {
         this.resetFocus();
-        // TODO: reset hover states of table of content links
-        // this.resetHovers();
+        this.resetVisibilities();
     }
 
     @Emit('exitMenu')
@@ -93,10 +98,18 @@ export default class TableOfContents extends Vue {
         // Filler
     }
 
+    // Turns the visibility of the requested article's preview abstract to 'off'
+    private resetVisibilities(): void {
+        this.parentCollection.articles.forEach(article => {
+            if (article.previewVisible === true)
+            article.previewVisible = false;
+        })
+    }
+
     // Constructs a URL from the provided article in the form of:
     // /article/{{node}}|{{uuid}}
     private getUrl(article: any): string {
-        return "/content/" + article.type.substring(article.type.indexOf('--') + 2) +  "/" + article.uuid;
+        return "/content/" + article.type +  "/" + article.uuid;
     }
     // Radio toggles the visibility of the article preview amongst all articles of a collection
     // except for the article menu item with the provided index
@@ -163,31 +176,34 @@ export default class TableOfContents extends Vue {
         height: auto;
         padding-bottom: 1em;
 
-        border-left: 3px solid transparent;
-
         font-family: 'Amiri', serif;
         font-weight: lighter;
     }
 
-    .table-of-contents__menu-item--hovered {
-        border-left: 3px solid black;
+    .table-of-contents__menu-item__content {
+        border-left: 3px solid transparent;
     }
 
-    .table-of-contents__menu-item--focused {
+    .table-of-contents__menu-item__content--hovered {
+        border-left: 3px solid black;
+        background: rgba(0, 0, 0, 0.03);
+    }
+
+    .table-of-contents__menu-item__content--focused {
         border-left: 3px solid transparent;
     }
 
     .table-of-contents__title {
         padding: 10px;
 
-        font-size: 2.1em;
+        font-size: 2.35em;
         line-height: 1em;
     }
 
     .table-of-contents__author {
         text-align: right;
         font-style: italic;
-        font-size: 1.4em;
-        line-height: 1.4em;
+        font-size: 1.75em;
+        line-height: 1.5em;
     }
 </style>

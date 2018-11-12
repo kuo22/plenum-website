@@ -1,13 +1,11 @@
 <template>
-    <div
-        :class="{ 'article-previews--visible': isAnyArticlePreviewActive}"
-    >
-        <!-- TODO: move above :class declaration to parent -->
+    <div>
         <div
-            v-for="(article, index) in articles"
-            v-show="isArticlePreviewVisibe(article, index)"
+            v-for="(article, index) in articles.filter(article => article.abstract)"
+            v-show="isArticlePreviewVisible(article, index)"
             :key="index"
             class="article-preview-card"
+            :class="{ 'article-preview-card--visible': isAnyArticlePreviewActive}"
         >
             <div class="article-preview-card__paper">
                 <article-previews-title-card :article="article"></article-previews-title-card>
@@ -27,8 +25,6 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import ArticlePreviewsTitleCard from '@/components/ArticlePreviewsTitleCard';
-import {SubmenuLink} from '../classes/SubmenuLink';
-import {Article} from '../types/types';
 
 @Component({
     components: {
@@ -36,32 +32,29 @@ import {Article} from '../types/types';
     },
 })
 
-// Submenu associated with a unique main menu entry
+// A stack of previews of a provided list of articles that individually presents
+// the articles' title, subtitle and abstract. Only articles that contain abstracts are potentially rendered.
 export default class ArticlePreviews extends Vue {
-    @Prop({ type: Array, default: () => []}) private articles!: Array<Object>; // DEP: Array<Article>[]
-
-    @Prop(Object) private parentCollection!: Object; // DEP: SubmenuLink
+    @Prop({ type: Array, default: () => []}) private articles!: Array<any>;
+    @Prop(Object) private parentCollection!: any;
 
     constructor() { super(); }
 
     // Computed: Returns whether or not any article's preview is visible
     get isAnyArticlePreviewActive() {
-        let articleActiveFlag: boolean = false;
-        for (let i = 0; i < this.articles.length; i++) {
-            if (this.articles[i].previewVisible || (document.getElementById(
-                    this.parentCollection.title.replace(' ', '') + '-entry-' + i) === document.activeElement)) {
-                articleActiveFlag = true;
-            }
-        }
-
-        return articleActiveFlag;
+        return this.articles.some((article: any, index) => {
+            // Uncomment to reimplement abstract visibility upon keyboard navigational focus
+            //let articleId = this.parentCollection.title.replace(' ', '') + '-entry-' + index;
+            //return article.abstract && (article.previewVisible || document.activeElement === document.getElementById(articleId));
+            return article.abstract && article.previewVisible;
+        });
     }
 
     // Returns whether or not the article should be visible
     // parameter(s) needed:
     //      article = the article that might be visible
     //      index   = the index of the same article in the table of contents
-    private isArticlePreviewVisibe(article: Article, index: number): boolean {
+    private isArticlePreviewVisible(article: any, index: number): boolean {
         return article.previewVisible || (document.getElementById(
             this.parentCollection.title.replace(' ', '') + '-entry-' + index) === document.activeElement
         );
@@ -70,8 +63,8 @@ export default class ArticlePreviews extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    .article-previews--visible {
-        visibility: visible;
+    .article-preview-card--visible {
+        visibility: visible !important;
     }
 
     .article-preview-card {
@@ -101,21 +94,21 @@ export default class ArticlePreviews extends Vue {
     }
 
     .article-preview-card__abstract-title {
-        margin-top: 2em;
-        margin-bottom: 2em;
+        margin-top: 1.2em;
+        margin-bottom: 1em;
 
-        font-size: 1.2em;
-        line-height: 1.2em;
+        font-size: 2em;
+        line-height: 2em;
         text-align: center;
     }
 
     .article-preview-card__abstract {
-        height: 68%;
+        height: 68%; // TODO: use flex box to automatically fill rest of
         overflow-x: hidden;
 
         text-indent: 3em;
-        font-size: 1.1em;
-        line-height: 1.3em;
+        font-size: 1.7em;
+        line-height: 1.5em;
         text-align: justify;
     }
 

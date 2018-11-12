@@ -3,25 +3,26 @@
         id="app"
         @keydown.tab="revertMenuSession"
     >
+        <div
+            v-show="$route.path.includes('publications')"
+            class="app__overlay"
+            @click="handleMenuBackgroundClickEvent"
+        ></div>
         <transition appear>
             <the-nav-bar
                 class="lefter"
-                @logoClicked="handleLogoClick"
+                @logoLinkActivated="handleLogoLinkActivation"
                 @revertMenuSession="revertMenuSession"
                 @openContent="handleOpenContentEvent"
             ></the-nav-bar>
         </transition>
 
-        <span
-            class="content-section content-section__overlay"
-            :class="this.$store.getters['menuTree/anyMenuIsOpen'] ? 'content-section__overlay--dimmed' : null"
-        >
-
-        </span>
+        <the-site-header></the-site-header>
 
         <transition
             name="component-fade"
             mode="out-in"
+            v-if="!$route.path.includes('publications')"
         >
             <router-view
                 class="content-section"
@@ -30,50 +31,39 @@
             >
             </router-view>
         </transition>
+
+        <the-site-footer class="site-footer"></the-site-footer>
     </div>
 </template>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {Action} from 'vuex-class';
 import TheNavBar from '@/components/TheNavBar';
 import Home from '@/views/Home';
+import TheSiteFooter from './components/TheSiteFooter';
+import TheSiteHeader from './components/TheSiteHeader';
 
 @Component({
     components: {
+        TheSiteHeader,
+        TheSiteFooter,
         TheNavBar,
         Home
-    },
-    computed: {
-
     }
 })
 
 export default class App extends Vue {
-    @Action('menuTree/createMenu') private createMenu;
-
-    private menuLoading: boolean; // Menu loading state
 
     constructor() {
         super();
-        this.menuLoading = true;
-        // this.menuOpen = false; // TODO: Initialize to open for when collection URL is requested
     }
 
-    // When the app is created, create the app's main navigation menu
-    public async created() {
-        await this.createMenu()
-            .then(() => {
-                this.menuLoading = false;
-            })
-            .catch((err) => {
-                // TODO: Handle loading error
-                console.error(err);
-            });
+    private handleMenuBackgroundClickEvent(): void {
+        this.revertMenuSession();
     }
 
     // Process to handle logo click event
-    private handleLogoClick(): void {
+    private handleLogoLinkActivation(): void {
         this.$router.push('/');
         let visitCount = this.$store.getters['routerNav/getVisitCount'];
         if (visitCount > 0) {
@@ -94,8 +84,12 @@ export default class App extends Vue {
     // Returns the app to the state that was before the menu session
     private revertMenuSession(): void {
         let visitCount = this.$store.getters['routerNav/getVisitCount'];
+        // If menu session didn't include clicked publication links
         if (visitCount > 0) {
             this.$router.go(visitCount * -1);
+            this.$store.dispatch('routerNav/resetVisitCount');
+        } else if (this.$route.path.includes('publications')) { // if menu session began open b/c first visit to site was to collection
+            this.$router.push('/');
             this.$store.dispatch('routerNav/resetVisitCount');
         }
         this.$store.dispatch('menuTree/closeMenuExpansions');
@@ -104,99 +98,76 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-    $menuFont: 'Avenir', 'Open Sans', sans-serif;
-    $readFont: 'Crimson Text', serif;
-    $lefterWidth: 240px;
-    $activeSubmenuWidth: 20px;
-    $borderWidth: 3px;
-    $border: 3px solid black;
+    @import 'styles/_settings';
+    @import 'styles/focusable';
 
     * {
         margin: 0;
         padding: 0;
         color: black;
         list-style-type: none;
-    }
-
-    a {
+        font-weight: normal;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        font-size: 12px;
         text-decoration: none;
     }
 
+    body {
+        background: $bgColor;
+    }
+
     #app {
-        width: 99vw; // 100vw adds a scroll bar to the bottom of page
+        position: absolute;
+        width: $appWidth; // 100vw adds a scroll bar to the bottom of page
         height: 100vh;
 
         color: #2c3e50;
 
+        background: transparent;
+
         text-align: center;
-        font-family: $menuFont;
+        font-family: $sansSerifFont;
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
     }
 
+    .app__overlay {
+        width: 100%;
+        height: 100%;
+    }
+
     .lefter {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: $lefterWidth;
-        height: 100%;
-        z-index: 4;
-
-        outline: $border;
-    }
-
-    .grid-frame {
-        width: $lefterWidth;
-        height: $lefterWidth;
-
-        background: white;
-
-        text-align: center;
-    }
-
-    .before-appear {
-        opacity: 0;
-    }
-
-    .appear {
-        transition: opacity 0.3s ease-in;
-    }
-
-    .after-appear {
-        opacity: 1;
+        z-index: 10;
     }
 
     .content-section {
-        position: absolute;
-        width: calc(100% - #{$lefterWidth});
-        height: 100vh;
-        right: 0;
         top: 0;
+        left: 0;
+        width: calc(#{$appWidth} - #{$lefterWidth} * 1.5);
+        padding: $headerHeight 0 0 calc(#{$lefterWidth} * 1.5);
 
         overflow-x: hidden;
     }
 
-    .content-section__overlay {
+    .site-footer {
         position: fixed;
-        z-index: 4;
-        background: rgba(0, 0, 0, 0.02);
-        pointer-events: none;
-        opacity: 0;
-
-        transition: opacity 0.3s ease;
+        bottom: 0;
+        width: 100%;
+        height: $footerHeight;
+        background: transparent;
     }
 
-    .content-section__overlay--dimmed {
-        opacity: 1;
 
-        transition: opacity 0.3s ease;
-    }
 
     .component-fade-enter-active, .component-fade-leave-active {
         transition: opacity .3s ease;
     }
-    .component-fade-enter, .component-fade-leave-to
-        /* .component-fade-leave-active below version 2.1.8 */ {
+    .component-fade-enter, .component-fade-leave-to {
         opacity: 0;
     }
 </style>

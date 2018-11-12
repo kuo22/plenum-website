@@ -1,22 +1,25 @@
 <template>
     <ul
         class="main-menu"
+        :class="{'main-menu--expanded': navHovered || anyMenuIsOpen || focusedIndex > -1, 'main-menu--active': anyMenuIsOpen}"
         role="menubar"
         aria-label="Plenum Main Navigation"
+        :aria-expanded="(navHovered || focusedIndex !== -1).toString()"
 
-        @mouseover="focusedIndex = -1"
+        @mouseover="handleNavHoverEvent()"
+        @mouseleave="navHovered = false"
     >
         <li
             v-for="(menu, index) in menuItems"
             :id="menu.title.toLowerCase().replace(' ', '-') + '-main-menu-item'"
             :key="index"
 
-            class="main-menu__menu-item menu-button"
-            :class="menu.disabled ? 'main-menu__menu-item--disabled' : null"
-            :style="changeBackground(menu)"
+            class="main-menu__menu-item"
+            :class="{'main-menu__menu-item--disabled': menu.disabled, 'main-menu__menu-item--active-hovered': menu.hovered || menu.expanded}"
+            :style="{background: menu.color}"
 
-            @mouseenter="menu.hovered = true"
-            @mouseleave="menu.hovered = false"
+            @mouseenter="handleMenuItemHoverEvent($event, menu)"
+            @mouseleave="handleMenuItemHoverEvent($event, menu)"
         >
 
             <!-- If a submenu exists, make a sub-menuitem; else, make a router-link -->
@@ -24,6 +27,8 @@
                 v-if="menu.submenu && Object.getOwnPropertyNames(menu.submenu).length > 1"
                 :id="'main-menu-item-' + index"
                 :key="'link-to-' + menu.title.replace(' ', '-')"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -42,22 +47,24 @@
                 @keydown.down.prevent="moveDown"
                 @keydown.home.prevent="focusedIndex = 0"
                 @keydown.end.prevent="focusedIndex = menuItems.length - 1"
-                @keydown.tab="focusedIndex = 0"
+                @keydown.tab="focusedIndex = -1"
                 @keydown.alphabet="focusByLetter($event.key, index)"
                 @focus="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
-                ><!-- TODO: get ride of this hacky &nbsp; next to menu title -->
+                >
                     {{ menu.title }}&nbsp;
                 </span>
             </a>
             <router-link
                  v-else
-                 :to="'/' + menu.title.toLowerCase()"
+                 :to="menu.path"
                  :id="'main-menu-item-' + index"
                  :key="'link-to-' + menu.title.toLowerCase().replace(' ', '-')"
+
+                 class="focusable"
 
                  v-focus="index === focusedIndex"
 
@@ -71,17 +78,21 @@
                  @keydown.down.prevent.native="moveDown"
                  @keydown.up.prevent.native="moveUp"
                  @keydown.alphabet.native="focusByLetter($event.key, index)"
+                 @keydown.tab.native="focusedIndex = -1"
                  @focus.native="focusedIndex = index"
             >
                 <span
-                    class="main-menu__menu-item-content menu-button-content"
+                    class="main-menu__menu-item-content focusable__content"
                     tabindex="-1"
                 >
                     {{ menu.title }}&nbsp;
                 </span>
             </router-link>
 
-            <transition name="fly-out-slide">
+            <transition
+                v-if="menu.submenu && menu.submenu.length > 0"
+                name="fly-out-slide"
+            >
                 <main-menu-fly-out
                     v-show="menu.expanded"
                     class="fly-out"
@@ -104,6 +115,7 @@
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import MainMenuFlyOut from '@/components/MainMenuFlyOut';
 import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' error
+import { mapGetters } from 'vuex';
 
 
 @Component({
@@ -111,11 +123,17 @@ import { mixin as focusMixin } from 'vue-focus'; // ignore 'cannot resolve' erro
     components: {
         MainMenuFlyOut,
     },
+    computed: {
+        ...mapGetters({
+            "anyMenuIsOpen": 'menuTree/anyMenuIsOpen'
+        })
+    }
 })
 
 // Main navigation
 export default class TheMainMenu extends Vue {
     @Prop(Array) private menuItems!: Array<any>; // Main Menu Items
+    private navHovered: boolean;
 
     // Number of times a submenu link has been clicked, and therefore a new page was loaded
     private focusedIndex: number; // Index of the focused menu item; Initialize to non-existent index value
@@ -123,6 +141,7 @@ export default class TheMainMenu extends Vue {
     constructor() {
         super();
         this.focusedIndex = -1;
+        this.navHovered = false;
     }
 
     // The procedure to open an article
@@ -141,13 +160,18 @@ export default class TheMainMenu extends Vue {
         return !this.menuItems.some((menuItem: any) => menuItem.expanded);
     }
 
-    private handleHoverEvent(event, mainMenuItemIndex) {
+    private handleNavHoverEvent() {
+        this.navHovered = true;
+        this.focusedIndex = -1;
+    }
+
+    private handleMenuItemHoverEvent(event, menu) {
         if (event.type === 'mouseenter') {
-
+            menu.hovered = true;
         } else if (event.type === 'mouseleave') {
-
+            menu.hovered = false;
         } else {
-            console.error('incorrectly used function: handleHoverEvent in TheMainMenu');
+            console.error('incorrectly used function: handleMenuItemHoverEvent in TheMainMenu');
         }
     }
 
@@ -191,26 +215,6 @@ export default class TheMainMenu extends Vue {
     // Increments the number of pages visited during a menu session
     private incrementPagesVisited(): void {
         this.$store.dispatch('routerNav/pageVisited');
-    }
-
-    /*****************/
-    /* CSS FUNCTIONS */
-    /*****************/
-
-    // Changes the provided menu item background to transparent if the menu item is being hovered over or is active
-    // parameter(s) needed:
-    //      menuItem = menu item to be changed
-    private changeBackground(menuItem): {} {
-        //if (!menuItem.disabled) {
-            if (menuItem.hovered || menuItem.expanded) {
-                return {background: 'transparent'};
-            } else {
-                return {background: menuItem.color};
-            }
-        // } else {
-        //      Grayscale version of HCL(..., 25, 90)
-        //     return {background: 'rgb(226, 226, 226)'};
-        // }
     }
 
     /*********************************/
@@ -263,16 +267,50 @@ export default class TheMainMenu extends Vue {
 </script>
 
 <style lang="scss" scoped>
+    @import "../styles/_settings";
+
     $menuItemHeight: 45px;
-    $border: 3px solid black;
-    $lefterWidth: 240px;
-    $buttonTextCenterAdjustment: 3px;
+    $menuItemWidth: calc(210px + #{$borderWidth} * 2);
+
+    .main-menu {
+        width: $menuItemHeight;
+        // Minus border width to accommodate left-outline while maintaining centered position when not open
+        left: calc((50% - 45px / 2) - #{$borderWidth});
+
+        position: relative;
+        overflow: hidden;
+
+        background: $bgColor;
+
+        transition: width 0.3s ease;
+    }
+
+    .main-menu--expanded {
+        width: $menuItemWidth;
+
+        transition: width 0.3s ease;
+    }
+
+    .main-menu--active {
+        overflow: visible;
+    }
 
     .main-menu__menu-item {
+        position: unset;
+        // TODO: fix bug where menu shifts right when left outline is shown with below line uncommented
+        width: calc(#{$lefterWidth} * 2 - 15px * 2);
         height: $menuItemHeight;
         margin: 15px 0;
 
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
+    }
+
+    .main-menu__menu-item:first-child {
+        margin-top: 0;
+    }
+
+    .main-menu__menu-item:last-child {
+        margin-bottom: 0;
     }
 
     .main-menu__menu-item:hover {
@@ -281,24 +319,25 @@ export default class TheMainMenu extends Vue {
 
     .main-menu__menu-item a[role=menuitem],
     .main-menu__menu-item a[role=link] {
+        cursor: pointer;
+    }
+
+    .main-menu__menu-item a[role=menuitem] span,
+    .main-menu__menu-item a[role=link] span {
         height: $menuItemHeight;
 
-        cursor: pointer;
-
-        font-size: 1.75em;
-        font-weight: bold;
         line-height: calc(#{$menuItemHeight} + #{$buttonTextCenterAdjustment});
         text-align: right;
+        font-size: 2em;
+        font-weight: bold;
     }
 
-    .main-menu__menu-item--disabled a {
-        cursor: no-drop !important;
-        text-decoration: line-through;
+    .main-menu__menu-item--active-hovered {
+        background: $bgColor !important;
     }
 
-    .main-menu__menu-item a[role=menuitem]:focus,
-    .main-menu__menu-item a[role=link]:focus {
-        outline: none;
+    .main-menu__menu-item--disabled a span {
+        color: grey;
     }
 
     .main-menu__menu-item-content,
@@ -313,7 +352,7 @@ export default class TheMainMenu extends Vue {
         top: 0;
         height: 100%;
         width: 100%;
-        left: $lefterWidth !important;
+        left: $navBarWidth;
         outline: $border;
         // width: calc(100% - calc(#{$lefterWidth} * 2));
         z-index: -1 !important;
@@ -329,19 +368,23 @@ export default class TheMainMenu extends Vue {
 
     /* Submenu Transition Animation */
     .fly-out-slide-enter {
+        opacity: 0;
         z-index: 4;
     }
 
     .fly-out-slide-enter-active {
-        transition: all .4s ease;
+        transition: all .1s ease;
         z-index: 4;
     }
 
     .fly-out-slide-enter-to {
+        opacity: 1;
+
         z-index: 4;
     }
 
     .fly-out-slide-leave {
+        opacity: 1;
         z-index: 4;
     }
 
@@ -351,11 +394,12 @@ export default class TheMainMenu extends Vue {
     }
 
     .fly-out-slide-leave-to {
+        opacity: 0;
         z-index: 4;
-        transform: translateX(-$lefterWidth);
+        //transform: translateX(-$navBarWidth);
     }
 
     .fly-out-slide-enter {
-        transform: translateX(-$lefterWidth);
+       //transform: translateX(-$navBarWidth);
     }
 </style>

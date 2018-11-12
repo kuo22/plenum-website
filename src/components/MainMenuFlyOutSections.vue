@@ -9,14 +9,17 @@
             v-for="(menuLink, index) in menuItems"
             :key="index"
 
-            class="collection-group-menu__menu-item menu-button"
+            class="collection-group-menu__menu-item"
             role="none"
         >
             <router-link
+                v-if="menuLink.articles"
                 :to="'/' + parentMenu.title.toLowerCase() +
                      '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
 
                 :id="menuTitle.replace(' ', '') + '-section-menu-item-' + index"
+
+                class="focusable"
 
                 role="menuitem"
                 aria-haspopup="true"
@@ -27,7 +30,44 @@
 
                 @mouseover.native="menuLink.hovered = true"
                 @mouseleave.native="menuLink.hovered = false"
-                @click.native="handleLinkActivation(parentMenu, menuTitle, menuLink, false)"
+                @click.native="handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, false)"
+                @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleCollectionLinkActivation(parentMenu, menuTitle, menuLink, true)"
+                @keydown.esc.prevent.native="exitMenu(menuTitle)"
+                @keydown.left.prevent.native="exitMenu(menuTitle)"
+                @keydown.down.prevent.native="moveDown"
+                @keydown.up.prevent.native="moveUp"
+                @keydown.home.prevent.native="focusedIndex = 0"
+                @keydown.end.prevent.native="focusedIndex = menuItems.length - 1"
+                @focus.prevent.native="focusOnMenuItem(index)"
+            >
+                <span
+                    class="collection-group-menu__menu-item-content focusable__content"
+                    :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
+                    tabindex="-1"
+                >
+                    {{ menuLink.title }}&nbsp;
+                </span>
+
+            </router-link>
+            <router-link
+                v-else
+                :to="'/' + parentMenu.title.toLowerCase() +
+                     '/' + menuLink.title.replace(new RegExp(' ', 'g'), '-').toLowerCase()"
+
+                :tabindex="index === focusedIndex ? '0' : '-1'"
+
+                class="focusable"
+
+                role="menuitem"
+                aria-haspopup="false"
+
+                v-focus="index === focusedIndex"
+
+                @mouseover.native="menuLink.hovered = true"
+                @mouseleave.native="menuLink.hovered = false"
+                @click.native="handleLinkActivation()"
                 @keydown.enter.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
                 @keydown.right.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
                 @keydown.space.prevent.native="menuLink.expanded ? focusToTOC(menuLink) : handleLinkActivation(parentMenu, menuTitle, menuLink, true)"
@@ -40,13 +80,12 @@
                 @focus.prevent.native="focusOnMenuItem(index)"
             >
                 <span
-                    class="collection-group-menu__menu-item-content menu-button-content"
-                    :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
-                    tabindex="-1"
+                        class="collection-group-menu__menu-item-content focusable__content"
+                        :class="{ 'collection-group-menu__menu-item-content--active': menuLink.expanded }"
+                        tabindex="-1"
                 >
                     {{ menuLink.title }}&nbsp;
                 </span>
-
             </router-link>
 
             <!-- TODO: Add title bar that includes basic info about the issue (title, editors, published date, download all button?) -->
@@ -54,9 +93,11 @@
 
             </div-->
             <!-- TODO move to article preview component? -->
-            <transition name="preview-fade">
+            <transition
+                    name="preview-fade">
                 <main-menu-fly-out-sections-previews
                     v-show="isPreviewVisible(index)"
+                    v-if="menuLink.articles"
 
                     :sectionMenuItem="menuLink"
                     :parentMenu="parentMenu"
@@ -96,8 +137,8 @@ export default class MainMenuFlyOutSections extends Vue {
         this.focusedIndex = -1;
     }
 
-    @Emit('handleLinkActivation')
-    public handleLinkActivation(mainMenuParent: Object,
+    @Emit('handleCollectionLinkActivation')
+    public handleCollectionLinkActivation(mainMenuParent: Object,
                                sectionTitle: string,
                                submenuLink: Object): void {
         this.collectionActivated(submenuLink);
@@ -114,6 +155,11 @@ export default class MainMenuFlyOutSections extends Vue {
     @Emit('collectionActivated')
     public collectionActivated(submenuLink: any): void {}
 
+    // TODO: decouple link activation to accomodate non-collections/non-articles for page links in menu
+    private handleLinkActivation(): void {
+        this.openArticle();
+    }
+
     // Returns whether or not the collection preview should be visible
     // parameter(s) needed:
     //      menuItemIndex = the index location of the menu item in the menu list
@@ -127,7 +173,10 @@ export default class MainMenuFlyOutSections extends Vue {
     // and return the preview to the collection image
     //      index = the index location of the menu item in the menu list
     private toggleOffAllArticleItemHovers(index: number): void {
-        this.menuItems.find(item => item.expanded).articles.forEach(article => article.previewVisible = false);
+        let foundItem = this.menuItems.find(item => item.expanded);
+        if (foundItem) {
+            this.menuItems.find(item => item.expanded).articles.forEach(article => article.previewVisible = false);
+        }
     }
 
     /*********************************/
@@ -203,22 +252,29 @@ export default class MainMenuFlyOutSections extends Vue {
 </script>
 
 <style lang="scss" scoped>
-    $lefterWidth: 240px;
-    $preview-width: calc(100vw - (#{$lefterWidth} * 2) - 3px);
+    @import '../styles/_settings';
+
+    $preview-width: calc(100vw - (#{$navBarWidth} * 2) - 3px);
     $preview-height: 90vh;
+    $menuItemFontSize: calc(#{$flyoutFontSize} - 0.25em);
+
+    .collection-group-menu {
+        //padding-top: 0.25em;
+    }
 
     .collection-group-menu__menu-item {
-        height: 2.5em;
-        line-height: 45px; // TODO: use responsive unit
+        font-size: 1.75em;
+        height: $flyoutFontSize;
     }
 
     .collection-group-menu__menu-item a {
+        height: $flyoutFontSize;
         text-decoration: none;
         outline: none;
     }
 
-    .collection-group-menu__menu-item a:hover {
-        text-decoration: underline;
+    .collection-group-menu__menu-item a span {
+        font-size: $menuItemFontSize;
     }
 
     .collection-group-menu__menu-item[role=menuitem] * {
@@ -227,19 +283,17 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     .collection-group-menu__menu-item-content {
+        // Adds a 2px padding to the menu item to accommodate a black border upon activation
         border-right: 2px solid transparent;
-    }
-
-    .collection-group-menu__menu-item-content:hover {
-        border-right: 2px solid black;
     }
 
     .collection-group-menu__menu-item-content--active {
         border-right: 2px solid black;
     }
 
-    .collection-group-menu__menu-item-content:active {
-        border-right: 2px solid transparent;
+    .collection-group-menu__menu-item-content:hover,
+    .collection-group-menu__menu-item-content--active {
+        background: rgba(0, 0, 0, 0.05);
     }
 
     .collection-title-bar {
@@ -248,33 +302,12 @@ export default class MainMenuFlyOutSections extends Vue {
     }
 
     /* APPEAR TRANSITION */
+    // TODO: convert to static style change, remove vue-transition
     .preview-fade-enter {
-        opacity: 0.75;
-        /*z-index: 3 !important;*/
-    }
-
-    .preview-fade-enter-active {
-        transition: opacity 200ms ease-in;
-        /*z-index: 3 !important;*/
-    }
-
-    .preview-fade-enter-to {
         opacity: 1;
-        //z-index: 2 !important;
     }
 
-    .preview-face-leave {
-        opacity: 1;
-        //z-index: 2 !important;
-    }
-
-    .preview-fade-leave-active {
-        transition: opacity 200ms ease-out;
-        //z-index: 2 !important;
-    }
-
-    .preview-fade-leave-to {
+    .preview-fade-leave {
         opacity: 0;
-        //z-index: 1 !important;
     }
 </style>
