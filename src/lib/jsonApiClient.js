@@ -16,6 +16,10 @@ axios.interceptors.response.use(response => {
 });
 
 export default {
+    // Construct a get request to the provided API endpoint with the provided
+    // query parameters
+    //      uri: string = API endpoint
+    //      params: Object || string = query parameters in JSON API request format
     get: (uri, params = null) => {
         let query;
         if (params && typeof params === 'object') {
@@ -25,7 +29,7 @@ export default {
         } else {
             query = '';
         }
-        const url = 'http://localhost:8888/contenta/web/api/' + uri + query;
+        const url = process.env.VUE_APP_CONTENTA_API + '/' + uri + query;
         store.dispatch('setAppLoading', true);
         return axios.get(url);
     },

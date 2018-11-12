@@ -22,6 +22,11 @@ export default new Router({
             component: Home,
         },
         {
+            path: '/about',
+            name: 'about',
+            component: About,
+        },
+        {
 
             path: '/publications/:publication',
             name: 'publication-table-of-contents',
@@ -31,11 +36,6 @@ export default new Router({
             path: '/content/:content_type/:id',
             name: 'publication-article',
             component: TextArticle,
-        },
-        {
-            path: '/about',
-            name: 'about',
-            component: About,
         },
         // TODO: reformat to properly decouple, this hard-coding has to be temporary
         {
