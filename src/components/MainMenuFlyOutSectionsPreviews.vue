@@ -61,7 +61,7 @@ export default class MainMenuFlyOutSectionsPreviews extends Vue {
 
     constructor() {
         super();
-        this.baseUrl = process.env.NODE_ENV === "development" ? 'http://localhost:8888' : process.env.VUE_APP_CONTENTA_BASE;
+        this.baseUrl = process.env.VUE_APP_CONTENTA_BASE;
     }
 
     @Emit('toggleOpen')

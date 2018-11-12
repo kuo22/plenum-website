@@ -19,8 +19,6 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import { Route } from 'vue-router';
-    import { Article } from '@/types/types';
 
     @Component({
         components: {

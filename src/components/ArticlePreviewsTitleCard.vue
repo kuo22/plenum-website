@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {Article} from '../types/types';
 
 @Component({
     components: {
@@ -22,7 +21,7 @@ import {Article} from '../types/types';
 
 // Submenu associated with a unique main menu entry
 export default class ArticlePreviewsTitleCard extends Vue {
-    @Prop() private article: Article;
+    @Prop() private article: any;
 
     constructor() {
         super();
