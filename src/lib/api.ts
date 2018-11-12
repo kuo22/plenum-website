@@ -1,15 +1,12 @@
 import jsonApi from './jsonApiClient';
 import {Action} from 'vuex-class';
 import { Vue } from 'vue-property-decorator';
-import store from '@/store';
-
 
 const namespace: string = 'menuTree';
 
 class Api extends Vue {
     @Action('setMenuTree', { namespace }) public setMenuTree: any;
 
-    // TODO: ADD 'previewVisible' ATTRIBUTE TO ARTICLE CREATION IN STORE AFTER API CALL
     private articleInclusions: string = 'download,download.field_media_file,images,images.field_image,keywords';
 
     constructor() {
